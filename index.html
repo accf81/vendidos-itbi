@@ -385,6 +385,81 @@ td.tag {
   .filters-row { grid-template-columns: 1fr 1fr; }
 }
 
+/* ── RESULT CARDS (mobile) ───────────────────── */
+.mobile-cards-view {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+}
+.result-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.result-card-addr {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+.result-card-comp {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: -4px;
+}
+.result-card-edificio {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.result-card-values {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 10px;
+  margin: 2px 0;
+}
+.result-card-val {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.result-card-val-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+}
+.result-card-val-num {
+  font-size: 13px;
+  font-weight: 700;
+}
+.result-card-val-num.money { color: var(--success); }
+.result-card-val-num.m2    { color: var(--accent); }
+.result-card-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border);
+}
+.result-card-tag {
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 2px 7px;
+}
+
 /* ── AUTOCOMPLETE ───────────────────────────── */
 .autocomplete-wrapper { position: relative; flex: 1; min-width: 0; }
 .autocomplete-wrapper.input-num { flex: 0 0 90px; }
@@ -1039,6 +1114,17 @@ function renderTable() {
     `${filteredResults.length.toLocaleString('pt-BR')} resultado${filteredResults.length !== 1 ? 's' : ''}` +
     (filteredResults.length < allResults.length ? ` (filtrado de ${allResults.length.toLocaleString('pt-BR')})` : '');
 
+  // Use card layout on mobile
+  if (window.innerWidth <= 640) {
+    renderCards();
+    return;
+  }
+
+  // Hide cards view if switching back to desktop
+  var existing = document.querySelector('.mobile-cards-view');
+  if (existing) existing.remove();
+  document.querySelector('.table-wrap').style.display = '';
+
   // Header
   const headerRow = document.getElementById('headerRow');
   headerRow.innerHTML = COLS.map(c => {
@@ -1082,6 +1168,77 @@ function renderTable() {
 
   tbody.innerHTML = rows;
   setupColResize();
+}
+
+// ─── CARDS (mobile) ──────────────────────────────────────────────────
+function renderCards() {
+  // Hide table
+  document.querySelector('.table-wrap').style.display = 'none';
+  document.getElementById('headerRow').innerHTML = '';
+  document.getElementById('filterRow').innerHTML = '';
+  document.getElementById('resultsBody').innerHTML = '';
+
+  // Remove old cards view
+  var old = document.querySelector('.mobile-cards-view');
+  if (old) old.remove();
+
+  const empty = document.getElementById('emptyState');
+  if (filteredResults.length === 0) {
+    empty.classList.remove('hidden');
+    return;
+  }
+  empty.classList.add('hidden');
+
+  var container = document.createElement('div');
+  container.className = 'mobile-cards-view';
+
+  filteredResults.forEach(function(row) {
+    var addr = (row.logradouro || '—');
+    if (row.numero) addr += ', ' + row.numero;
+    var comp = '';
+    if (row.complemento) comp += row.complemento;
+    if (row.bairro) comp += (comp ? ' · ' : '') + row.bairro;
+
+    var edificio = row.referencia || '';
+    var area = row.area_construida_m2 ? Number(row.area_construida_m2).toLocaleString('pt-BR') + ' m²' : '—';
+    var valor = row.valor_transacao ? formatMoney(row.valor_transacao) : '—';
+    var vm2 = row.valor_m2 ? formatMoney(row.valor_m2) : '—';
+    var data = row.data_transacao ? formatDate(row.data_transacao) : '—';
+    var cart = row.cartorio ? shortCartorio(row.cartorio) : '';
+    var mat = row.matricula || '';
+    var sql = row.sql || '';
+
+    var card = document.createElement('div');
+    card.className = 'result-card';
+    card.innerHTML =
+      '<div class="result-card-addr">' + addr + '</div>' +
+      (comp ? '<div class="result-card-comp">' + comp + '</div>' : '') +
+      (edificio ? '<div class="result-card-edificio">🏢 ' + edificio + '</div>' : '') +
+      '<div class="result-card-values">' +
+        '<div class="result-card-val">' +
+          '<span class="result-card-val-label">Área</span>' +
+          '<span class="result-card-val-num">' + area + '</span>' +
+        '</div>' +
+        '<div class="result-card-val">' +
+          '<span class="result-card-val-label">Valor</span>' +
+          '<span class="result-card-val-num money">' + valor + '</span>' +
+        '</div>' +
+        '<div class="result-card-val">' +
+          '<span class="result-card-val-label">R$/m²</span>' +
+          '<span class="result-card-val-num m2">' + vm2 + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="result-card-footer">' +
+        '<span class="result-card-tag">📅 ' + data + '</span>' +
+        (cart ? '<span class="result-card-tag">' + cart + '</span>' : '') +
+        (mat ? '<span class="result-card-tag">Mat. ' + mat + '</span>' : '') +
+        (sql ? '<span class="result-card-tag">SQL ' + sql + '</span>' : '') +
+      '</div>';
+
+    container.appendChild(card);
+  });
+
+  document.getElementById('resultsPanel').appendChild(container);
 }
 
 function applyColFilter(key, val) {
