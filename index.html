@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vendidos ITBI">
+<meta name="theme-color" content="#0f0f0f" id="themeColor">
+<title>Vendidos ITBI — Pandora Homes</title>
+<link rel="manifest" href="manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+<style>
+:root {
+  --bg:       #0f0f0f;
+  --surface:  #1a1a1a;
+  --surface2: #242424;
+  --border:   #2e2e2e;
+  --text:     #e8e8e8;
+  --muted:    #888;
+  --accent:   #ff6600;
+  --accent2:  #cc5200;
+  --success:  #22c55e;
+  --warning:  #f59e0b;
+  --danger:   #ef4444;
+  --header-h: 56px;
+  --radius:   10px;
+  --shadow:   0 2px 12px rgba(0,0,0,.4);
+}
+[data-theme="light"] {
+  --bg:       #f0f2f5;
+  --surface:  #ffffff;
+  --surface2: #f8f9fa;
+  --border:   #dde1e7;
+  --text:     #1a1a2e;
+  --muted:    #6b7280;
+  --accent:   #ff6600;
+  --accent2:  #cc5200;
+  --shadow:   0 2px 12px rgba(0,0,0,.1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow-x: hidden; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  transition: background .2s, color .2s;
+}
+
+/* ── LOADING ───────────────────────────────── */
+#loading {
+  position: fixed; inset: 0; z-index: 999;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px;
+}
+#loading h2 { font-size: 20px; font-weight: 600; }
+#loading p  { color: var(--muted); font-size: 13px; }
+.spinner {
+  width: 44px; height: 44px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.progress-bar {
+  width: 240px; height: 4px;
+  background: var(--border); border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--accent);
+  border-radius: 2px;
+  transition: width .3s;
+  width: 0%;
+}
+
+/* ── HEADER ────────────────────────────────── */
+header {
+  position: sticky; top: 0; z-index: 100;
+  height: var(--header-h);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  padding: 0 16px; gap: 12px;
+  box-shadow: var(--shadow);
+}
+.logo { font-size: 18px; font-weight: 700; letter-spacing: -.3px; flex: 1; }
+.logo span { color: var(--accent); }
+.badge {
+  font-size: 10px; font-weight: 600;
+  background: var(--accent); color: #fff;
+  padding: 2px 7px; border-radius: 20px;
+  letter-spacing: .5px;
+}
+.btn-icon {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: background .15s, border-color .15s;
+}
+.btn-icon:hover { background: var(--border); }
+
+/* ── MAIN LAYOUT ───────────────────────────── */
+main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* ── SEARCH PANEL ──────────────────────────── */
+.search-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow);
+}
+.panel-title {
+  font-size: 11px; font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+.search-section { margin-bottom: 16px; }
+.search-section-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 8px;
+  display: flex; align-items: center; gap: 6px;
+}
+.divider {
+  text-align: center;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 12px 0;
+  position: relative;
+}
+.divider::before, .divider::after {
+  content: ''; position: absolute; top: 50%;
+  width: 42%; height: 1px; background: var(--border);
+}
+.divider::before { left: 0; }
+.divider::after  { right: 0; }
+
+/* Address cards */
+.address-cards { display: flex; flex-direction: column; gap: 8px; }
+.address-card {
+  display: flex; gap: 8px; align-items: center;
+}
+.address-num {
+  min-width: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  text-align: right;
+}
+.addr-fields { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
+.input-rua  { flex: 1; min-width: 160px; }
+.input-num  { width: 90px; }
+
+/* Inputs */
+input[type=text], input[type=number], select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color .15s, box-shadow .15s;
+  outline: none;
+}
+input::placeholder { color: var(--muted); }
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(255,102,0,.15);
+}
+select { cursor: pointer; }
+
+/* Filters row */
+.filters-row {
+  display: grid;
+  grid-template-columns: 1fr 100px 100px;
+  gap: 8px;
+}
+.filter-group label {
+  display: block;
+  font-size: 11px; font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+/* Buttons */
+.btn-add {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--accent);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  margin-top: 4px;
+}
+.btn-add:hover { background: rgba(74,158,255,.08); border-color: var(--accent); }
+.btn-remove {
+  width: 30px; height: 30px;
+  min-width: 30px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--muted);
+  border-radius: 7px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  transition: background .15s, color .15s;
+}
+.btn-remove:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+.btn-search {
+  width: 100%;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 12px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .3px;
+  transition: background .15s, transform .1s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-top: 8px;
+}
+.btn-search:hover  { background: var(--accent2); }
+.btn-search:active { transform: scale(.98); }
+
+/* ── STATS BAR ──────────────────────────────── */
+.stats-bar {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  display: flex; gap: 24px; flex-wrap: wrap;
+  align-items: center;
+}
+.stat { display: flex; flex-direction: column; gap: 2px; }
+.stat-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.stat-value { font-size: 18px; font-weight: 700; }
+.stat-value.accent { color: var(--accent); }
+.stat-value.success { color: var(--success); }
+.stats-bar .sep { width: 1px; height: 36px; background: var(--border); }
+
+/* ── RESULTS TABLE ──────────────────────────── */
+.results-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.table-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  flex-wrap: wrap;
+}
+.table-header h3 { font-size: 14px; font-weight: 700; flex: 1; }
+.table-wrap { overflow-x: hidden; -webkit-overflow-scrolling: touch; }
+@media (max-width: 900px) { .table-wrap { overflow-x: auto; } }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  table-layout: fixed;
+}
+/* Fixed column widths — all columns visible without horizontal scroll */
+thead th:nth-child(1)  { width: 7%;  } /* Data */
+thead th:nth-child(2)  { width: 14%; } /* Rua */
+thead th:nth-child(3)  { width: 4%;  } /* Nº */
+thead th:nth-child(4)  { width: 9%;  } /* Complemento */
+thead th:nth-child(5)  { width: 10%; } /* Bairro */
+thead th:nth-child(6)  { width: 11%; } /* Edifício */
+thead th:nth-child(7)  { width: 5%;  } /* A.C. */
+thead th:nth-child(8)  { width: 10%; } /* Valor */
+thead th:nth-child(9)  { width: 8%;  } /* R$/m² */
+thead th:nth-child(10) { width: 6%;  } /* Cartório */
+thead th:nth-child(11) { width: 10%; } /* Matrícula */
+thead th:nth-child(12) { width: 6%;  } /* SQL */
+thead th {
+  background: var(--surface2);
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 2px solid var(--border);
+  position: sticky; top: 0;
+  transition: background .15s, color .15s;
+}
+thead th:hover { background: var(--border); color: var(--text); }
+thead th.sorted { color: var(--accent); }
+thead th .sort-icon { margin-left: 4px; opacity: .5; }
+thead th.sorted .sort-icon { opacity: 1; }
+
+.filter-row th {
+  background: var(--surface2);
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 33px;
+}
+.filter-row th input {
+  padding: 5px 8px;
+  font-size: 12px;
+  border-radius: 5px;
+  width: 100%;
+  min-width: 0;
+}
+
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background .1s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--surface2); }
+tbody td {
+  padding: 10px 12px;
+  vertical-align: middle;
+  white-space: nowrap;
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+td.val-money { font-weight: 700; color: var(--success); }
+td.val-m2    { color: var(--accent); font-weight: 600; }
+td.val-date  { color: var(--muted); font-size: 12px; }
+td.tag {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.empty-state {
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--muted);
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state h3 { font-size: 16px; margin-bottom: 6px; color: var(--text); }
+
+/* ── MOBILE ──────────────────────────────────── */
+@media (max-width: 640px) {
+  :root { --header-h: 52px; }
+  main { padding: 12px; gap: 12px; }
+  .search-panel { padding: 16px; }
+  .filters-row { grid-template-columns: 1fr 1fr; }
+  .addr-fields { flex-wrap: nowrap; }
+  .input-rua { min-width: 120px; }
+  .stats-bar { gap: 12px; padding: 12px 16px; }
+  .stat-value { font-size: 15px; }
+  .logo { font-size: 15px; }
+  thead th, tbody td { padding: 7px 9px; font-size: 12px; }
+}
+@media (max-width: 400px) {
+  .filters-row { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── AUTOCOMPLETE ───────────────────────────── */
+.autocomplete-wrapper { position: relative; flex: 1; min-width: 0; }
+.autocomplete-wrapper.input-num { flex: 0 0 90px; }
+.autocomplete-list {
+  position: absolute;
+  top: calc(100% + 2px); left: 0; right: 0;
+  z-index: 500;
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 0 0 9px 9px;
+  max-height: 220px;
+  overflow-y: auto;
+  box-shadow: 0 6px 20px rgba(0,0,0,.5);
+}
+.autocomplete-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  transition: background .1s, color .1s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.autocomplete-item:last-child { border-bottom: none; }
+.autocomplete-item:hover, .autocomplete-item.active {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-clear {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: var(--surface2);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+}
+.btn-clear:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+.btn-export {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--success);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.btn-export:hover { opacity: .85; }
+/* ── COL RESIZE ─────────────────────────────────────────────────── */
+thead th {
+  position: relative;
+}
+.col-resize-handle {
+  position: absolute;
+  top: 0; right: 0;
+  width: 5px; height: 100%;
+  cursor: col-resize;
+  user-select: none;
+  z-index: 1;
+}
+.col-resize-handle:hover,
+.col-resize-active {
+  background: var(--accent);
+  opacity: .5;
+}
+/* ── UTIL ────────────────────────────────────── */
+.hidden { display: none !important; }
+.chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 700;
+  background: rgba(255,102,0,.15);
+  color: var(--accent);
+}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="spinner"></div>
+  <h2>Vendidos ITBI</h2>
+  <p id="loadingMsg">Inicializando...</p>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">🏢 <span>Pandora</span> Vendidos</div>
+    <span class="badge">ITBI SP</span>
+    <button class="btn-icon" id="btnTheme" title="Alternar tema" onclick="toggleTheme()">☀️</button>
+  </header>
+
+  <main>
+
+    <!-- SEARCH -->
+    <div class="search-panel">
+      <div class="panel-title">🔍 Busca</div>
+
+      <!-- Address cards -->
+      <div class="search-section">
+        <div class="search-section-label">📍 Por endereço</div>
+        <div class="address-cards" id="addressCards"></div>
+        <button class="btn-add" onclick="addAddressCard()">+ Adicionar endereço</button>
+      </div>
+
+      <div class="divider">OU</div>
+
+      <!-- Building name (multiple) -->
+      <div class="search-section">
+        <div class="search-section-label">🏢 Por nome do edifício</div>
+        <div class="address-cards" id="edificioCards"></div>
+        <button class="btn-add" onclick="addEdificioCard()">+ Adicionar edifício</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-row" style="margin-bottom:14px; margin-top:8px;">
+        <div class="filter-group">
+          <label>Bairro</label>
+          <div class="autocomplete-wrapper" style="width:100%">
+            <input type="text" id="inputBairro" placeholder="Ex: Jardim América" autocomplete="off" style="width:100%">
+            <div class="autocomplete-list hidden" id="ac-bairro"></div>
+          </div>
+        </div>
+
+        <div class="filter-group">
+          <label>De (ano)</label>
+          <select id="selectAnoIni">
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Até (ano)</label>
+          <select id="selectAnoFim">
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+          </select>
+        </div>
+      </div>
+
+      <button class="btn-search" onclick="doSearch()">
+        <span>🔍</span> Buscar
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar hidden" id="statsBar">
+      <div class="stat">
+        <span class="stat-label">Resultados</span>
+        <span class="stat-value accent" id="statTotal">—</span>
+      </div>
+      <div class="sep"></div>
+      <div class="stat">
+        <span class="stat-label">Ticket Médio</span>
+        <span class="stat-value" id="statMedia">—</span>
+      </div>
+      <div class="sep"></div>
+      <div class="stat">
+        <span class="stat-label">Mais recente</span>
+        <span class="stat-value" id="statRecente">—</span>
+      </div>
+      <div class="sep"></div>
+      <div class="stat">
+        <span class="stat-label">Mais antiga</span>
+        <span class="stat-value" id="statAntiga">—</span>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="results-panel hidden" id="resultsPanel">
+      <div class="table-header">
+        <h3 id="resultsTitle">Resultados</h3>
+        <button class="btn-clear hidden" id="btnClear" onclick="clearSearch()" title="Limpar busca">✕ Limpar</button>
+        <button class="btn-export hidden" id="btnExport" onclick="exportCSV()" title="Exportar para planilha">📥 Exportar</button>
+      </div>
+      <div class="table-wrap">
+        <table id="resultsTable">
+          <thead>
+            <tr id="headerRow"></tr>
+            <tr class="filter-row" id="filterRow"></tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+      <div class="empty-state hidden" id="emptyState">
+        <div class="icon">🔍</div>
+        <h3>Nenhum resultado encontrado</h3>
+        <p>Tente buscar por outros endereços ou ampliar o período.</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────
+const DB_URL = './ITBI_SP_residencial.db.gz';
+const COLS = [
+  { key: 'data_transacao',    label: 'Data',       fmt: 'date'  },
+  { key: 'logradouro',        label: 'Rua',        fmt: 'text'  },
+  { key: 'numero',            label: 'Nº',         fmt: 'text'  },
+  { key: 'complemento',       label: 'Complemento',fmt: 'text'  },
+  { key: 'bairro',            label: 'Bairro',     fmt: 'text'  },
+  { key: 'referencia',        label: 'Edifício',   fmt: 'text'  },
+  { key: 'area_construida_m2',label: 'A.C. (m²)',  fmt: 'num'   },
+  { key: 'valor_transacao',   label: 'Valor',      fmt: 'money' },
+  { key: 'valor_m2',          label: 'R$/m²',      fmt: 'money' },
+  { key: 'cartorio',          label: 'Cartório',   fmt: 'cartorio' },
+  { key: 'matricula',         label: 'Matrícula',  fmt: 'text'  },
+  { key: 'sql',               label: 'SQL',        fmt: 'text'  },
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────
+let db = null;
+let colWidths = {}; // user-set column widths in px
+let allResults = [];
+let filteredResults = [];
+let sortCol = 'data_transacao';
+let sortDir = 'DESC';
+let cardCount = 0;
+let colFilters = {};
+
+// ─── INIT ───────────────────────────────────────────────────────────
+window.addEventListener('load', async () => {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  }
+  addAddressCard();
+  addEdificioCard();
+  await loadDatabase();
+});
+
+async function loadDatabase() {
+  try {
+    setProgress(5, 'Carregando motor SQL...');
+    const SQL = await initSqlJs({
+      locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
+    });
+
+    setProgress(20, 'Baixando banco de dados (47 MB)...');
+    const res = await fetch(DB_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const reader = res.body.getReader();
+    const total = parseInt(res.headers.get('content-length') || '0');
+    let received = 0;
+    const chunks = [];
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      if (total > 0) {
+        const pct = 20 + Math.round((received / total) * 50);
+        setProgress(pct, `Baixando... ${Math.round(received/1024/1024)}MB de ${Math.round(total/1024/1024)}MB`);
+      }
+    }
+
+    setProgress(72, 'Descomprimindo...');
+    const compressed = new Uint8Array(received);
+    let offset = 0;
+    for (const chunk of chunks) { compressed.set(chunk, offset); offset += chunk.length; }
+    const decompressed = pako.inflate(compressed);
+
+    setProgress(90, 'Preparando banco...');
+    db = new SQL.Database(decompressed);
+
+    setProgress(100, 'Pronto!');
+    setTimeout(() => {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+
+      // DB sanity check
+      try {
+        var ts = db.prepare('SELECT COUNT(*) as n FROM vendas');
+        ts.step(); var cnt = ts.getAsObject(); ts.free();
+        console.log('DB OK, total rows:', cnt.n);
+      } catch(e) { console.error('DB check failed:', e); }
+
+      // Autocomplete para edifício e bairro
+      // Edificio autocomplete set up per card via addEdificioCard()
+      setupSimpleAutocomplete('inputBairro', 'ac-bairro',
+        () => `SELECT DISTINCT bairro FROM vendas WHERE UPPER(bairro) LIKE ? ORDER BY bairro LIMIT 15`
+      );
+    }, 400);
+
+  } catch (e) {
+    document.getElementById('loadingMsg').textContent = '❌ Erro: ' + e.message;
+    document.getElementById('loadingMsg').style.color = '#ef4444';
+    console.error(e);
+  }
+}
+
+function setProgress(pct, msg) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('loadingMsg').textContent = msg;
+}
+
+// ─── THEME ─────────────────────────────────────────────────────────
+function toggleTheme() {
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('btnTheme').textContent = isDark ? '🌙' : '☀️';
+  document.getElementById('themeColor').content = isDark ? '#ffffff' : '#0f0f0f';
+}
+
+// ─── ADDRESS CARDS ──────────────────────────────────────────────────
+let edificioCount = 0;
+
+function addEdificioCard() {
+  edificioCount++;
+  const eid = edificioCount;
+  const container = document.getElementById('edificioCards');
+  const card = document.createElement('div');
+  card.className = 'address-card edificio-card';
+  card.id = 'edificio-card-' + eid;
+  card.dataset.eid = eid;
+  card.innerHTML =
+    '<span class="address-num">' + eid + '.</span>' +
+    '<div class="autocomplete-wrapper" style="flex:1">' +
+      '<input type="text" id="edicifio-val-' + eid + '" placeholder="Ex: Villa Rica, Palazzo, Uirapuru..." autocomplete="off" spellcheck="false" style="width:100%">' +
+      '<div class="autocomplete-list hidden" id="ac-ed-' + eid + '"></div>' +
+    '</div>' +
+    '<button class="btn-remove" onclick="removeEdificioCard(' + eid + ')" title="Remover">×</button>';
+  container.appendChild(card);
+  document.getElementById('edicifio-val-' + eid).focus();
+  // Setup autocomplete for this card
+  setupSimpleAutocomplete('edicifio-val-' + eid, 'ac-ed-' + eid,
+    function() { return "SELECT DISTINCT referencia FROM vendas WHERE UPPER(referencia) LIKE ? AND referencia IS NOT NULL AND referencia != '' ORDER BY referencia LIMIT 15"; }
+  );
+}
+
+function removeEdificioCard(eid) {
+  var cards = document.querySelectorAll('.edificio-card');
+  if (cards.length <= 1) return;
+  document.getElementById('edificio-card-' + eid)?.remove();
+}
+
+function addAddressCard() {
+  cardCount++;
+  const id = cardCount;
+  const container = document.getElementById('addressCards');
+  const card = document.createElement('div');
+  card.className = 'address-card';
+  card.id = `card-${id}`;
+  card.innerHTML = `
+    <span class="address-num">${id}.</span>
+    <div class="addr-fields">
+      <div class="autocomplete-wrapper">
+        <input type="text" id="rua-${id}" placeholder="Logradouro (ex: Alameda Tietê)" autocomplete="off" spellcheck="false" style="width:100%">
+        <div class="autocomplete-list hidden" id="ac-rua-${id}"></div>
+      </div>
+      <div class="autocomplete-wrapper input-num">
+        <input type="text" id="num-${id}" placeholder="Número" autocomplete="off" style="width:100%">
+        <div class="autocomplete-list hidden" id="ac-num-${id}"></div>
+      </div>
+    </div>
+    <button class="btn-remove" onclick="removeCard(${id})" title="Remover">×</button>`;
+  container.appendChild(card);
+  document.getElementById(`rua-${id}`).focus();
+  setupCardAutocomplete(id);
+}
+
+function removeCard(id) {
+  const cards = document.querySelectorAll('.address-card');
+  if (cards.length <= 1) return;
+  document.getElementById(`card-${id}`)?.remove();
+}
+
+// ─── AUTOCOMPLETE ───────────────────────────────────────────────────
+let acDebounce = {};
+
+function showDropdown(listEl, items, onSelect) {
+  closeAllDropdowns();
+  if (!items || items.length === 0) return;
+  listEl.innerHTML = '';
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'autocomplete-item';
+    div.textContent = item;
+    div.addEventListener('mousedown', e => { e.preventDefault(); onSelect(item); closeAllDropdowns(); });
+    listEl.appendChild(div);
+  });
+  listEl.classList.remove('hidden');
+}
+
+function closeAllDropdowns() {
+  document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden'));
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.autocomplete-wrapper')) closeAllDropdowns();
+});
+
+function queryDB(sql, params) {
+  if (!db) return [];
+  try {
+    var stmt = db.prepare(sql);
+    stmt.bind(params);
+    var rows = [];
+    while (stmt.step()) {
+      var r = stmt.getAsObject();
+      var v = Object.values(r)[0];
+      if (v !== null && v !== undefined && v !== '') rows.push(v);
+    }
+    stmt.free();
+    return rows;
+  } catch(e) {
+    console.warn('queryDB error:', e.message, '|', sql);
+    return [];
+  }
+}
+
+function setupCardAutocomplete(id) {
+  const ruaEl = document.getElementById(`rua-${id}`);
+  const numEl = document.getElementById(`num-${id}`);
+  const ruaList = document.getElementById(`ac-rua-${id}`);
+  const numList = document.getElementById(`ac-num-${id}`);
+
+  ruaEl.addEventListener('input', () => {
+    clearTimeout(acDebounce[`rua-${id}`]);
+    acDebounce[`rua-${id}`] = setTimeout(() => {
+      const val = ruaEl.value.trim();
+      if (val.length < 2) { closeAllDropdowns(); return; }
+      const norm = removeAccents(val.toUpperCase());
+      const items = queryDB(
+        `SELECT DISTINCT logradouro FROM vendas WHERE logradouro LIKE ? ORDER BY logradouro LIMIT 15`,
+        [`%${norm}%`]
+      );
+      showDropdown(ruaList, items, chosen => {
+        ruaEl.value = chosen;
+        numEl.focus();
+        // Show numbers for chosen street
+        const nums = queryDB(
+          `SELECT DISTINCT numero FROM vendas WHERE logradouro=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
+          [chosen]
+        );
+        showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
+      });
+    }, 220);
+  });
+
+  ruaEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
+
+  numEl.addEventListener('focus', () => {
+    const street = ruaEl.value.trim();
+    if (!street || numEl.value) return;
+    const nums = queryDB(
+      `SELECT DISTINCT numero FROM vendas WHERE logradouro=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
+      [street]
+    );
+    showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
+  });
+
+  numEl.addEventListener('input', () => {
+    clearTimeout(acDebounce[`num-${id}`]);
+    acDebounce[`num-${id}`] = setTimeout(() => {
+      const street = ruaEl.value.trim();
+      const val = numEl.value.trim();
+      if (!val) return;
+      const items = queryDB(
+        `SELECT DISTINCT numero FROM vendas WHERE logradouro LIKE ? AND numero LIKE ? ORDER BY CAST(numero AS INTEGER) LIMIT 20`,
+        [`%${removeAccents(street.toUpperCase())}%`, `${val}%`]
+      );
+      showDropdown(numList, items, n => { numEl.value = n; doSearch(); });
+    }, 200);
+  });
+
+  numEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
+}
+
+function setupSimpleAutocomplete(inputId, listId, getSql, transform) {
+  const el = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  if (!el || !list) return;
+  el.addEventListener('input', () => {
+    clearTimeout(acDebounce[inputId]);
+    acDebounce[inputId] = setTimeout(() => {
+      const val = el.value.trim();
+      if (val.length < 2) { closeAllDropdowns(); return; }
+      const norm = removeAccents(val.toUpperCase());
+      const items = queryDB(getSql(norm), [`%${norm}%`]);
+      showDropdown(list, items, chosen => { el.value = chosen; });
+    }, 220);
+  });
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
+}
+
+// ─── NORMALIZE ──────────────────────────────────────────────────────
+function removeAccents(str) {
+  var norm = str.normalize('NFD');
+  return norm.replace(/[\u0300-\u036f]/g, '');
+}
+
+function normalizeStreet(input) {
+  // Uppercase + remove accents
+  let s = removeAccents(input.trim().toUpperCase());
+  // Strip common type prefixes (full name or abbreviation)
+  const prefixes = [
+    'ALAMEDA','AVENIDA','TRAVESSA','ESTRADA','RODOVIA','PRACA','LARGO','RUA',
+    'AL','AV','EST','TV','PC','R'
+  ];
+  for (const p of prefixes) {
+    const re = new RegExp('^' + p + '\\s+');
+    if (re.test(s)) { s = s.replace(re, '').trim(); break; }
+  }
+  return s;
+}
+
+// ─── SEARCH ─────────────────────────────────────────────────────────
+function doSearch() {
+  if (!db) return;
+
+  const anoIni = document.getElementById('selectAnoIni').value;
+  const anoFim = document.getElementById('selectAnoFim').value;
+  const bairro = document.getElementById('inputBairro').value.trim();
+  // Collect edificio cards
+  const edificios = [];
+  document.querySelectorAll('.edificio-card').forEach(card => {
+    const id = card.dataset.eid;
+    const val = document.getElementById('edicifio-val-' + id)?.value.trim();
+    if (val) edificios.push(val);
+  });
+
+  // Collect address cards
+  const addresses = [];
+  document.querySelectorAll('.address-card:not(.edificio-card)').forEach(card => {
+    const id = card.id.replace('card-', '');
+    const rua = document.getElementById(`rua-${id}`)?.value?.trim() || '';
+    const num = document.getElementById(`num-${id}`)?.value?.trim() || '';
+    if (rua) addresses.push({ rua, num });
+  });
+
+  if (addresses.length === 0 && edificios.length === 0) {
+    alert('Digite pelo menos um endereço ou nome de edifício para buscar.');
+    return;
+  }
+
+  // Build WHERE clause with positional ? params
+  const conditions = [];
+  const params = [];
+
+  // Addresses and edificios are OR'ed together in one group
+  var searchClauses = [];
+  addresses.forEach(function(a) {
+    const normalized = normalizeStreet(a.rua);
+    params.push('%' + normalized + '%');
+    let clause = 'logradouro LIKE ?';
+    if (a.num) {
+      params.push(a.num.trim());
+      clause += ' AND numero = ?';
+    }
+    searchClauses.push('(' + clause + ')');
+  });
+  edificios.forEach(function(ed) {
+    var edUp = ed.toUpperCase();
+    params.push('%' + edUp + '%');
+    params.push('%' + edUp + '%');
+    searchClauses.push('(UPPER(referencia) LIKE ? OR UPPER(complemento) LIKE ?)');
+  });
+  if (searchClauses.length > 0) {
+    conditions.push('(' + searchClauses.join(' OR ') + ')');
+  }
+
+  if (bairro) {
+    params.push('%' + bairro.toUpperCase() + '%');
+    conditions.push('UPPER(bairro) LIKE ?');
+  }
+
+  conditions.push('ano >= ' + parseInt(anoIni) + ' AND ano <= ' + parseInt(anoFim));
+
+  var sql = 'SELECT sql, data_transacao, logradouro, numero, complemento, bairro, ' +
+    'referencia, area_construida_m2, ' +
+    'valor_transacao, valor_m2, cartorio, matricula ' +
+    'FROM vendas WHERE ' + conditions.join(' AND ') +
+    ' ORDER BY data_transacao DESC LIMIT 2000';
+
+  console.log('SQL:', sql);
+  console.log('PARAMS:', JSON.stringify(params));
+
+  try {
+    var stmt = db.prepare(sql);
+    stmt.bind(params);
+    allResults = [];
+    while (stmt.step()) allResults.push(stmt.getAsObject());
+    stmt.free();
+    console.log('Results found:', allResults.length);
+  } catch (e) {
+    console.error('SQL Error:', e.message);
+    alert('Erro na consulta: ' + e.message);
+    return;
+  }
+
+  colFilters = {};
+  filteredResults = [...allResults];
+  renderStats();
+  renderTable();
+}
+
+// ─── STATS ──────────────────────────────────────────────────────────
+function renderStats() {
+  const data = filteredResults;
+  document.getElementById('statsBar').classList.toggle('hidden', data.length === 0);
+  if (data.length === 0) return;
+
+  document.getElementById('statTotal').textContent = data.length.toLocaleString('pt-BR');
+
+  const vals = data.filter(r => r.valor_transacao > 0).map(r => r.valor_transacao);
+  const media = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+  document.getElementById('statMedia').textContent = formatMoney(media);
+
+  const dates = data.filter(r => r.data_transacao).map(r => r.data_transacao).sort();
+  document.getElementById('statRecente').textContent = dates.length ? formatDate(dates[dates.length - 1]) : '—';
+  document.getElementById('statAntiga').textContent  = dates.length ? formatDate(dates[0]) : '—';
+}
+
+// ─── TABLE ──────────────────────────────────────────────────────────
+function renderTable() {
+  const panel = document.getElementById('resultsPanel');
+  const empty = document.getElementById('emptyState');
+  panel.classList.remove('hidden');
+  var exportBtn = document.getElementById('btnExport');
+  var clearBtn = document.getElementById('btnClear');
+  var hasResults = filteredResults.length > 0;
+  if (exportBtn) exportBtn.classList.toggle('hidden', !hasResults);
+  if (clearBtn) clearBtn.classList.toggle('hidden', !hasResults);
+
+  document.getElementById('resultsTitle').textContent =
+    `${filteredResults.length.toLocaleString('pt-BR')} resultado${filteredResults.length !== 1 ? 's' : ''}` +
+    (filteredResults.length < allResults.length ? ` (filtrado de ${allResults.length.toLocaleString('pt-BR')})` : '');
+
+  // Header
+  const headerRow = document.getElementById('headerRow');
+  headerRow.innerHTML = COLS.map(c => {
+    const isSorted = sortCol === c.key;
+    const icon = isSorted ? (sortDir === 'ASC' ? '↑' : '↓') : '↕';
+    return `<th onclick="sortBy('${c.key}')" class="${isSorted ? 'sorted' : ''}">
+      ${c.label} <span class="sort-icon">${icon}</span>
+    </th>`;
+  }).join('');
+
+  // Filter row
+  const filterRow = document.getElementById('filterRow');
+  filterRow.innerHTML = COLS.map(c =>
+    `<th><input type="text" placeholder="Filtrar" value="${colFilters[c.key] || ''}"
+      oninput="applyColFilter('${c.key}', this.value)" style="min-width:55px;"></th>`
+  ).join('');
+
+  // Body
+  const tbody = document.getElementById('resultsBody');
+  if (filteredResults.length === 0) {
+    empty.classList.remove('hidden');
+    tbody.innerHTML = '';
+    return;
+  }
+  empty.classList.add('hidden');
+
+  const rows = filteredResults.map(row => {
+    const cells = COLS.map(c => {
+      const v = row[c.key];
+      if (v === null || v === undefined || v === '') return `<td class="tag">—</td>`;
+      switch (c.fmt) {
+        case 'date':  return `<td class="val-date">${formatDate(v)}</td>`;
+        case 'money': return `<td class="val-money">${formatMoney(v)}</td>`;
+        case 'num':   return `<td>${v ? Number(v).toLocaleString('pt-BR') : '—'}</td>`;
+        case 'cartorio': return `<td class="tag">${shortCartorio(v)}</td>`;
+        default:      return `<td>${v}</td>`;
+      }
+    }).join('');
+    return `<tr>${cells}</tr>`;
+  }).join('');
+
+  tbody.innerHTML = rows;
+  setupColResize();
+}
+
+function applyColFilter(key, val) {
+  colFilters[key] = val.trim().toUpperCase();
+  filteredResults = allResults.filter(row =>
+    Object.entries(colFilters).every(([k, v]) => {
+      if (!v) return true;
+      const cell = String(row[k] ?? '').toUpperCase();
+      return cell.includes(v);
+    })
+  );
+  renderStats();
+  renderTable();
+}
+
+function sortBy(key) {
+  if (sortCol === key) {
+    sortDir = sortDir === 'DESC' ? 'ASC' : 'DESC';
+  } else {
+    sortCol = key;
+    sortDir = 'DESC';
+  }
+  const col = COLS.find(c => c.key === key);
+  filteredResults.sort((a, b) => {
+    let va = a[key] ?? '', vb = b[key] ?? '';
+    if (col?.fmt === 'money' || col?.fmt === 'num') {
+      va = parseFloat(va) || 0;
+      vb = parseFloat(vb) || 0;
+    } else {
+      va = String(va).toLowerCase();
+      vb = String(vb).toLowerCase();
+    }
+    if (va < vb) return sortDir === 'ASC' ? -1 : 1;
+    if (va > vb) return sortDir === 'ASC' ? 1 : -1;
+    return 0;
+  });
+  renderTable();
+}
+
+// ─── COLUMN RESIZE ───────────────────────────────────────────────────
+function setupColResize() {
+  var headerRow = document.getElementById('headerRow');
+  if (!headerRow) return;
+  var ths = headerRow.querySelectorAll('th');
+  ths.forEach(function(th, i) {
+    // Apply saved width
+    if (colWidths[i]) th.style.width = colWidths[i] + 'px';
+    // Remove old handle if any
+    var old = th.querySelector('.col-resize-handle');
+    if (old) old.remove();
+    // Add handle
+    var handle = document.createElement('span');
+    handle.className = 'col-resize-handle';
+    handle.addEventListener('mousedown', function(e) {
+      e.preventDefault();
+      var startX = e.pageX;
+      var startW = th.offsetWidth;
+      handle.classList.add('col-resize-active');
+      function onMove(e) {
+        var w = Math.max(40, startW + e.pageX - startX);
+        th.style.width = w + 'px';
+        colWidths[i] = w;
+      }
+      function onUp() {
+        handle.classList.remove('col-resize-active');
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup', onUp);
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp);
+    });
+    th.appendChild(handle);
+  });
+}
+
+// ─── CLEAR ──────────────────────────────────────────────────────────
+function clearSearch() {
+  // Clear address cards back to 1
+  document.getElementById('addressCards').innerHTML = '';
+  cardCount = 0;
+  addAddressCard();
+  // Clear edificio cards back to 1
+  document.getElementById('edificioCards').innerHTML = '';
+  edificioCount = 0;
+  addEdificioCard();
+  // Clear filters
+  document.getElementById('inputBairro').value = '';
+  document.getElementById('selectAnoIni').value = '2020';
+  document.getElementById('selectAnoFim').value = '2026';
+  // Hide results
+  document.getElementById('resultsPanel').classList.add('hidden');
+  document.getElementById('statsBar').classList.add('hidden');
+  document.getElementById('btnClear').classList.add('hidden');
+  document.getElementById('btnExport').classList.add('hidden');
+  allResults = []; filteredResults = [];
+}
+
+// ─── EXPORT ─────────────────────────────────────────────────────────
+function exportCSV() {
+  if (!filteredResults.length) return;
+  var BOM = '﻿'; // UTF-8 BOM for Excel
+  var headers = COLS.map(function(c) { return '"' + c.label + '"'; }).join(';');
+  var rows = filteredResults.map(function(row) {
+    return COLS.map(function(col) {
+      var v = row[col.key];
+      if (v === null || v === undefined) return '';
+      if (col.fmt === 'date') return formatDate(v);
+      if (col.fmt === 'money') return String(v).replace('.', ',');
+      if (col.fmt === 'num')   return String(v || '').replace('.', ',');
+      if (col.fmt === 'cartorio') return shortCartorio(v);
+      if (col.fmt === 'tag')   return shortIptu(v);
+      return '"' + String(v).replace(/"/g, '""') + '"';
+    }).join(';');
+  });
+  var csv = BOM + headers + '\n' + rows.join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  var now = new Date();
+  var ts = now.getFullYear() + '-' +
+    String(now.getMonth()+1).padStart(2,'0') + '-' +
+    String(now.getDate()).padStart(2,'0');
+  a.download = 'ITBI_Vendidos_' + ts + '.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ─── FORMAT ─────────────────────────────────────────────────────────
+function formatDate(v) {
+  if (!v) return '—';
+  const d = String(v).slice(0, 10);
+  const [y, m, dd] = d.split('-');
+  return `${dd}/${m}/${y}`;
+}
+
+function formatMoney(v) {
+  if (!v || isNaN(v)) return '—';
+  return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+function shortCartorio(v) {
+  if (!v) return '—';
+  // "5º Cartório de Registro de Imóvel" → "5º CRI"
+  var m = v.match(/^(\d+)[ºª°]?/);
+  if (m) return m[1] + 'º CRI';
+  if (v.toLowerCase().includes('cartório')) return 'CRI';
+  return v.slice(0, 6);
+}
+
+function shortIptu(v) {
+  if (!v) return '—';
+  if (v.includes('APARTAMENTO')) return 'APARTAMENTO';
+  if (v.includes('GARAGEM')) return 'GARAGEM';
+  if (v.includes('RESIDÊNCIA COLETIVA')) return 'RES. COLETIVA';
+  if (v.includes('FLAT')) return 'FLAT';
+  if (v.includes('RESIDÊNCIA')) return 'RESIDÊNCIA';
+  return v.slice(0, 12);
+}
+</script>
+</body>
+</html>
