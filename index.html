@@ -112,7 +112,7 @@ header {
 
 /* ── MAIN LAYOUT ───────────────────────────── */
 main {
-  max-width: 1400px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 16px;
   display: flex; flex-direction: column; gap: 16px;
@@ -280,28 +280,28 @@ select { cursor: pointer; }
   flex-wrap: wrap;
 }
 .table-header h3 { font-size: 14px; font-weight: 700; flex: 1; }
-.table-wrap { overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-@media (max-width: 900px) { .table-wrap { overflow-x: auto; } }
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
-  table-layout: fixed;
+  table-layout: auto;
+  min-width: 900px;
 }
-/* Fixed column widths — all columns visible without horizontal scroll */
-thead th:nth-child(1)  { width: 7%;  } /* Data */
-thead th:nth-child(2)  { width: 14%; } /* Rua */
-thead th:nth-child(3)  { width: 4%;  } /* Nº */
-thead th:nth-child(4)  { width: 9%;  } /* Complemento */
-thead th:nth-child(5)  { width: 10%; } /* Bairro */
-thead th:nth-child(6)  { width: 11%; } /* Edifício */
-thead th:nth-child(7)  { width: 5%;  } /* A.C. */
-thead th:nth-child(8)  { width: 10%; } /* Valor */
-thead th:nth-child(9)  { width: 8%;  } /* R$/m² */
-thead th:nth-child(10) { width: 6%;  } /* Cartório */
-thead th:nth-child(11) { width: 10%; } /* Matrícula */
-thead th:nth-child(12) { width: 6%;  } /* SQL */
+/* Minimum column widths — expand naturally with screen */
+thead th:nth-child(1)  { min-width: 90px;  } /* Data */
+thead th:nth-child(2)  { min-width: 160px; } /* Rua */
+thead th:nth-child(3)  { min-width: 55px;  } /* Nº */
+thead th:nth-child(4)  { min-width: 110px; } /* Complemento */
+thead th:nth-child(5)  { min-width: 110px; } /* Bairro */
+thead th:nth-child(6)  { min-width: 130px; } /* Edifício */
+thead th:nth-child(7)  { min-width: 70px;  } /* A.C. */
+thead th:nth-child(8)  { min-width: 120px; } /* Valor */
+thead th:nth-child(9)  { min-width: 100px; } /* R$/m² */
+thead th:nth-child(10) { min-width: 75px;  } /* Cartório */
+thead th:nth-child(11) { min-width: 110px; } /* Matrícula */
+thead th:nth-child(12) { min-width: 70px;  } /* SQL */
 thead th {
   background: var(--surface2);
   padding: 8px 12px;
