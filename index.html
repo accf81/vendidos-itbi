@@ -907,17 +907,16 @@ function setupCardAutocomplete(id) {
     acDebounce[`rua-${id}`] = setTimeout(() => {
       const val = ruaEl.value.trim();
       if (val.length < 2) { closeAllDropdowns(); return; }
-      const norm = removeAccents(val.toUpperCase());
+      const norm = normalizeLogradouro(val);
       const items = queryDB(
-        `SELECT DISTINCT logradouro FROM vendas WHERE logradouro LIKE ? ORDER BY logradouro LIMIT 15`,
+        `SELECT DISTINCT logradouro_norm FROM vendas WHERE logradouro_norm LIKE ? ORDER BY logradouro_norm LIMIT 15`,
         [`%${norm}%`]
       );
       showDropdown(ruaList, items, chosen => {
         ruaEl.value = chosen;
         numEl.focus();
-        // Show numbers for chosen street
         const nums = queryDB(
-          `SELECT DISTINCT numero FROM vendas WHERE logradouro=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
+          `SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
           [chosen]
         );
         showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
@@ -931,8 +930,8 @@ function setupCardAutocomplete(id) {
     const street = ruaEl.value.trim();
     if (!street || numEl.value) return;
     const nums = queryDB(
-      `SELECT DISTINCT numero FROM vendas WHERE logradouro=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
-      [street]
+      `SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
+      [normalizeLogradouro(street)]
     );
     showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
   });
@@ -944,8 +943,8 @@ function setupCardAutocomplete(id) {
       const val = numEl.value.trim();
       if (!val) return;
       const items = queryDB(
-        `SELECT DISTINCT numero FROM vendas WHERE logradouro LIKE ? AND numero LIKE ? ORDER BY CAST(numero AS INTEGER) LIMIT 20`,
-        [`%${removeAccents(street.toUpperCase())}%`, `${val}%`]
+        `SELECT DISTINCT numero FROM vendas WHERE logradouro_norm LIKE ? AND numero LIKE ? ORDER BY CAST(numero AS INTEGER) LIMIT 20`,
+        [`%${normalizeLogradouro(street)}%`, `${val}%`]
       );
       showDropdown(numList, items, n => { numEl.value = n; doSearch(); });
     }, 200);
@@ -978,9 +977,8 @@ function removeAccents(str) {
 }
 
 function normalizeStreet(input) {
-  // Uppercase + remove accents
+  // Uppercase + remove accents (legado — mantido para compatibilidade)
   let s = removeAccents(input.trim().toUpperCase());
-  // Strip common type prefixes (full name or abbreviation)
   const prefixes = [
     'ALAMEDA','AVENIDA','TRAVESSA','ESTRADA','RODOVIA','PRACA','LARGO','RUA',
     'AL','AV','EST','TV','PC','R'
@@ -989,6 +987,26 @@ function normalizeStreet(input) {
     const re = new RegExp('^' + p + '\\s+');
     if (re.test(s)) { s = s.replace(re, '').trim(); break; }
   }
+  return s;
+}
+
+// Normaliza logradouro igual ao banco (logradouro_norm)
+const _NORM_MAP = [
+  [/^R\b/,'RUA'],[/^AV\b/,'AVENIDA'],[/^AL\b/,'ALAMEDA'],[/^PC\b/,'PRACA'],
+  [/^PCA\b/,'PRACA'],[/^TV\b/,'TRAVESSA'],[/^EST\b/,'ESTRADA'],[/^RD\b/,'RODOVIA'],
+  [/^VL\b/,'VILA'],[/\bENG\b/g,'ENGENHEIRO'],[/\bDR\b/g,'DOUTOR'],[/\bDRA\b/g,'DOUTORA'],
+  [/\bPROF\b/g,'PROFESSOR'],[/\bPROFA\b/g,'PROFESSORA'],[/\bPDE\b/g,'PADRE'],
+  [/\bCEL\b/g,'CORONEL'],[/\bBRIG\b/g,'BRIGADEIRO'],[/\bBR\b/g,'BARAO'],
+  [/\bCONS\b/g,'CONSELHEIRO'],[/\bMAL\b/g,'MARECHAL'],[/\bGEN\b/g,'GENERAL'],
+  [/\bGOV\b/g,'GOVERNADOR'],[/\bDEP\b/g,'DEPUTADO'],[/\bSEN\b/g,'SENADOR'],
+  [/\bVER\b/g,'VEREADOR'],[/\bPRES\b/g,'PRESIDENTE'],[/\bSTA\b/g,'SANTA'],
+  [/\bSTO\b/g,'SANTO'],[/\bDES\b/g,'DESEMBARGADOR'],[/\bMIN\b/g,'MINISTRO'],
+  [/\bCOM\b/g,'COMENDADOR'],
+];
+function normalizeLogradouro(s) {
+  if (!s) return s;
+  s = removeAccents(s.trim().toUpperCase()).replace(/\s+/g,' ');
+  for (const [p,r] of _NORM_MAP) s = s.replace(p, r);
   return s;
 }
 
@@ -1028,12 +1046,12 @@ function doSearch() {
   // Addresses and edificios are OR'ed together in one group
   var searchClauses = [];
   addresses.forEach(function(a) {
-    const normalized = normalizeStreet(a.rua);
+    const normalized = normalizeLogradouro(a.rua);
     params.push('%' + normalized + '%');
-    let clause = 'logradouro LIKE ?';
+    let clause = 'logradouro_norm LIKE ?';
     if (a.num) {
       params.push(a.num.trim());
-      clause += ' AND numero = ?';
+      clause += ' AND numero LIKE ?';
     }
     searchClauses.push('(' + clause + ')');
   });
