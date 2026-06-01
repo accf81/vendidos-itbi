@@ -179,14 +179,16 @@ def main():
     total_inicial = cur.fetchone()[0]
     print(f"\n   Registros iniciais: {total_inicial:,}")
 
-    # 3. Remover vagas de garagem
-    print(f"\n3. Removendo vagas de garagem...")
+    # 3. Remover vagas de garagem PURAS (não remove apartamentos que incluem vaga)
+    # Vagas puras: complemento COMEÇA com VG, VAGA, GARAGEM, BOX
+    # Apartamento+vaga (manter): "AP 22 E VG", "A 869 AP 81 VG" — não começam com esses prefixos
+    print(f"\n3. Removendo vagas de garagem puras...")
     cur.execute("""
         DELETE FROM vendas
-        WHERE UPPER(COALESCE(complemento,'')) LIKE '%VAGA%'
-           OR UPPER(COALESCE(complemento,'')) LIKE '% VG%'
-           OR UPPER(COALESCE(complemento,'')) LIKE '%GARAGEM%'
-           OR UPPER(COALESCE(complemento,'')) LIKE '%BOX%'
+        WHERE UPPER(COALESCE(complemento,'')) LIKE 'VG%'
+           OR UPPER(COALESCE(complemento,'')) LIKE 'VAGA%'
+           OR UPPER(COALESCE(complemento,'')) LIKE 'GARAGEM%'
+           OR UPPER(COALESCE(complemento,'')) LIKE 'BOX%'
     """)
     removidos_vagas = cur.rowcount
     print(f"   ✓ {removidos_vagas:,} vagas/garagens removidas")
