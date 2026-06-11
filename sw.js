@@ -1,4 +1,4 @@
-const CACHE = 'itbi-v11';
+const CACHE = 'itbi-v12';
 const ASSETS = ['./','./index.html','./ITBI_SP_residencial.db.gz'];
 
 self.addEventListener('install', e => {
