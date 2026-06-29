@@ -129,19 +129,69 @@ SPECIFIC_CORRECTIONS = {
     "RUA LEOPOLDO COUTO DE MAGALHAES JUNIOR": "RUA LEOPOLDO COUTO MAGALHAES JUNIOR",
     "RUA MARQUES OLINDA": "RUA MARQUES DE OLINDA",
     "RUA SERRA DO JAPI": "RUA SERRA DE JAPI",
-    "RUA SITIANTES": "RUA DOS SITIANTES",
+    "RUA SITIANTES": "RUA DOS SITIANTES",    "RUA MINISTRO ALVARO DE SOUZA LIMA": "AVENIDA MINISTRO ALVARO DE SOUZA LIMA",}
+
+LOWER_WORDS = {
+    'DE','DO','DA','DOS','DAS',
+    'E','EM','NO','NA','NOS','NAS',
+    'POR','PARA','COM','SOB','SOBRE','ATE','ATÉ',
+    'AO','AOS','A','PELA','PELO'
 }
+
+ABBREVS_FMT = {
+    'RUA': 'Rua',
+    'AVENIDA': 'Av.',
+    'ALAMEDA': 'Alameda',
+    'TRAVESSA': 'Travessa',
+    'ESTRADA': 'Estrada',
+    'RODOVIA': 'Rodovia',
+    'VILA': 'Vila',
+    'LARGO': 'Largo',
+    'PARQUE': 'Parque',
+    'VIADUTO': 'Viaduto',
+    'PRAÇA': 'Praça',
+    'PRACA': 'Praça',
+    'VIADUTO': 'Viaduto',
+    'PASSARELA': 'Passarela',
+}
+
+def clean_word(word):
+    return re.sub(r'[^\wÀ-ÿ]+', '', word, flags=re.UNICODE)
+
+def title_case_word(word, is_first=False):
+    if not word:
+        return word
+    up = word.upper()
+    clean = clean_word(up)
+    if clean in ABBREVS_FMT:
+        return ABBREVS_FMT[clean]
+    if not is_first and clean in LOWER_WORDS:
+        return clean.lower()
+    return word.lower().capitalize()
+
+
+def title_case_logradouro(text):
+    if not text:
+        return text
+    text = re.sub(r'\s+', ' ', text.strip())
+    words = text.split(' ')
+    result = []
+    for idx, word in enumerate(words):
+        result.append(title_case_word(word, is_first=(idx == 0)))
+    return ' '.join(result)
+
 
 def normalize_logradouro(s):
     if not s:
         return s
     s = s.upper().strip()
     s = re.sub(r'\s+', ' ', s)
+    # Aplica correções específicas antes de normalizar prefixos
+    s = SPECIFIC_CORRECTIONS.get(s, s)
     for pattern, replacement in NORMALIZE_MAP:
         s = re.sub(pattern, replacement, s)
-    # Aplicar correções específicas de variantes DE/DO/DA
-    s = SPECIFIC_CORRECTIONS.get(s, s)
     return s
+
 
 def normalize_cartorio(s):
     if not s:
@@ -204,13 +254,18 @@ def main():
     total_apos_limpeza = cur.fetchone()[0]
     print(f"\n   Registros após limpeza: {total_apos_limpeza:,}")
 
-    # 5. Adicionar coluna logradouro_norm
-    print(f"\n5. Adicionando coluna logradouro_norm...")
+    # 5. Adicionar colunas de logradouro
+    print(f"\n5. Adicionando colunas logradouro_norm e logradouro_fmt...")
     try:
         cur.execute("ALTER TABLE vendas ADD COLUMN logradouro_norm TEXT")
-        print("   ✓ Coluna criada")
+        print("   ✓ Coluna logradouro_norm criada")
     except sqlite3.OperationalError:
-        print("   ℹ Coluna já existe, atualizando...")
+        print("   ℹ Coluna logradouro_norm já existe, atualizando...")
+    try:
+        cur.execute("ALTER TABLE vendas ADD COLUMN logradouro_fmt TEXT")
+        print("   ✓ Coluna logradouro_fmt criada")
+    except sqlite3.OperationalError:
+        print("   ℹ Coluna logradouro_fmt já existe, atualizando...")
 
     # 6. Normalizar logradouros (em lotes para mostrar progresso)
     print(f"\n6. Normalizando logradouros...")
@@ -218,13 +273,15 @@ def main():
     rows = cur.fetchall()
     batch = []
     for i, (rowid, logradouro) in enumerate(rows):
-        batch.append((normalize_logradouro(logradouro), rowid))
+        norm = normalize_logradouro(logradouro)
+        fmt = title_case_logradouro(norm)
+        batch.append((norm, fmt, rowid))
         if len(batch) >= 10000:
-            cur.executemany("UPDATE vendas SET logradouro_norm=? WHERE rowid=?", batch)
+            cur.executemany("UPDATE vendas SET logradouro_norm=?, logradouro_fmt=? WHERE rowid=?", batch)
             batch = []
             print(f"   ... {i+1:,}/{len(rows):,} ({(i+1)/len(rows)*100:.0f}%)", end='\r')
     if batch:
-        cur.executemany("UPDATE vendas SET logradouro_norm=? WHERE rowid=?", batch)
+        cur.executemany("UPDATE vendas SET logradouro_norm=?, logradouro_fmt=? WHERE rowid=?", batch)
     print(f"   ✓ {len(rows):,} logradouros normalizados                    ")
 
     # Verificar resultado
