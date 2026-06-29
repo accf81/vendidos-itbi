@@ -282,8 +282,8 @@ def main():
     batch = []
     for i, (rowid, logradouro) in enumerate(rows):
         norm = normalize_logradouro(logradouro)
-        # gerar em title case e então converter para sentence-case (primeira letra maiúscula)
-        fmt = sentence_case(title_case_logradouro(norm))
+        # gerar em Title Case (cada palavra importante com inicial maiúscula)
+        fmt = title_case_logradouro(norm)
         batch.append((norm, fmt, rowid))
         if len(batch) >= 10000:
             cur.executemany("UPDATE vendas SET logradouro_norm=?, logradouro_fmt=? WHERE rowid=?", batch)
