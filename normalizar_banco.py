@@ -186,10 +186,11 @@ def normalize_logradouro(s):
         return s
     s = s.upper().strip()
     s = re.sub(r'\s+', ' ', s)
-    # Aplica correções específicas antes de normalizar prefixos
-    s = SPECIFIC_CORRECTIONS.get(s, s)
+    # Expande prefixos primeiro (R -> RUA, AV -> AVENIDA, etc.)
     for pattern, replacement in NORMALIZE_MAP:
         s = re.sub(pattern, replacement, s)
+    # Aplica correções específicas depois de expandir prefixos
+    s = SPECIFIC_CORRECTIONS.get(s, s)
     return s
 
 
