@@ -1143,6 +1143,15 @@ function renderTable() {
   if (existing) existing.remove();
   document.querySelector('.table-wrap').style.display = '';
 
+  // Helper para preferir logradouro_fmt se existir
+  function getCellValue(row, key) {
+    if (key === 'logradouro') {
+      if (row.logradouro_fmt && String(row.logradouro_fmt).trim()) return row.logradouro_fmt;
+      return row.logradouro || '—';
+    }
+    return row[key];
+  }
+
   // Header
   const headerRow = document.getElementById('headerRow');
   headerRow.innerHTML = COLS.map(c => {
@@ -1171,7 +1180,7 @@ function renderTable() {
 
   const rows = filteredResults.map(row => {
     const cells = COLS.map(c => {
-      const v = row[c.key];
+      const v = getCellValue(row, c.key);
       if (v === null || v === undefined || v === '') return `<td class="tag">—</td>`;
       switch (c.fmt) {
         case 'date':  return `<td class="val-date">${formatDate(v)}</td>`;
@@ -1211,7 +1220,7 @@ function renderCards() {
   container.className = 'mobile-cards-view';
 
   filteredResults.forEach(function(row) {
-    var addr = (row.logradouro || '—');
+    var addr = (row.logradouro_fmt && String(row.logradouro_fmt).trim()) ? row.logradouro_fmt : (row.logradouro || '—');
     if (row.numero) addr += ', ' + row.numero;
     var comp = '';
     if (row.complemento) comp += row.complemento;
