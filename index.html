@@ -7,45 +7,69 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Vendidos ITBI">
 <meta name="theme-color" content="#0f0f0f" id="themeColor">
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <title>Vendidos ITBI — Pandora Homes</title>
 <link rel="manifest" href="manifest.json">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;700;800;900&display=swap');
 :root {
-  --bg:       #0f0f0f;
-  --surface:  #1a1a1a;
-  --surface2: #242424;
-  --border:   #2e2e2e;
-  --text:     #e8e8e8;
-  --muted:    #888;
-  --accent:   #ff6600;
-  --accent2:  #cc5200;
-  --success:  #22c55e;
-  --warning:  #f59e0b;
-  --danger:   #ef4444;
-  --header-h: 56px;
-  --radius:   10px;
-  --shadow:   0 2px 12px rgba(0,0,0,.4);
+  --bg:           #0f0f0f;
+  --surface:      #16181d;
+  --surface2:     #1c1f25;
+  --surface3:     #23272e;
+  --border:       rgba(255,255,255,.08);
+  --text:         #eef0f3;
+  --muted:        #8a9099;
+  --accent:       #ff6600;
+  --accent2:      #cc5200;
+  --accent-pale:  rgba(255,102,0,.12);
+  --success:      #22c55e;
+  --warning:      #f59e0b;
+  --danger:       #ef4444;
+  --sep-line:     rgba(255,255,255,.16);
+  --header-h:     58px;
+  --radius:       10px;
+  --radius-md:    8px;
+  --radius-lg:    12px;
+  --radius-xl:    14px;
+  --shadow:       0 12px 26px -14px rgba(0,0,0,.6);
+  --shadow-card:  0 1px 0 rgba(255,255,255,.04) inset, 0 12px 24px -14px rgba(0,0,0,.6);
+  --shadow-btn:   0 1px 0 rgba(255,255,255,.07) inset, 0 2px 5px rgba(0,0,0,.35);
+  --space-xs:     8px;
+  --space-sm:     12px;
+  --space-md:     16px;
+  --space-lg:     20px;
+  --space-xl:     24px;
+  --font-brand:   'Montserrat', sans-serif;
+  --font-ui:      -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --text-ui:      14px;
+  --text-small:   12px;
 }
 [data-theme="light"] {
-  --bg:       #f0f2f5;
-  --surface:  #ffffff;
-  --surface2: #f8f9fa;
-  --border:   #dde1e7;
-  --text:     #1a1a2e;
-  --muted:    #6b7280;
-  --accent:   #ff6600;
-  --accent2:  #cc5200;
-  --shadow:   0 2px 12px rgba(0,0,0,.1);
+  --bg:           #eef0f6;
+  --surface:      #ffffff;
+  --surface2:     #f5f7fb;
+  --surface3:     #e3e7f2;
+  --border:       #c8d0e8;
+  --text:         #1a2744;
+  --muted:        #6f7a8e;
+  --sep-line:     rgba(26,39,68,.12);
+  --accent-pale:  rgba(255,102,0,.08);
+  --shadow:       0 10px 24px -16px rgba(26,39,68,.25);
+  --shadow-card:  0 1px 2px rgba(26,39,68,.06), 0 10px 24px -16px rgba(26,39,68,.25);
+  --shadow-btn:   0 1px 1px rgba(26,39,68,.05), 0 1px 3px rgba(26,39,68,.12);
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { height: 100%; overflow-x: hidden; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--font-ui);
   background: var(--bg);
   color: var(--text);
-  font-size: 14px;
+  font-size: var(--text-ui);
   line-height: 1.5;
   transition: background .2s, color .2s;
 }
@@ -80,35 +104,61 @@ body {
 }
 
 /* ── HEADER ────────────────────────────────── */
+header svg,
+.search-title svg,
+.btn svg,
+.add-link svg,
+.btn-export svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 header {
   position: sticky; top: 0; z-index: 100;
-  height: var(--header-h);
+  height: calc(var(--header-h) + env(safe-area-inset-top));
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center;
-  padding: 0 16px; gap: 12px;
+  padding: env(safe-area-inset-top) 18px 0; gap: 12px;
   box-shadow: var(--shadow);
 }
-.logo { font-size: 18px; font-weight: 700; letter-spacing: -.3px; flex: 1; }
+.logo {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-brand);
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
 .logo span { color: var(--accent); }
 .badge {
-  font-size: 10px; font-weight: 600;
-  background: var(--accent); color: #fff;
-  padding: 2px 7px; border-radius: 20px;
-  letter-spacing: .5px;
+  font-size: 10px; font-weight: 700;
+  background: var(--accent-pale);
+  color: var(--accent);
+  padding: 3px 8px; border-radius: 999px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
 }
 .btn-icon {
   width: 36px; height: 36px;
   border: 1px solid var(--border);
   background: var(--surface2);
   color: var(--text);
-  border-radius: 8px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   font-size: 16px;
   transition: background .15s, border-color .15s;
 }
-.btn-icon:hover { background: var(--border); }
+.btn-icon:hover { background: var(--surface3); }
 
 /* ── MAIN LAYOUT ───────────────────────────── */
 main {
@@ -120,57 +170,32 @@ main {
 
 /* ── SEARCH PANEL ──────────────────────────── */
 .search-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  background: linear-gradient(var(--surface), var(--surface)) padding-box, linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02) 45%, rgba(255,255,255,.012)) border-box;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xl);
   padding: 20px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
-.panel-title {
-  font-size: 11px; font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--muted);
+.search-title {
+  font-family: var(--font-brand);
+  font-size: 22px; font-weight: 700;
+  letter-spacing: -.02em;
   margin-bottom: 16px;
 }
-.search-section { margin-bottom: 16px; }
-.search-section-label {
-  font-size: 12px; font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 8px;
-  display: flex; align-items: center; gap: 6px;
-}
-.divider {
-  text-align: center;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 1px;
-  margin: 12px 0;
-  position: relative;
-}
-.divider::before, .divider::after {
-  content: ''; position: absolute; top: 50%;
-  width: 42%; height: 1px; background: var(--border);
-}
-.divider::before { left: 0; }
-.divider::after  { right: 0; }
 
-/* Address cards */
-.address-cards { display: flex; flex-direction: column; gap: 8px; }
+/* Linhas de endereço (numeradas) */
+.address-cards { display: flex; flex-direction: column; gap: 12px; }
 .address-card {
-  display: flex; gap: 8px; align-items: center;
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 118px 36px;
+  gap: 10px; align-items: center;
 }
 .address-num {
-  min-width: 20px;
-  font-size: 11px;
-  font-weight: 700;
+  font-family: var(--font-brand);
+  font-size: 15px; font-weight: 800;
   color: var(--accent);
   text-align: right;
 }
-.addr-fields { display: flex; gap: 8px; flex: 1; flex-wrap: wrap; }
-.input-rua  { flex: 1; min-width: 160px; }
-.input-num  { width: 90px; }
 
 /* Inputs */
 input[type=text], input[type=number], select {
@@ -178,8 +203,8 @@ input[type=text], input[type=number], select {
   background: var(--surface2);
   border: 1px solid var(--border);
   color: var(--text);
-  border-radius: 8px;
-  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
   font-size: 14px;
   font-family: inherit;
   transition: border-color .15s, box-shadow .15s;
@@ -192,92 +217,85 @@ input:focus, select:focus {
 }
 select { cursor: pointer; }
 
-/* Filters row */
-.filters-row {
-  display: grid;
-  grid-template-columns: 1fr 100px 100px;
-  gap: 8px;
+/* Botões de ação da busca */
+.actions-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 11px 16px;
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  background: var(--accent); color: #fff;
+  box-shadow: var(--shadow-btn);
+  transition: background .15s, transform .1s;
 }
-.filter-group label {
-  display: block;
-  font-size: 11px; font-weight: 600;
-  color: var(--muted);
-  margin-bottom: 4px;
+.btn:hover  { background: var(--accent2); }
+.btn:active { transform: scale(.98); }
+.btn.secondary { background: var(--surface2); color: var(--text); border-color: var(--border); box-shadow: none; }
+.btn.secondary:hover { background: var(--surface3); }
+
+/* + Adicionar endereço (link) */
+.add-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: none; border: none; padding: 0;
+  color: var(--accent);
+  font-size: 14px; font-weight: 700;
+  cursor: pointer;
+  margin-top: 14px;
 }
 
-/* Buttons */
-.btn-add {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--accent);
-  border-radius: 8px;
-  padding: 7px 14px;
-  font-size: 13px; font-weight: 600;
-  cursor: pointer;
-  transition: background .15s, border-color .15s;
-  margin-top: 4px;
-}
-.btn-add:hover { background: rgba(74,158,255,.08); border-color: var(--accent); }
+/* Remover linha (x) */
 .btn-remove {
-  width: 30px; height: 30px;
-  min-width: 30px;
+  width: 36px; height: 36px;
   border: 1px solid var(--border);
   background: var(--surface2);
   color: var(--muted);
-  border-radius: 7px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  transition: background .15s, color .15s;
+  font-size: 18px; line-height: 1;
+  transition: background .15s, color .15s, border-color .15s;
 }
-.btn-remove:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-.btn-search {
-  width: 100%;
-  background: var(--accent);
-  color: #fff;
-  border: none;
-  border-radius: 9px;
-  padding: 12px;
-  font-size: 15px; font-weight: 700;
-  cursor: pointer;
-  letter-spacing: .3px;
-  transition: background .15s, transform .1s;
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin-top: 8px;
-}
-.btn-search:hover  { background: var(--accent2); }
-.btn-search:active { transform: scale(.98); }
+.btn-remove:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ── STATS BAR ──────────────────────────────── */
 .stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+.stat {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 14px 16px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 14px 20px;
-  display: flex; gap: 24px; flex-wrap: wrap;
-  align-items: center;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
 }
-.stat { display: flex; flex-direction: column; gap: 2px; }
-.stat-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; }
+.stat-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
 .stat-value { font-size: 18px; font-weight: 700; }
 .stat-value.accent { color: var(--accent); }
 .stat-value.success { color: var(--success); }
-.stats-bar .sep { width: 1px; height: 36px; background: var(--border); }
+.stats-bar .sep { display: none; }
 
 /* ── RESULTS TABLE ──────────────────────────── */
 .results-panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-card);
 }
 .table-header {
   padding: 14px 16px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; gap: 12px;
   flex-wrap: wrap;
+  background: var(--surface2);
 }
 .table-header h3 { font-size: 14px; font-weight: 700; flex: 1; }
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -309,19 +327,23 @@ thead th {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .6px;
+  letter-spacing: .08em;
   color: var(--muted);
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
-  border-bottom: 2px solid var(--border);
+  border-bottom: 1px solid var(--border);
   position: sticky; top: 0;
   transition: background .15s, color .15s;
 }
-thead th:hover { background: var(--border); color: var(--text); }
+thead th:hover { background: var(--surface3); color: var(--text); }
 thead th.sorted { color: var(--accent); }
 thead th .sort-icon { margin-left: 4px; opacity: .5; }
 thead th.sorted .sort-icon { opacity: 1; }
+
+/* Separadores verticais contínuos entre colunas (grade completa) */
+thead th, tbody td { border-right: 2px solid var(--sep-line); }
+thead th:last-child, tbody td:last-child { border-right: none; }
 
 .filter-row th {
   background: var(--surface2);
@@ -370,19 +392,18 @@ td.tag {
 
 /* ── MOBILE ──────────────────────────────────── */
 @media (max-width: 640px) {
-  :root { --header-h: 52px; }
+  :root { --header-h: 54px; }
   main { padding: 12px; gap: 12px; }
   .search-panel { padding: 16px; }
-  .filters-row { grid-template-columns: 1fr 1fr; }
-  .addr-fields { flex-wrap: nowrap; }
-  .input-rua { min-width: 120px; }
-  .stats-bar { gap: 12px; padding: 12px 16px; }
+  .address-card { grid-template-columns: 20px minmax(0, 1fr) 84px 34px; gap: 8px; }
+  .btn-remove { width: 34px; height: 34px; }
+  .stats-bar { grid-template-columns: 1fr 1fr; }
   .stat-value { font-size: 15px; }
   .logo { font-size: 15px; }
   thead th, tbody td { padding: 7px 9px; font-size: 12px; }
 }
 @media (max-width: 400px) {
-  .filters-row { grid-template-columns: 1fr 1fr; }
+  .stats-bar { grid-template-columns: 1fr; }
 }
 
 /* ── RESULT CARDS (mobile) ───────────────────── */
@@ -395,11 +416,12 @@ td.tag {
 .result-card {
   background: var(--surface2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  box-shadow: var(--shadow-card);
 }
 .result-card-addr {
   font-size: 15px;
@@ -419,7 +441,7 @@ td.tag {
 }
 .result-card-values {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   background: var(--surface);
   border-radius: 8px;
@@ -490,7 +512,7 @@ td.tag {
   color: #fff;
 }
 .btn-clear {
-  display: inline-flex; align-items: center; gap: 5px;
+  display: inline-flex; align-items: center; gap: 6px;
   background: var(--surface2);
   color: var(--muted);
   border: 1px solid var(--border);
@@ -558,72 +580,47 @@ thead th {
 
   <!-- HEADER -->
   <header>
-    <div class="logo">🏢 <span>Pandora</span> Vendidos</div>
+    <div class="logo">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 7.5 12 3l9 4.5" />
+        <path d="M5 10.5v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 17.5v-7" />
+        <path d="M8.5 19v-5h7v5" />
+      </svg>
+      <span>Pandora</span> Vendidos
+    </div>
     <span class="badge">ITBI SP</span>
-    <button class="btn-icon" id="btnTheme" title="Alternar tema" onclick="toggleTheme()">☀️</button>
+    <button class="btn-icon" id="btnTheme" title="Alternar tema" onclick="toggleTheme()" aria-label="Alternar tema">
+      <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3v2" />
+        <path d="M12 19v2" />
+        <path d="M4.93 4.93l1.41 1.41" />
+        <path d="M17.66 17.66l1.41 1.41" />
+        <path d="M3 12h2" />
+        <path d="M19 12h2" />
+        <path d="M4.93 19.07l1.41-1.41" />
+        <path d="M17.66 6.34l1.41-1.41" />
+        <circle cx="12" cy="12" r="4" />
+      </svg>
+    </button>
   </header>
 
   <main>
 
     <!-- SEARCH -->
     <div class="search-panel">
-      <div class="panel-title">🔍 Busca</div>
-
-      <!-- Address cards -->
-      <div class="search-section">
-        <div class="search-section-label">📍 Por endereço</div>
-        <div class="address-cards" id="addressCards"></div>
-        <button class="btn-add" onclick="addAddressCard()">+ Adicionar endereço</button>
+      <h1 class="search-title">Busca por endereço</h1>
+      <div class="address-cards" id="addressCards"></div>
+      <button class="add-link" onclick="addAddressCard()">+ Adicionar endereço</button>
+      <div class="actions-row">
+        <button class="btn secondary" onclick="clearSearch()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+          <span>Limpar</span>
+        </button>
+        <button class="btn" onclick="doSearch()">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m20 20-4.2-4.2" /></svg>
+          <span>Buscar</span>
+        </button>
       </div>
-
-      <div class="divider">OU</div>
-
-      <!-- Building name (multiple) -->
-      <div class="search-section">
-        <div class="search-section-label">🏢 Por nome do edifício</div>
-        <div class="address-cards" id="edificioCards"></div>
-        <button class="btn-add" onclick="addEdificioCard()">+ Adicionar edifício</button>
-      </div>
-
-      <!-- Filters -->
-      <div class="filters-row" style="margin-bottom:14px; margin-top:8px;">
-        <div class="filter-group">
-          <label>Bairro</label>
-          <div class="autocomplete-wrapper" style="width:100%">
-            <input type="text" id="inputBairro" placeholder="Ex: Jardim América" autocomplete="off" style="width:100%">
-            <div class="autocomplete-list hidden" id="ac-bairro"></div>
-          </div>
-        </div>
-
-        <div class="filter-group">
-          <label>De (ano)</label>
-          <select id="selectAnoIni">
-            <option value="2020">2020</option>
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-          </select>
-        </div>
-        <div class="filter-group">
-          <label>Até (ano)</label>
-          <select id="selectAnoFim">
-            <option value="2020">2020</option>
-            <option value="2021">2021</option>
-            <option value="2022">2022</option>
-            <option value="2023">2023</option>
-            <option value="2024">2024</option>
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-          </select>
-        </div>
-      </div>
-
-      <button class="btn-search" onclick="doSearch()">
-        <span>🔍</span> Buscar
-      </button>
     </div>
 
     <!-- STATS -->
@@ -653,8 +650,10 @@ thead th {
     <div class="results-panel hidden" id="resultsPanel">
       <div class="table-header">
         <h3 id="resultsTitle">Resultados</h3>
-        <button class="btn-clear hidden" id="btnClear" onclick="clearSearch()" title="Limpar busca">✕ Limpar</button>
-        <button class="btn-export hidden" id="btnExport" onclick="exportCSV()" title="Exportar para planilha">📥 Exportar</button>
+        <button class="btn-export hidden" id="btnExport" onclick="exportCSV()" title="Exportar para planilha">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10" /><path d="m8 9 4 4 4-4" /><path d="M5 15v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" /></svg>
+          <span>Exportar</span>
+        </button>
       </div>
       <div class="table-wrap">
         <table id="resultsTable">
@@ -666,7 +665,7 @@ thead th {
         </table>
       </div>
       <div class="empty-state hidden" id="emptyState">
-        <div class="icon">🔍</div>
+        <div class="icon"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
         <h3>Nenhum resultado encontrado</h3>
         <p>Tente buscar por outros endereços ou ampliar o período.</p>
       </div>
@@ -709,7 +708,7 @@ window.addEventListener('load', async () => {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
   }
   addAddressCard();
-  addEdificioCard();
+  applyThemeIcon();
   await loadDatabase();
 });
 
@@ -761,15 +760,10 @@ async function loadDatabase() {
         console.log('DB OK, total rows:', cnt.n);
       } catch(e) { console.error('DB check failed:', e); }
 
-      // Autocomplete para edifício e bairro
-      // Edificio autocomplete set up per card via addEdificioCard()
-      setupSimpleAutocomplete('inputBairro', 'ac-bairro',
-        () => `SELECT DISTINCT bairro FROM vendas WHERE UPPER(bairro) LIKE ? ORDER BY bairro LIMIT 15`
-      );
     }, 400);
 
   } catch (e) {
-    document.getElementById('loadingMsg').textContent = '❌ Erro: ' + e.message;
+    document.getElementById('loadingMsg').textContent = 'Erro: ' + e.message;
     document.getElementById('loadingMsg').style.color = '#ef4444';
     console.error(e);
   }
@@ -781,46 +775,21 @@ function setProgress(pct, msg) {
 }
 
 // ─── THEME ─────────────────────────────────────────────────────────
+var ICON_SUN  = '<path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/><circle cx="12" cy="12" r="4"/>';
+var ICON_MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+function applyThemeIcon() {
+  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  var el = document.getElementById('themeIcon');
+  if (el) el.innerHTML = dark ? ICON_SUN : ICON_MOON;
+  document.getElementById('themeColor').content = dark ? '#0f0f0f' : '#ffffff';
+}
 function toggleTheme() {
-  const html = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
-  document.getElementById('btnTheme').textContent = isDark ? '🌙' : '☀️';
-  document.getElementById('themeColor').content = isDark ? '#ffffff' : '#0f0f0f';
+  var html = document.documentElement;
+  html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  applyThemeIcon();
 }
 
 // ─── ADDRESS CARDS ──────────────────────────────────────────────────
-let edificioCount = 0;
-
-function addEdificioCard() {
-  edificioCount++;
-  const eid = edificioCount;
-  const container = document.getElementById('edificioCards');
-  const card = document.createElement('div');
-  card.className = 'address-card edificio-card';
-  card.id = 'edificio-card-' + eid;
-  card.dataset.eid = eid;
-  card.innerHTML =
-    '<span class="address-num">' + eid + '.</span>' +
-    '<div class="autocomplete-wrapper" style="flex:1">' +
-      '<input type="text" id="edicifio-val-' + eid + '" placeholder="Ex: Villa Rica, Palazzo, Uirapuru..." autocomplete="off" spellcheck="false" style="width:100%">' +
-      '<div class="autocomplete-list hidden" id="ac-ed-' + eid + '"></div>' +
-    '</div>' +
-    '<button class="btn-remove" onclick="removeEdificioCard(' + eid + ')" title="Remover">×</button>';
-  container.appendChild(card);
-  document.getElementById('edicifio-val-' + eid).focus();
-  // Setup autocomplete for this card
-  setupSimpleAutocomplete('edicifio-val-' + eid, 'ac-ed-' + eid,
-    function() { return "SELECT DISTINCT referencia FROM vendas WHERE UPPER(referencia) LIKE ? AND referencia IS NOT NULL AND referencia != '' ORDER BY referencia LIMIT 15"; }
-  );
-}
-
-function removeEdificioCard(eid) {
-  var cards = document.querySelectorAll('.edificio-card');
-  if (cards.length <= 1) return;
-  document.getElementById('edificio-card-' + eid)?.remove();
-}
-
 function addAddressCard() {
   cardCount++;
   const id = cardCount;
@@ -829,27 +798,34 @@ function addAddressCard() {
   card.className = 'address-card';
   card.id = `card-${id}`;
   card.innerHTML = `
-    <span class="address-num">${id}.</span>
-    <div class="addr-fields">
-      <div class="autocomplete-wrapper">
-        <input type="text" id="rua-${id}" placeholder="Logradouro (ex: Alameda Tietê)" autocomplete="off" spellcheck="false" style="width:100%">
-        <div class="autocomplete-list hidden" id="ac-rua-${id}"></div>
-      </div>
-      <div class="autocomplete-wrapper input-num">
-        <input type="text" id="num-${id}" placeholder="Número" autocomplete="off" style="width:100%">
-        <div class="autocomplete-list hidden" id="ac-num-${id}"></div>
-      </div>
+    <span class="address-num"></span>
+    <div class="autocomplete-wrapper">
+      <input type="text" id="rua-${id}" placeholder="Logradouro (ex: Alameda Tietê)" autocomplete="off" spellcheck="false" style="width:100%">
+      <div class="autocomplete-list hidden" id="ac-rua-${id}"></div>
+    </div>
+    <div class="autocomplete-wrapper">
+      <input type="text" id="num-${id}" placeholder="Número" autocomplete="off" style="width:100%">
+      <div class="autocomplete-list hidden" id="ac-num-${id}"></div>
     </div>
     <button class="btn-remove" onclick="removeCard(${id})" title="Remover">×</button>`;
   container.appendChild(card);
+  renumberCards();
   document.getElementById(`rua-${id}`).focus();
   setupCardAutocomplete(id);
+}
+
+function renumberCards() {
+  document.querySelectorAll('#addressCards .address-card').forEach(function(card, i) {
+    var n = card.querySelector('.address-num');
+    if (n) n.textContent = (i + 1) + '.';
+  });
 }
 
 function removeCard(id) {
   const cards = document.querySelectorAll('.address-card');
   if (cards.length <= 1) return;
   document.getElementById(`card-${id}`)?.remove();
+  renumberCards();
 }
 
 // ─── AUTOCOMPLETE ───────────────────────────────────────────────────
@@ -1014,28 +990,17 @@ function normalizeLogradouro(s) {
 function doSearch() {
   if (!db) return;
 
-  const anoIni = document.getElementById('selectAnoIni').value;
-  const anoFim = document.getElementById('selectAnoFim').value;
-  const bairro = document.getElementById('inputBairro').value.trim();
-  // Collect edificio cards
-  const edificios = [];
-  document.querySelectorAll('.edificio-card').forEach(card => {
-    const id = card.dataset.eid;
-    const val = document.getElementById('edicifio-val-' + id)?.value.trim();
-    if (val) edificios.push(val);
-  });
-
   // Collect address cards
   const addresses = [];
-  document.querySelectorAll('.address-card:not(.edificio-card)').forEach(card => {
+  document.querySelectorAll('.address-card').forEach(card => {
     const id = card.id.replace('card-', '');
     const rua = document.getElementById(`rua-${id}`)?.value?.trim() || '';
     const num = document.getElementById(`num-${id}`)?.value?.trim() || '';
     if (rua) addresses.push({ rua, num });
   });
 
-  if (addresses.length === 0 && edificios.length === 0) {
-    alert('Digite pelo menos um endereço ou nome de edifício para buscar.');
+  if (addresses.length === 0) {
+    alert('Digite pelo menos um endereço para buscar.');
     return;
   }
 
@@ -1043,7 +1008,6 @@ function doSearch() {
   const conditions = [];
   const params = [];
 
-  // Addresses and edificios are OR'ed together in one group
   var searchClauses = [];
   addresses.forEach(function(a) {
     const normalized = normalizeLogradouro(a.rua);
@@ -1055,22 +1019,9 @@ function doSearch() {
     }
     searchClauses.push('(' + clause + ')');
   });
-  edificios.forEach(function(ed) {
-    var edUp = ed.toUpperCase();
-    params.push('%' + edUp + '%');
-    params.push('%' + edUp + '%');
-    searchClauses.push('(UPPER(referencia) LIKE ? OR UPPER(complemento) LIKE ?)');
-  });
   if (searchClauses.length > 0) {
     conditions.push('(' + searchClauses.join(' OR ') + ')');
   }
-
-  if (bairro) {
-    params.push('%' + bairro.toUpperCase() + '%');
-    conditions.push('UPPER(bairro) LIKE ?');
-  }
-
-  conditions.push('ano >= ' + parseInt(anoIni) + ' AND ano <= ' + parseInt(anoFim));
 
   var sql = 'SELECT sql, data_transacao, logradouro, numero, complemento, bairro, ' +
     'referencia, area_construida_m2, ' +
@@ -1123,10 +1074,8 @@ function renderTable() {
   const empty = document.getElementById('emptyState');
   panel.classList.remove('hidden');
   var exportBtn = document.getElementById('btnExport');
-  var clearBtn = document.getElementById('btnClear');
   var hasResults = filteredResults.length > 0;
   if (exportBtn) exportBtn.classList.toggle('hidden', !hasResults);
-  if (clearBtn) clearBtn.classList.toggle('hidden', !hasResults);
 
   document.getElementById('resultsTitle').textContent =
     `${filteredResults.length.toLocaleString('pt-BR')} resultado${filteredResults.length !== 1 ? 's' : ''}` +
@@ -1240,7 +1189,7 @@ function renderCards() {
     card.innerHTML =
       '<div class="result-card-addr">' + addr + '</div>' +
       (comp ? '<div class="result-card-comp">' + comp + '</div>' : '') +
-      (edificio ? '<div class="result-card-edificio">🏢 ' + edificio + '</div>' : '') +
+      (edificio ? '<div class="result-card-edificio">' + edificio + '</div>' : '') +
       '<div class="result-card-values">' +
         '<div class="result-card-val">' +
           '<span class="result-card-val-label">Área</span>' +
@@ -1256,7 +1205,7 @@ function renderCards() {
         '</div>' +
       '</div>' +
       '<div class="result-card-footer">' +
-        '<span class="result-card-tag">📅 ' + data + '</span>' +
+        '<span class="result-card-tag">' + data + '</span>' +
         (cart ? '<span class="result-card-tag">' + cart + '</span>' : '') +
         (mat ? '<span class="result-card-tag">Mat. ' + mat + '</span>' : '') +
         (sql ? '<span class="result-card-tag">SQL ' + sql + '</span>' : '') +
@@ -1343,23 +1292,15 @@ function setupColResize() {
 
 // ─── CLEAR ──────────────────────────────────────────────────────────
 function clearSearch() {
-  // Clear address cards back to 1
+  // Volta as linhas de endereço para uma só
   document.getElementById('addressCards').innerHTML = '';
   cardCount = 0;
   addAddressCard();
-  // Clear edificio cards back to 1
-  document.getElementById('edificioCards').innerHTML = '';
-  edificioCount = 0;
-  addEdificioCard();
-  // Clear filters
-  document.getElementById('inputBairro').value = '';
-  document.getElementById('selectAnoIni').value = '2020';
-  document.getElementById('selectAnoFim').value = '2026';
-  // Hide results
+  // Esconde resultados
   document.getElementById('resultsPanel').classList.add('hidden');
   document.getElementById('statsBar').classList.add('hidden');
-  document.getElementById('btnClear').classList.add('hidden');
-  document.getElementById('btnExport').classList.add('hidden');
+  var exp = document.getElementById('btnExport');
+  if (exp) exp.classList.add('hidden');
   allResults = []; filteredResults = [];
 }
 
