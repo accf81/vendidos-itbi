@@ -1,733 +1,446 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Vendidos ITBI">
-<meta name="theme-color" content="#0f0f0f" id="themeColor">
-<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Vendidos ITBI — Pandora Homes</title>
+<meta name="apple-mobile-web-app-title" content="Pandora Vendidos">
+<meta name="theme-color" content="#ffffff">
+<title>Pandora Vendidos — o preço real de venda, não uma estimativa</title>
+<meta name="description" content="Preço real de venda de imóveis em São Paulo, direto da Prefeitura (ITBI). Busque grátis, sem cadastro. Ferramenta da Pandora Homes.">
 <link rel="manifest" href="manifest.json">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Pandora Vendidos">
+<meta property="og:title" content="Pandora Vendidos — o preço real de venda, não uma estimativa">
+<meta property="og:description" content="Dados oficiais da Prefeitura de São Paulo (ITBI). Busque grátis, sem cadastro.">
+<meta property="og:url" content="https://vendidos.pandorahomes.com.br/">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://vendidos.pandorahomes.com.br/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  "name": "Pandora Homes",
+  "url": "https://www.pandorahomes.com.br",
+  "telephone": "+5511945240721",
+  "areaServed": "São Paulo, SP",
+  "memberOf": { "@type": "Organization", "name": "Rede Pilar" }
+}
+</script>
+
+<link rel="stylesheet" href="css/design-tokens.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;700;800;900&display=swap');
-:root {
-  --bg:           #0f0f0f;
-  --surface:      #16181d;
-  --surface2:     #1c1f25;
-  --surface3:     #23272e;
-  --border:       rgba(255,255,255,.08);
-  --text:         #eef0f3;
-  --muted:        #8a9099;
-  --accent:       #ff6600;
-  --accent2:      #cc5200;
-  --accent-pale:  rgba(255,102,0,.12);
-  --success:      #22c55e;
-  --warning:      #f59e0b;
-  --danger:       #ef4444;
-  --sep-line:     rgba(255,255,255,.16);
-  --header-h:     58px;
-  --radius:       10px;
-  --radius-md:    8px;
-  --radius-lg:    12px;
-  --radius-xl:    14px;
-  --shadow:       0 12px 26px -14px rgba(0,0,0,.6);
-  --shadow-card:  0 1px 0 rgba(255,255,255,.04) inset, 0 12px 24px -14px rgba(0,0,0,.6);
-  --shadow-btn:   0 1px 0 rgba(255,255,255,.07) inset, 0 2px 5px rgba(0,0,0,.35);
-  --space-xs:     8px;
-  --space-sm:     12px;
-  --space-md:     16px;
-  --space-lg:     20px;
-  --space-xl:     24px;
-  --font-brand:   'Montserrat', sans-serif;
-  --font-ui:      -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --text-ui:      14px;
-  --text-small:   12px;
-}
-[data-theme="light"] {
-  --bg:           #eef0f6;
-  --surface:      #ffffff;
-  --surface2:     #f5f7fb;
-  --surface3:     #e3e7f2;
-  --border:       #c8d0e8;
-  --text:         #1a2744;
-  --muted:        #6f7a8e;
-  --sep-line:     rgba(26,39,68,.12);
-  --accent-pale:  rgba(255,102,0,.08);
-  --shadow:       0 10px 24px -16px rgba(26,39,68,.25);
-  --shadow-card:  0 1px 2px rgba(26,39,68,.06), 0 10px 24px -16px rgba(26,39,68,.25);
-  --shadow-btn:   0 1px 1px rgba(26,39,68,.05), 0 1px 3px rgba(26,39,68,.12);
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; overflow-x: hidden; }
-body {
-  font-family: var(--font-ui);
-  background: var(--bg);
-  color: var(--text);
-  font-size: var(--text-ui);
-  line-height: 1.5;
-  transition: background .2s, color .2s;
-}
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800;900&display=swap');
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; font-family: var(--font-ui); font-size: var(--text-body); line-height: var(--leading-normal); background: var(--bg); color: var(--text); }
+  h1, h2, h3 { font-family: var(--font-brand); letter-spacing: var(--tracking-tight); }
+  a { color: inherit; text-decoration: none; }
+  img, svg { display: block; max-width: 100%; }
+  button, input, select, textarea { font-family: inherit; }
 
-/* ── LOADING ───────────────────────────────── */
-#loading {
-  position: fixed; inset: 0; z-index: 999;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 20px;
-}
-#loading h2 { font-size: 20px; font-weight: 600; }
-#loading p  { color: var(--muted); font-size: 13px; }
-.spinner {
-  width: 44px; height: 44px;
-  border: 3px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin .8s linear infinite;
-}
-@keyframes spin { to { transform: rotate(360deg); } }
-.progress-bar {
-  width: 240px; height: 4px;
-  background: var(--border); border-radius: 2px; overflow: hidden;
-}
-.progress-fill {
-  height: 100%; background: var(--accent);
-  border-radius: 2px;
-  transition: width .3s;
-  width: 0%;
-}
+  :root {
+    --site-py-top: 28px; --site-py-sm: 40px; --site-py-md: 64px; --site-py-lg: 88px;
+    --site-gap: 28px; --site-max: 1120px;
+  }
+  @media (max-width: 640px) { :root { --site-py-top: 18px; --site-py-sm: 28px; --site-py-md: 40px; --site-py-lg: 48px; } }
+  .wrap { max-width: var(--site-max); margin: 0 auto; padding: 0 20px; }
+  @media (max-width: 640px) { .wrap { padding: 0 16px; } }
+  .icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
-/* ── HEADER ────────────────────────────────── */
-header svg,
-.search-title svg,
-.btn svg,
-.add-link svg,
-.btn-export svg {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.7;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
+  /* ── LOADING ── */
+  #loading { position: fixed; inset: 0; z-index: 999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 20px; text-align: center; }
+  #loading svg.wordmark { height: 24px; width: auto; color: var(--brand-navy); margin-bottom: 6px; }
+  #loading h2 { font-size: 16px; font-weight: 700; color: var(--brand-navy); margin: 0; }
+  #loading p { color: var(--muted); font-size: 13px; margin: 0; }
+  .spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .progress-bar { width: 240px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--brand-orange); border-radius: 2px; transition: width .3s; width: 0%; }
+  #app.hidden, #loading.hidden { display: none; }
 
-header {
-  position: sticky; top: 0; z-index: 100;
-  height: calc(var(--header-h) + env(safe-area-inset-top));
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center;
-  padding: env(safe-area-inset-top) 18px 0; gap: 12px;
-  box-shadow: var(--shadow);
-}
-.logo {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-brand);
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -.02em;
-}
-.logo span { color: var(--accent); }
-.badge {
-  font-size: 10px; font-weight: 700;
-  background: var(--accent-pale);
-  color: var(--accent);
-  padding: 3px 8px; border-radius: 999px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-.btn-icon {
-  width: 36px; height: 36px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  color: var(--text);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 16px;
-  transition: background .15s, border-color .15s;
-}
-.btn-icon:hover { background: var(--surface3); }
+  /* ── HEADER ── */
+  header.site { background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 90; }
+  .header-inner { display: flex; align-items: center; justify-content: space-between; height: 52px; gap: 16px; }
+  .logo-lockup { display: flex; align-items: center; gap: 10px; }
+  .logo-lockup svg.wordmark { height: 17px; width: auto; color: var(--brand-navy); }
+  .logo-divider { width: 1px; height: 16px; background: var(--border); }
+  .logo-sub { font-family: var(--font-brand); font-size: 12px; font-weight: 600; color: var(--brand-orange); }
+  nav.site-nav { display: flex; align-items: center; gap: 4px; }
+  nav.site-nav a { font-family: var(--font-brand); font-size: 13px; font-weight: 600; padding: 7px 13px; border-radius: var(--radius-md); color: var(--muted); }
+  nav.site-nav a:hover, nav.site-nav a.current { color: var(--brand-orange); }
+  .nav-cta { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: var(--font-brand); font-size: 12.5px; font-weight: 700; }
+  .menu-btn { display: none; background: none; border: 1px solid var(--border); border-radius: var(--radius-md); width: 36px; height: 36px; align-items: center; justify-content: center; cursor: pointer; color: var(--text); }
+  @media (max-width: 860px) { nav.site-nav { display: none; } .nav-cta.desktop-only { display: none; } .menu-btn { display: inline-flex; } }
+  .mobile-nav { display: none; flex-direction: column; gap: 2px; padding: 10px 16px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .mobile-nav.open { display: flex; }
+  .mobile-nav a { padding: 12px 10px; border-radius: var(--radius-md); font-family: var(--font-brand); font-weight: 600; font-size: 14px; color: var(--text); }
+  .mobile-nav .nav-cta { justify-content: center; margin-top: 6px; }
 
-/* ── MAIN LAYOUT ───────────────────────────── */
-main {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 16px;
-  display: flex; flex-direction: column; gap: 16px;
-}
+  /* ── HERO ── */
+  .hero { padding: var(--site-py-top) 0 var(--site-py-md); background: linear-gradient(180deg, var(--brand-navy-faint), var(--bg) 70%); }
+  .hero-copy { margin-bottom: 28px; }
+  h1.hero-title { font-size: clamp(24px, 3.3vw, 38px); font-weight: 200; line-height: 1.2; color: var(--brand-navy); margin: 0 0 16px; }
+  h1.hero-title strong { font-weight: 700; color: var(--text); }
+  .hero-sub { font-size: 16px; color: var(--muted); line-height: 1.6; margin: 0 0 6px; }
+  .hero-stat { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .hero-stat b { color: var(--brand-navy); font-weight: 700; }
+  .hero-meta { font-size: 11.5px; color: var(--muted); margin-top: 6px; text-align: right; display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+  .hero-meta .icon { width: 12px; height: 12px; color: var(--brand-orange); }
 
-/* ── SEARCH PANEL ──────────────────────────── */
-.search-panel {
-  background: linear-gradient(var(--surface), var(--surface)) padding-box, linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.02) 45%, rgba(255,255,255,.012)) border-box;
-  border: 1px solid transparent;
-  border-radius: var(--radius-xl);
-  padding: 20px;
-  box-shadow: var(--shadow-card);
-}
-.search-title {
-  font-family: var(--font-brand);
-  font-size: 22px; font-weight: 700;
-  letter-spacing: -.02em;
-  margin-bottom: 16px;
-}
+  /* ── BUSCA (motor real) ── */
+  .search-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-card); padding: 22px; }
+  .address-card { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 12px; }
+  .address-num { flex: none; width: 20px; padding-bottom: 13px; font-family: var(--font-brand); font-weight: 800; color: var(--brand-orange); font-size: 14px; }
+  .autocomplete-wrapper { position: relative; flex: 1 1 260px; min-width: 0; }
+  .autocomplete-wrapper.num-wrapper { flex: 0 1 140px; }
+  .autocomplete-wrapper input { width: 100%; padding: 13px 14px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 15px; }
+  .autocomplete-wrapper input:focus { outline: none; border-color: var(--brand-orange); }
+  .autocomplete-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); max-height: 220px; overflow-y: auto; z-index: 20; }
+  .autocomplete-list.hidden { display: none; }
+  .autocomplete-item { padding: 10px 14px; font-size: 13.5px; cursor: pointer; }
+  .autocomplete-item:hover { background: var(--accent-pale); color: var(--brand-orange); }
+  .btn-remove { flex: none; width: 44px; height: 44px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface2); color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; line-height: 1; }
+  .btn-remove:hover { color: var(--danger); border-color: var(--danger); }
+  .search-help { font-size: 13px; color: var(--muted); margin-top: 14px; display: flex; align-items: flex-start; gap: 8px; }
+  .search-help .icon { flex: none; margin-top: 1px; width: 14px; height: 14px; color: var(--brand-orange); }
+  .btn-buscar { margin-top: 14px; width: 100%; padding: 14px; border: none; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: var(--font-brand); font-weight: 700; font-size: 15px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; }
+  @media (min-width: 640px) { .btn-buscar { width: auto; padding: 14px 28px; } }
+  .add-address { margin-top: 4px; font-size: 13px; font-weight: 600; color: var(--brand-orange); display: inline-flex; align-items: center; gap: 6px; cursor: pointer; background: none; border: none; padding: 0; }
 
-/* Linhas de endereço (numeradas) */
-.address-cards { display: flex; flex-direction: column; gap: 12px; }
-.address-card {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) 118px 36px;
-  gap: 10px; align-items: center;
-}
-.address-num {
-  font-family: var(--font-brand);
-  font-size: 15px; font-weight: 800;
-  color: var(--accent);
-  text-align: right;
-}
+  /* ── RESULTADOS ── */
+  .results { margin-top: 22px; display: none; }
+  .results.show { display: block; }
+  .results-source { font-size: 12px; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+  .results-source .src-txt { display: flex; align-items: center; gap: 6px; }
+  .results-source .icon { width: 12px; height: 12px; flex: none; }
+  .btn-export { flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); color: var(--brand-navy); font-family: var(--font-brand); font-weight: 700; font-size: 12px; cursor: pointer; }
+  .btn-export .icon { width: 14px; height: 14px; color: var(--brand-orange); }
+  .result-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); margin-bottom: 10px; flex-wrap: wrap; }
+  .result-addr { font-weight: 600; font-size: 14px; color: var(--text); }
+  .result-meta { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .result-price { text-align: right; }
+  .result-price .val { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-navy); }
+  .result-price .m2 { font-size: 11.5px; color: var(--muted); }
+  .results-empty { padding: 30px 10px; text-align: center; color: var(--muted); font-size: 14px; }
 
-/* Inputs */
-input[type=text], input[type=number], select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: var(--radius-md);
-  padding: 10px 12px;
-  font-size: 14px;
-  font-family: inherit;
-  transition: border-color .15s, box-shadow .15s;
-  outline: none;
-}
-input::placeholder { color: var(--muted); }
-input:focus, select:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(255,102,0,.15);
-}
-select { cursor: pointer; }
+  /* ── SEÇÃO GENÉRICA ── */
+  section.block { padding: var(--site-py-md) 0; }
+  section.block.alt { background: var(--surface2); }
+  h2.block-title { font-size: clamp(22px, 3vw, 30px); font-weight: 200; color: var(--brand-navy); margin: 0 0 10px; }
+  h2.block-title strong { font-weight: 700; }
+  .block-sub { color: var(--muted); font-size: 15px; margin: 0 0 36px; }
+  .audience-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--site-gap); }
+  @media (max-width: 780px) { .audience-grid { grid-template-columns: 1fr; } }
+  .audience-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 24px; box-shadow: var(--shadow-card); }
+  .audience-card h3 { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 8px; }
+  .audience-card p { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.55; }
 
-/* Botões de ação da busca */
-.actions-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-.btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  padding: 11px 16px;
-  font-size: 14px; font-weight: 700;
-  cursor: pointer;
-  background: var(--accent); color: #fff;
-  box-shadow: var(--shadow-btn);
-  transition: background .15s, transform .1s;
-}
-.btn:hover  { background: var(--accent2); }
-.btn:active { transform: scale(.98); }
-.btn.secondary { background: var(--surface2); color: var(--text); border-color: var(--border); box-shadow: none; }
-.btn.secondary:hover { background: var(--surface3); }
+  /* ── CTA final ── */
+  .cta-final { background: var(--brand-navy); color: #fff; border-radius: var(--radius-xl); padding: 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; }
+  @media (max-width: 780px) { .cta-final { grid-template-columns: 1fr; padding: 26px 20px; } }
+  .cta-final h2 { font-size: clamp(22px, 3vw, 29px); font-weight: 200; color: #fff; margin: 0 0 14px; line-height: 1.22; }
+  .cta-final h2 strong { font-weight: 700; color: var(--brand-orange-light); }
+  .cta-intro { color: var(--brand-navy-pale); font-size: 14.5px; line-height: 1.65; margin: 0 0 20px; }
+  .cta-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .cta-points li { display: flex; gap: 12px; align-items: flex-start; }
+  .cta-points .icon { flex: none; width: 18px; height: 18px; color: var(--brand-orange-light); margin-top: 2px; }
+  .cta-points span { font-size: 13.5px; color: var(--brand-navy-pale); line-height: 1.5; }
+  .lead-form { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius-lg); padding: 22px; }
+  .lead-form label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--brand-navy-pale); margin: 0 0 6px; }
+  .lead-form .f { margin-bottom: 14px; }
+  .lead-form input, .lead-form select { width: 100%; padding: 12px 13px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.05); color: #fff; font-size: 14px; box-sizing: border-box; }
+  .lead-form input::placeholder { color: rgba(255,255,255,.4); }
+  .lead-form button { width: 100%; padding: 14px; border: none; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: var(--font-brand); font-weight: 700; font-size: 14.5px; cursor: pointer; margin-top: 4px; }
+  .lead-thanks { display: none; text-align: center; padding: 20px 10px; }
+  .lead-thanks.show { display: block; }
+  .lead-thanks .icon { width: 34px; height: 34px; color: var(--brand-orange-light); margin: 0 auto 12px; }
+  .lead-thanks h3 { font-family: var(--font-brand); color: #fff; font-size: 16px; margin: 0 0 6px; }
+  .lead-thanks p { color: var(--brand-navy-pale); font-size: 13.5px; margin: 0; }
 
-/* + Adicionar endereço (link) */
-.add-link {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: none; border: none; padding: 0;
-  color: var(--accent);
-  font-size: 14px; font-weight: 700;
-  cursor: pointer;
-  margin-top: 14px;
-}
+  /* ── modal export ── */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15,20,30,.55); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.show { display: flex; }
+  .modal-card { background: var(--surface); border-radius: var(--radius-xl); padding: 28px; width: 420px; max-width: 100%; box-shadow: var(--shadow-lg); position: relative; }
+  .modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); }
+  .modal-card h3 { font-family: var(--font-brand); font-size: 17px; font-weight: 700; color: var(--brand-navy); margin: 0 0 6px; }
+  .modal-card p.modal-sub { font-size: 13.5px; color: var(--muted); margin: 0 0 20px; }
+  .modal-card .f { margin-bottom: 14px; }
+  .modal-card label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+  .modal-card input, .modal-card select { width: 100%; padding: 12px 13px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; box-sizing: border-box; }
+  .modal-thanks { display: none; text-align: center; padding: 10px 0; }
+  .modal-thanks.show { display: block; }
+  .modal-thanks .icon { width: 32px; height: 32px; color: var(--success); margin: 0 auto 12px; }
+  .modal-thanks p { font-size: 13.5px; color: var(--muted); margin: 0; }
 
-/* Remover linha (x) */
-.btn-remove {
-  width: 36px; height: 36px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  color: var(--muted);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; line-height: 1;
-  transition: background .15s, color .15s, border-color .15s;
-}
-.btn-remove:hover { color: var(--accent); border-color: var(--accent); }
-
-/* ── STATS BAR ──────────────────────────────── */
-.stats-bar {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  padding: 0;
-  background: transparent;
-  border: none;
-}
-.stat {
-  display: flex; flex-direction: column; gap: 2px;
-  padding: 14px 16px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-.stat-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
-.stat-value { font-size: 18px; font-weight: 700; }
-.stat-value.accent { color: var(--accent); }
-.stat-value.success { color: var(--success); }
-.stats-bar .sep { display: none; }
-
-/* ── RESULTS TABLE ──────────────────────────── */
-.results-panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-}
-.table-header {
-  padding: 14px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 12px;
-  flex-wrap: wrap;
-  background: var(--surface2);
-}
-.table-header h3 { font-size: 14px; font-weight: 700; flex: 1; }
-.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-  table-layout: auto;
-  min-width: 900px;
-}
-/* Minimum column widths — expand naturally with screen */
-thead th:nth-child(1)  { min-width: 90px;  } /* Data */
-thead th:nth-child(2)  { min-width: 160px; } /* Rua */
-thead th:nth-child(3)  { min-width: 55px;  } /* Nº */
-thead th:nth-child(4)  { min-width: 110px; } /* Complemento */
-thead th:nth-child(5)  { min-width: 110px; } /* Bairro */
-thead th:nth-child(6)  { min-width: 130px; } /* Edifício */
-thead th:nth-child(7)  { min-width: 70px;  } /* A.C. */
-thead th:nth-child(8)  { min-width: 120px; } /* Valor */
-thead th:nth-child(9)  { min-width: 100px; } /* R$/m² */
-thead th:nth-child(10) { min-width: 75px;  } /* Cartório */
-thead th:nth-child(11) { min-width: 110px; } /* Matrícula */
-thead th:nth-child(12) { min-width: 70px;  } /* SQL */
-thead th {
-  background: var(--surface2);
-  padding: 8px 12px;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  color: var(--muted);
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 0;
-  transition: background .15s, color .15s;
-}
-thead th:hover { background: var(--surface3); color: var(--text); }
-thead th.sorted { color: var(--accent); }
-thead th .sort-icon { margin-left: 4px; opacity: .5; }
-thead th.sorted .sort-icon { opacity: 1; }
-
-/* Separadores verticais contínuos entre colunas (grade completa) */
-thead th, tbody td { border-right: 2px solid var(--sep-line); }
-thead th:last-child, tbody td:last-child { border-right: none; }
-
-.filter-row th {
-  background: var(--surface2);
-  padding: 4px 6px;
-  border-bottom: 1px solid var(--border);
-  position: sticky; top: 33px;
-}
-.filter-row th input {
-  padding: 5px 8px;
-  font-size: 12px;
-  border-radius: 5px;
-  width: 100%;
-  min-width: 0;
-}
-
-tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background .1s;
-}
-tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: var(--surface2); }
-tbody td {
-  padding: 10px 12px;
-  vertical-align: middle;
-  white-space: nowrap;
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-td.val-money { font-weight: 700; color: var(--success); }
-td.val-m2    { color: var(--accent); font-weight: 600; }
-td.val-date  { color: var(--muted); font-size: 12px; }
-td.tag {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.empty-state {
-  padding: 60px 20px;
-  text-align: center;
-  color: var(--muted);
-}
-.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
-.empty-state h3 { font-size: 16px; margin-bottom: 6px; color: var(--text); }
-
-/* ── MOBILE ──────────────────────────────────── */
-@media (max-width: 640px) {
-  :root { --header-h: 54px; }
-  main { padding: 12px; gap: 12px; }
-  .search-panel { padding: 16px; }
-  .address-card { grid-template-columns: 20px minmax(0, 1fr) 84px 34px; gap: 8px; }
-  .btn-remove { width: 34px; height: 34px; }
-  .stats-bar { grid-template-columns: 1fr 1fr; }
-  .stat-value { font-size: 15px; }
-  .logo { font-size: 15px; }
-  thead th, tbody td { padding: 7px 9px; font-size: 12px; }
-}
-@media (max-width: 400px) {
-  .stats-bar { grid-template-columns: 1fr; }
-}
-
-/* ── RESULT CARDS (mobile) ───────────────────── */
-.mobile-cards-view {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px;
-}
-.result-card {
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: var(--shadow-card);
-}
-.result-card-addr {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--text);
-  line-height: 1.3;
-}
-.result-card-comp {
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: -4px;
-}
-.result-card-edificio {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--accent);
-}
-.result-card-values {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  background: var(--surface);
-  border-radius: 8px;
-  padding: 10px;
-  margin: 2px 0;
-}
-.result-card-val {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-.result-card-val-label {
-  font-size: 9px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .6px;
-  color: var(--muted);
-}
-.result-card-val-num {
-  font-size: 13px;
-  font-weight: 700;
-}
-.result-card-val-num.money { color: var(--success); }
-.result-card-val-num.m2    { color: var(--accent); }
-.result-card-footer {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-top: 4px;
-  border-top: 1px solid var(--border);
-}
-.result-card-tag {
-  font-size: 11px;
-  color: var(--muted);
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 2px 7px;
-}
-
-/* ── AUTOCOMPLETE ───────────────────────────── */
-.autocomplete-wrapper { position: relative; flex: 1; min-width: 0; }
-.autocomplete-wrapper.input-num { flex: 0 0 90px; }
-.autocomplete-list {
-  position: absolute;
-  top: calc(100% + 2px); left: 0; right: 0;
-  z-index: 500;
-  background: var(--surface);
-  border: 1px solid var(--accent);
-  border-radius: 0 0 9px 9px;
-  max-height: 220px;
-  overflow-y: auto;
-  box-shadow: 0 6px 20px rgba(0,0,0,.5);
-}
-.autocomplete-item {
-  padding: 10px 14px;
-  cursor: pointer;
-  font-size: 13px;
-  border-bottom: 1px solid var(--border);
-  transition: background .1s, color .1s;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.autocomplete-item:last-child { border-bottom: none; }
-.autocomplete-item:hover, .autocomplete-item.active {
-  background: var(--accent);
-  color: #fff;
-}
-.btn-clear {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--surface2);
-  color: var(--muted);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 7px 14px;
-  font-size: 13px; font-weight: 600;
-  cursor: pointer;
-  transition: background .15s, color .15s;
-}
-.btn-clear:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
-.btn-export {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: var(--success);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 7px 16px;
-  font-size: 13px; font-weight: 700;
-  cursor: pointer;
-  transition: opacity .15s;
-}
-.btn-export:hover { opacity: .85; }
-/* ── COL RESIZE ─────────────────────────────────────────────────── */
-thead th {
-  position: relative;
-}
-.col-resize-handle {
-  position: absolute;
-  top: 0; right: 0;
-  width: 5px; height: 100%;
-  cursor: col-resize;
-  user-select: none;
-  z-index: 1;
-}
-.col-resize-handle:hover,
-.col-resize-active {
-  background: var(--accent);
-  opacity: .5;
-}
-/* ── UTIL ────────────────────────────────────── */
-.hidden { display: none !important; }
-.chip {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 10px;
-  font-weight: 700;
-  background: rgba(255,102,0,.15);
-  color: var(--accent);
-}
+  /* ── FOOTER ── */
+  footer.site { background: var(--brand-navy); color: var(--brand-navy-pale); padding: var(--site-py-md) 0 28px; }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
+  @media (max-width: 780px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+  footer.site svg.wordmark { height: 18px; width: auto; color: #fff; margin-bottom: 14px; }
+  .footer-desc { font-size: 13px; line-height: 1.6; max-width: 260px; margin: 0 0 16px; }
+  .footer-pilar { display: flex; align-items: center; gap: 8px; }
+  .footer-pilar img { height: 15px; width: auto; }
+  .footer-pilar span { font-size: 11.5px; color: rgba(255,255,255,.45); }
+  .footer-col h4 { font-family: var(--font-brand); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: rgba(255,255,255,.5); margin: 0 0 14px; }
+  .footer-col a, .footer-col div.line { display: block; font-size: 13.5px; margin-bottom: 10px; color: var(--brand-navy-pale); }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,.1); margin-top: 40px; padding-top: 20px; font-size: 12px; color: rgba(255,255,255,.45); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
 </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div id="loading">
+  <svg class="wordmark" viewBox="0 0 1375.79 376.12" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M356.75,22.3v64.36h19.36V14.48l-19.36,7.82ZM14.48,0l7.86,19.37h331.48l7.82-19.37H14.48ZM353.82,356.71H22.34l-7.86,19.41h347.16l-7.82-19.41ZM19.36,22.3L0,14.44v347.25l19.36-7.86V22.3ZM356.75,289.42v64.4l19.36,7.82v-72.22h-19.36Z"/><path d="M200.09,121.97h-48.95v18.17h48.81c19.05,0,30.65,10.13,30.65,27.54s-11.59,28.03-30.65,28.03h-48.81v67.42h21.54v-49.26h27.41c31.67,0,52.06-16.7,52.06-46.33s-20.39-45.57-52.06-45.57Z"/><path d="M377.49,121.97h-23.9l-54.1,141.15h21.85l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM340.85,210.62l24.16-65.07,23.76,65.07h-47.93Z"/><path d="M593.71,121.97v107.26l-72.58-107.26h-23.59v141.15h20.08v-110.37l74.31,110.37h21.85V121.97h-20.08Z"/><path d="M735.75,121.97h-44.55v141.15h44.55c44.11,0,71.11-30.51,71.11-71.24s-25.94-69.91-71.11-69.91ZM734.86,244.33h-21.99v-103.76h21.99c32.56,0,49.83,19.5,49.83,51.3s-17.41,52.46-49.83,52.46Z"/><path d="M939.98,119.04c-40.91,0-71.86,31.49-71.86,73.29s30.96,73.73,71.86,73.73,71.64-32.11,71.64-73.73-30.78-73.29-71.64-73.29ZM939.98,246.55c-29.94,0-49.43-24.03-49.43-54.23s19.5-53.97,49.43-53.97,49.21,23.63,49.21,53.97-19.5,54.23-49.21,54.23Z"/><path d="M1151.49,206.8c21.41-5.11,34.16-20.65,34.16-40.86,0-28.16-19.5-43.97-51.88-43.97h-52.77v17.99h51.43c19.94,0,31.36,9.1,31.36,25.98s-11.42,25.94-31.36,25.94h-51.43v71.24h21.68v-53.08h25.94l35.18,53.08h25.94l-38.24-56.32Z"/><path d="M1322.13,121.97h-23.9l-53.97,141.15h21.72l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM1285.49,210.62l24.16-65.07,23.9,65.07h-48.06Z"/></svg>
   <div class="spinner"></div>
-  <h2>Vendidos ITBI</h2>
-  <p id="loadingMsg">Inicializando...</p>
+  <h2>Pandora Vendidos</h2>
+  <p id="loadingMsg">Carregando dados oficiais da Prefeitura de SP...</p>
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </div>
 
-<!-- APP -->
 <div id="app" class="hidden">
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3 7.5 12 3l9 4.5" />
-        <path d="M5 10.5v7a1.5 1.5 0 0 0 1.5 1.5h11A1.5 1.5 0 0 0 19 17.5v-7" />
-        <path d="M8.5 19v-5h7v5" />
-      </svg>
-      <span>Pandora</span> Vendidos
-    </div>
-    <span class="badge">ITBI SP</span>
-    <button class="btn-icon" id="btnTheme" title="Alternar tema" onclick="toggleTheme()" aria-label="Alternar tema">
-      <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3v2" />
-        <path d="M12 19v2" />
-        <path d="M4.93 4.93l1.41 1.41" />
-        <path d="M17.66 17.66l1.41 1.41" />
-        <path d="M3 12h2" />
-        <path d="M19 12h2" />
-        <path d="M4.93 19.07l1.41-1.41" />
-        <path d="M17.66 6.34l1.41-1.41" />
-        <circle cx="12" cy="12" r="4" />
-      </svg>
+<header class="site">
+  <div class="wrap header-inner">
+    <a href="index.html" class="logo-lockup">
+      <svg class="wordmark" viewBox="0 0 1375.79 376.12" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M356.75,22.3v64.36h19.36V14.48l-19.36,7.82ZM14.48,0l7.86,19.37h331.48l7.82-19.37H14.48ZM353.82,356.71H22.34l-7.86,19.41h347.16l-7.82-19.41ZM19.36,22.3L0,14.44v347.25l19.36-7.86V22.3ZM356.75,289.42v64.4l19.36,7.82v-72.22h-19.36Z"/><path d="M200.09,121.97h-48.95v18.17h48.81c19.05,0,30.65,10.13,30.65,27.54s-11.59,28.03-30.65,28.03h-48.81v67.42h21.54v-49.26h27.41c31.67,0,52.06-16.7,52.06-46.33s-20.39-45.57-52.06-45.57Z"/><path d="M377.49,121.97h-23.9l-54.1,141.15h21.85l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM340.85,210.62l24.16-65.07,23.76,65.07h-47.93Z"/><path d="M593.71,121.97v107.26l-72.58-107.26h-23.59v141.15h20.08v-110.37l74.31,110.37h21.85V121.97h-20.08Z"/><path d="M735.75,121.97h-44.55v141.15h44.55c44.11,0,71.11-30.51,71.11-71.24s-25.94-69.91-71.11-69.91ZM734.86,244.33h-21.99v-103.76h21.99c32.56,0,49.83,19.5,49.83,51.3s-17.41,52.46-49.83,52.46Z"/><path d="M939.98,119.04c-40.91,0-71.86,31.49-71.86,73.29s30.96,73.73,71.86,73.73,71.64-32.11,71.64-73.73-30.78-73.29-71.64-73.29ZM939.98,246.55c-29.94,0-49.43-24.03-49.43-54.23s19.5-53.97,49.43-53.97,49.21,23.63,49.21,53.97-19.5,54.23-49.21,54.23Z"/><path d="M1151.49,206.8c21.41-5.11,34.16-20.65,34.16-40.86,0-28.16-19.5-43.97-51.88-43.97h-52.77v17.99h51.43c19.94,0,31.36,9.1,31.36,25.98s-11.42,25.94-31.36,25.94h-51.43v71.24h21.68v-53.08h25.94l35.18,53.08h25.94l-38.24-56.32Z"/><path d="M1322.13,121.97h-23.9l-53.97,141.15h21.72l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM1285.49,210.62l24.16-65.07,23.9,65.07h-48.06Z"/></svg>
+      <div class="logo-divider"></div>
+      <span class="logo-sub">Vendidos</span>
+    </a>
+    <nav class="site-nav">
+      <a href="index.html" class="current">Início</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="blog/index.html">Blog</a>
+    </nav>
+    <a href="https://wa.me/5511945240721" target="_blank" class="nav-cta desktop-only">
+      <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px;color:#fff"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Falar com Alex
+    </a>
+    <button class="menu-btn" id="menuBtn" aria-label="Abrir menu">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
     </button>
-  </header>
+  </div>
+  <div class="mobile-nav" id="mobileNav">
+    <a href="index.html" class="current">Início</a>
+    <a href="sobre.html">Sobre</a>
+    <a href="blog/index.html">Blog</a>
+    <a href="https://wa.me/5511945240721" target="_blank" class="nav-cta">
+      <svg class="icon" viewBox="0 0 24 24" style="width:15px;height:15px;color:#fff"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      Falar com Alex
+    </a>
+  </div>
+</header>
 
-  <main>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <h1 class="hero-title">O preço real de venda — <strong>não uma estimativa.</strong></h1>
+        <p class="hero-sub">Dados oficiais da Prefeitura de São Paulo (ITBI): o valor que cada imóvel realmente foi vendido, não o valor anunciado.</p>
+        <p class="hero-stat"><b>718 mil</b> transações registradas desde 2020 · atualizado todo mês</p>
+        <p class="hero-meta">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+          Dado oficial da Prefeitura de São Paulo
+        </p>
+      </div>
 
-    <!-- SEARCH -->
-    <div class="search-panel">
-      <h1 class="search-title">Busca por endereço</h1>
-      <div class="address-cards" id="addressCards"></div>
-      <button class="add-link" onclick="addAddressCard()">+ Adicionar endereço</button>
-      <div class="actions-row">
-        <button class="btn secondary" onclick="clearSearch()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
-          <span>Limpar</span>
+      <div class="search-card">
+        <div id="addressCards"></div>
+        <button type="button" class="add-address" id="addAddressBtn" onclick="addAddressCard()">
+          <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 5v14M5 12h14"/></svg>
+          Adicionar outro endereço pra comparar
         </button>
-        <button class="btn" onclick="doSearch()">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6" /><path d="m20 20-4.2-4.2" /></svg>
-          <span>Buscar</span>
+        <div class="search-help">
+          <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+          Digite rua e número para ver todos os imóveis vendidos naquele endereço, de 2020 até hoje — sem cadastro, sem e-mail.
+        </div>
+        <button class="btn-buscar" onclick="doSearch()">
+          <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;color:#fff"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          Buscar vendidos
         </button>
+
+        <div class="results" id="resultsPanel">
+          <div class="results-source">
+            <span class="src-txt" id="resultsCount">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+              Fonte: Prefeitura de São Paulo, registro de ITBI — atualizado mensalmente
+            </span>
+            <button type="button" class="btn-export" id="btnExport">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+              Exportar dados
+            </button>
+          </div>
+          <div id="resultsList"></div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <!-- STATS -->
-    <div class="stats-bar hidden" id="statsBar">
-      <div class="stat">
-        <span class="stat-label">Resultados</span>
-        <span class="stat-value accent" id="statTotal">—</span>
-      </div>
-      <div class="sep"></div>
-      <div class="stat">
-        <span class="stat-label">Ticket Médio</span>
-        <span class="stat-value" id="statMedia">—</span>
-      </div>
-      <div class="sep"></div>
-      <div class="stat">
-        <span class="stat-label">Mais recente</span>
-        <span class="stat-value" id="statRecente">—</span>
-      </div>
-      <div class="sep"></div>
-      <div class="stat">
-        <span class="stat-label">Mais antiga</span>
-        <span class="stat-value" id="statAntiga">—</span>
+  <section class="block">
+    <div class="wrap">
+      <h2 class="block-title">Pra quem é o <strong>Pandora Vendidos</strong></h2>
+      <p class="block-sub">A mesma base de dados serve a três pessoas diferentes, cada uma com um motivo próprio pra usar.</p>
+      <div class="audience-grid">
+        <div class="audience-card"><h3>Proprietário</h3><p>Saiba, com dado real, quanto vale seu imóvel antes de decidir o preço.</p></div>
+        <div class="audience-card"><h3>Comprador</h3><p>Veja se o preço pedido faz sentido com o que a região vendeu de verdade.</p></div>
+        <div class="audience-card"><h3>Corretor parceiro</h3><p>Leve dado real pra reunião com o proprietário, não estimativa de portal.</p></div>
       </div>
     </div>
+  </section>
 
-    <!-- RESULTS -->
-    <div class="results-panel hidden" id="resultsPanel">
-      <div class="table-header">
-        <h3 id="resultsTitle">Resultados</h3>
-        <button class="btn-export hidden" id="btnExport" onclick="exportCSV()" title="Exportar para planilha">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v10" /><path d="m8 9 4 4 4-4" /><path d="M5 15v2a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2" /></svg>
-          <span>Exportar</span>
-        </button>
-      </div>
-      <div class="table-wrap">
-        <table id="resultsTable">
-          <thead>
-            <tr id="headerRow"></tr>
-            <tr class="filter-row" id="filterRow"></tr>
-          </thead>
-          <tbody id="resultsBody"></tbody>
-        </table>
-      </div>
-      <div class="empty-state hidden" id="emptyState">
-        <div class="icon"><svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></div>
-        <h3>Nenhum resultado encontrado</h3>
-        <p>Tente buscar por outros endereços ou ampliar o período.</p>
+  <section class="block alt">
+    <div class="wrap">
+      <div class="cta-final">
+        <div>
+          <h2>Quanto vale <strong>o seu imóvel</strong> — não a média do edifício.</h2>
+          <p class="cta-intro">O ITBI mostra o que já foi vendido. Uma avaliação completa vai além — e é isso que você recebe ao falar comigo:</p>
+          <ul class="cta-points">
+            <li><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Vendidos de prédios parecidos na sua região — não só o que rolou no seu endereço</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>Concorrentes disponíveis no mercado agora — o que está competindo com você</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Ajuste pelo que faz seu imóvel único: reforma, andar, vista, estado de conservação</span></li>
+          </ul>
+        </div>
+        <div>
+          <form class="lead-form" id="ctaForm">
+            <div class="f"><label>Nome</label><input type="text" id="ctaNome" placeholder="Seu nome" required></div>
+            <div class="f"><label>WhatsApp</label><input type="text" id="ctaWhats" placeholder="(11) 90000-0000" required></div>
+            <div class="f"><label>Endereço do imóvel</label><input type="text" id="ctaEndereco" placeholder="Rua e número"></div>
+            <div class="f">
+              <label>Sobre a venda</label>
+              <select id="ctaIntencao">
+                <option value="ja_decidi_vender">Já decidi vender</option>
+                <option value="pesquisando">Ainda estou pesquisando</option>
+                <option value="so_valor">Só quero entender o valor</option>
+              </select>
+            </div>
+            <button type="submit">Quero uma avaliação</button>
+          </form>
+          <div class="lead-thanks" id="ctaThanks">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+            <h3>Recebido!</h3>
+            <p>Alex vai te chamar no WhatsApp em breve.</p>
+          </div>
+        </div>
       </div>
     </div>
+  </section>
+</main>
 
-  </main>
+<footer class="site">
+  <div class="wrap footer-grid">
+    <div>
+      <svg class="wordmark" viewBox="0 0 1375.79 376.12" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M356.75,22.3v64.36h19.36V14.48l-19.36,7.82ZM14.48,0l7.86,19.37h331.48l7.82-19.37H14.48ZM353.82,356.71H22.34l-7.86,19.41h347.16l-7.82-19.41ZM19.36,22.3L0,14.44v347.25l19.36-7.86V22.3ZM356.75,289.42v64.4l19.36,7.82v-72.22h-19.36Z"/><path d="M200.09,121.97h-48.95v18.17h48.81c19.05,0,30.65,10.13,30.65,27.54s-11.59,28.03-30.65,28.03h-48.81v67.42h21.54v-49.26h27.41c31.67,0,52.06-16.7,52.06-46.33s-20.39-45.57-52.06-45.57Z"/><path d="M377.49,121.97h-23.9l-54.1,141.15h21.85l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM340.85,210.62l24.16-65.07,23.76,65.07h-47.93Z"/><path d="M593.71,121.97v107.26l-72.58-107.26h-23.59v141.15h20.08v-110.37l74.31,110.37h21.85V121.97h-20.08Z"/><path d="M735.75,121.97h-44.55v141.15h44.55c44.11,0,71.11-30.51,71.11-71.24s-25.94-69.91-71.11-69.91ZM734.86,244.33h-21.99v-103.76h21.99c32.56,0,49.83,19.5,49.83,51.3s-17.41,52.46-49.83,52.46Z"/><path d="M939.98,119.04c-40.91,0-71.86,31.49-71.86,73.29s30.96,73.73,71.86,73.73,71.64-32.11,71.64-73.73-30.78-73.29-71.64-73.29ZM939.98,246.55c-29.94,0-49.43-24.03-49.43-54.23s19.5-53.97,49.43-53.97,49.21,23.63,49.21,53.97-19.5,54.23-49.21,54.23Z"/><path d="M1151.49,206.8c21.41-5.11,34.16-20.65,34.16-40.86,0-28.16-19.5-43.97-51.88-43.97h-52.77v17.99h51.43c19.94,0,31.36,9.1,31.36,25.98s-11.42,25.94-31.36,25.94h-51.43v71.24h21.68v-53.08h25.94l35.18,53.08h25.94l-38.24-56.32Z"/><path d="M1322.13,121.97h-23.9l-53.97,141.15h21.72l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM1285.49,210.62l24.16-65.07,23.9,65.07h-48.06Z"/></svg>
+      <p class="footer-desc">Ferramenta gratuita de consulta de imóveis vendidos, com dados oficiais da Prefeitura de São Paulo (ITBI).</p>
+      <div class="footer-pilar">
+        <img src="img/logo_pandora.png" alt="Logo da Rede Pilar">
+        <span>Parceiro Rede Pilar</span>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Navegação</h4>
+      <a href="index.html">Início</a>
+      <a href="sobre.html">Sobre</a>
+      <a href="blog/index.html">Blog</a>
+    </div>
+    <div class="footer-col">
+      <h4>Pandora Homes</h4>
+      <div class="line">Alex Fontes</div>
+      <div class="line">CRECI 205029-F</div>
+      <a href="https://www.pandorahomes.com.br" target="_blank">pandorahomes.com.br</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contato</h4>
+      <a href="tel:+5511945240721">(11) 94524-0721</a>
+      <a href="mailto:alexccfontes@gmail.com">alexccfontes@gmail.com</a>
+      <a href="https://instagram.com/homespandora" target="_blank">@homespandora</a>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© 2026 Pandora Homes</span>
+    <span>Dados: Prefeitura de São Paulo (ITBI)</span>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="exportModal">
+  <div class="modal-card">
+    <button type="button" class="modal-close" id="exportModalClose">
+      <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+    <form id="exportForm">
+      <h3>Antes de exportar</h3>
+      <p class="modal-sub">Preenche rapidinho — a planilha é baixada na hora.</p>
+      <div class="f"><label>Nome</label><input type="text" id="expNome" placeholder="Seu nome" required></div>
+      <div class="f"><label>E-mail</label><input type="email" id="expEmail" placeholder="seu@email.com" required></div>
+      <div class="f"><label>Telefone</label><input type="text" id="expTelefone" placeholder="(11) 90000-0000"></div>
+      <div class="f">
+        <label>Você é</label>
+        <select id="expTipo">
+          <option value="proprietario">Proprietário</option>
+          <option value="comprador">Comprador</option>
+          <option value="corretor">Corretor</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-buscar" style="width:100%;justify-content:center">
+        <svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;color:#fff"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        Exportar planilha
+      </button>
+    </form>
+    <div class="modal-thanks" id="exportThanks">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+      <h3>Prontinho!</h3>
+      <p>A planilha foi baixada.</p>
+    </div>
+  </div>
+</div>
+
 </div>
 
 <script>
-// ─── CONFIG ────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════
+// SUPABASE — leads públicos (tabela leads_vendidos, insert-only p/ anon)
+// ══════════════════════════════════════════════════════════════════
+const SUPABASE_URL = 'https://sobmjqounukzbplrmhkr.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_o5fTXnmp8hhp76WymPJ_MQ_MuJUhvfY';
+async function saveLead(payload) {
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/leads_vendidos', {
+      method: 'POST',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+      body: JSON.stringify(payload)
+    });
+  } catch (e) { console.error('Erro ao salvar lead:', e); }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// MOTOR DE BUSCA — mesma lógica do Vendidos ITBI original
+// ══════════════════════════════════════════════════════════════════
 const DB_URL = './ITBI_SP_residencial.db.gz';
-const COLS = [
-  { key: 'data_transacao',    label: 'Data',       fmt: 'date'  },
-  { key: 'logradouro',        label: 'Rua',        fmt: 'text'  },
-  { key: 'numero',            label: 'Nº',         fmt: 'text'  },
-  { key: 'complemento',       label: 'Complemento',fmt: 'text'  },
-  { key: 'bairro',            label: 'Bairro',     fmt: 'text'  },
-  { key: 'referencia',        label: 'Edifício',   fmt: 'text'  },
-  { key: 'area_construida_m2',label: 'A.C. (m²)',  fmt: 'num'   },
-  { key: 'valor_transacao',   label: 'Valor',      fmt: 'money' },
-  { key: 'valor_m2',          label: 'R$/m²',      fmt: 'money' },
-  { key: 'cartorio',          label: 'Cartório',   fmt: 'cartorio' },
-  { key: 'matricula',         label: 'Matrícula',  fmt: 'text'  },
-  { key: 'sql',               label: 'SQL',        fmt: 'text'  },
-];
-
-// ─── STATE ─────────────────────────────────────────────────────────
 let db = null;
-let colWidths = {}; // user-set column widths in px
-let allResults = [];
-let filteredResults = [];
-let sortCol = 'data_transacao';
-let sortDir = 'DESC';
 let cardCount = 0;
-let colFilters = {};
+let filteredResults = [];
+let acDebounce = {};
 
-// ─── INIT ───────────────────────────────────────────────────────────
 window.addEventListener('load', async () => {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  }
+  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
   addAddressCard();
-  applyThemeIcon();
   await loadDatabase();
 });
 
 async function loadDatabase() {
   try {
-    setProgress(5, 'Carregando motor SQL...');
-    const SQL = await initSqlJs({
-      locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}`
-    });
-
-    setProgress(20, 'Baixando banco de dados (47 MB)...');
+    setProgress(5, 'Carregando motor de busca...');
+    const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}` });
+    setProgress(20, 'Baixando dados oficiais...');
     const res = await fetch(DB_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
     const reader = res.body.getReader();
     const total = parseInt(res.headers.get('content-length') || '0');
     let received = 0;
     const chunks = [];
-
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -735,35 +448,23 @@ async function loadDatabase() {
       received += value.length;
       if (total > 0) {
         const pct = 20 + Math.round((received / total) * 50);
-        setProgress(pct, `Baixando... ${Math.round(received/1024/1024)}MB de ${Math.round(total/1024/1024)}MB`);
+        setProgress(pct, `Carregando dados oficiais... ${Math.round(received/1024/1024)}MB de ${Math.round(total/1024/1024)}MB`);
       }
     }
-
-    setProgress(72, 'Descomprimindo...');
+    setProgress(72, 'Preparando...');
     const compressed = new Uint8Array(received);
     let offset = 0;
     for (const chunk of chunks) { compressed.set(chunk, offset); offset += chunk.length; }
     const decompressed = pako.inflate(compressed);
-
-    setProgress(90, 'Preparando banco...');
+    setProgress(90, 'Quase lá...');
     db = new SQL.Database(decompressed);
-
     setProgress(100, 'Pronto!');
     setTimeout(() => {
       document.getElementById('loading').classList.add('hidden');
       document.getElementById('app').classList.remove('hidden');
-
-      // DB sanity check
-      try {
-        var ts = db.prepare('SELECT COUNT(*) as n FROM vendas');
-        ts.step(); var cnt = ts.getAsObject(); ts.free();
-        console.log('DB OK, total rows:', cnt.n);
-      } catch(e) { console.error('DB check failed:', e); }
-
-    }, 400);
-
+    }, 300);
   } catch (e) {
-    document.getElementById('loadingMsg').textContent = 'Erro: ' + e.message;
+    document.getElementById('loadingMsg').textContent = 'Erro ao carregar: ' + e.message;
     document.getElementById('loadingMsg').style.color = '#ef4444';
     console.error(e);
   }
@@ -774,22 +475,7 @@ function setProgress(pct, msg) {
   document.getElementById('loadingMsg').textContent = msg;
 }
 
-// ─── THEME ─────────────────────────────────────────────────────────
-var ICON_SUN  = '<path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/><circle cx="12" cy="12" r="4"/>';
-var ICON_MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
-function applyThemeIcon() {
-  var dark = document.documentElement.getAttribute('data-theme') === 'dark';
-  var el = document.getElementById('themeIcon');
-  if (el) el.innerHTML = dark ? ICON_SUN : ICON_MOON;
-  document.getElementById('themeColor').content = dark ? '#0f0f0f' : '#ffffff';
-}
-function toggleTheme() {
-  var html = document.documentElement;
-  html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-  applyThemeIcon();
-}
-
-// ─── ADDRESS CARDS ──────────────────────────────────────────────────
+// ─── ADDRESS CARDS ───
 function addAddressCard() {
   cardCount++;
   const id = cardCount;
@@ -800,27 +486,23 @@ function addAddressCard() {
   card.innerHTML = `
     <span class="address-num"></span>
     <div class="autocomplete-wrapper">
-      <input type="text" id="rua-${id}" placeholder="Logradouro (ex: Alameda Tietê)" autocomplete="off" spellcheck="false" style="width:100%">
+      <input type="text" id="rua-${id}" placeholder="Ex: Alameda Lorena" autocomplete="off" spellcheck="false">
       <div class="autocomplete-list hidden" id="ac-rua-${id}"></div>
     </div>
-    <div class="autocomplete-wrapper">
-      <input type="text" id="num-${id}" placeholder="Número" autocomplete="off" style="width:100%">
+    <div class="autocomplete-wrapper num-wrapper">
+      <input type="text" id="num-${id}" placeholder="Número" autocomplete="off">
       <div class="autocomplete-list hidden" id="ac-num-${id}"></div>
     </div>
-    <button class="btn-remove" onclick="removeCard(${id})" title="Remover">×</button>`;
+    <button type="button" class="btn-remove" onclick="removeCard(${id})" title="Remover">×</button>`;
   container.appendChild(card);
   renumberCards();
-  document.getElementById(`rua-${id}`).focus();
   setupCardAutocomplete(id);
 }
-
 function renumberCards() {
-  document.querySelectorAll('#addressCards .address-card').forEach(function(card, i) {
-    var n = card.querySelector('.address-num');
-    if (n) n.textContent = (i + 1) + '.';
+  document.querySelectorAll('#addressCards .address-card').forEach((card, i) => {
+    card.querySelector('.address-num').textContent = (i + 1) + '.';
   });
 }
-
 function removeCard(id) {
   const cards = document.querySelectorAll('.address-card');
   if (cards.length <= 1) return;
@@ -828,9 +510,7 @@ function removeCard(id) {
   renumberCards();
 }
 
-// ─── AUTOCOMPLETE ───────────────────────────────────────────────────
-let acDebounce = {};
-
+// ─── AUTOCOMPLETE ───
 function showDropdown(listEl, items, onSelect) {
   closeAllDropdowns();
   if (!items || items.length === 0) return;
@@ -844,14 +524,8 @@ function showDropdown(listEl, items, onSelect) {
   });
   listEl.classList.remove('hidden');
 }
-
-function closeAllDropdowns() {
-  document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden'));
-}
-
-document.addEventListener('click', e => {
-  if (!e.target.closest('.autocomplete-wrapper')) closeAllDropdowns();
-});
+function closeAllDropdowns() { document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden')); }
+document.addEventListener('click', e => { if (!e.target.closest('.autocomplete-wrapper')) closeAllDropdowns(); });
 
 function queryDB(sql, params) {
   if (!db) return [];
@@ -866,10 +540,7 @@ function queryDB(sql, params) {
     }
     stmt.free();
     return rows;
-  } catch(e) {
-    console.warn('queryDB error:', e.message, '|', sql);
-    return [];
-  }
+  } catch(e) { console.warn('queryDB error:', e.message); return []; }
 }
 
 function setupCardAutocomplete(id) {
@@ -884,89 +555,38 @@ function setupCardAutocomplete(id) {
       const val = ruaEl.value.trim();
       if (val.length < 2) { closeAllDropdowns(); return; }
       const norm = normalizeLogradouro(val);
-      const items = queryDB(
-        `SELECT DISTINCT logradouro_norm FROM vendas WHERE logradouro_norm LIKE ? ORDER BY logradouro_norm LIMIT 15`,
-        [`%${norm}%`]
-      );
+      const items = queryDB(`SELECT DISTINCT logradouro_norm FROM vendas WHERE logradouro_norm LIKE ? ORDER BY logradouro_norm LIMIT 15`, [`%${norm}%`]);
       showDropdown(ruaList, items, chosen => {
         ruaEl.value = chosen;
         numEl.focus();
-        const nums = queryDB(
-          `SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
-          [chosen]
-        );
+        const nums = queryDB(`SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`, [chosen]);
         showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
       });
     }, 220);
   });
-
   ruaEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
 
   numEl.addEventListener('focus', () => {
     const street = ruaEl.value.trim();
     if (!street || numEl.value) return;
-    const nums = queryDB(
-      `SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`,
-      [normalizeLogradouro(street)]
-    );
+    const nums = queryDB(`SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`, [normalizeLogradouro(street)]);
     showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
   });
-
   numEl.addEventListener('input', () => {
     clearTimeout(acDebounce[`num-${id}`]);
     acDebounce[`num-${id}`] = setTimeout(() => {
       const street = ruaEl.value.trim();
       const val = numEl.value.trim();
       if (!val) return;
-      const items = queryDB(
-        `SELECT DISTINCT numero FROM vendas WHERE logradouro_norm LIKE ? AND numero LIKE ? ORDER BY CAST(numero AS INTEGER) LIMIT 20`,
-        [`%${normalizeLogradouro(street)}%`, `${val}%`]
-      );
+      const items = queryDB(`SELECT DISTINCT numero FROM vendas WHERE logradouro_norm LIKE ? AND numero LIKE ? ORDER BY CAST(numero AS INTEGER) LIMIT 20`, [`%${normalizeLogradouro(street)}%`, `${val}%`]);
       showDropdown(numList, items, n => { numEl.value = n; doSearch(); });
     }, 200);
   });
-
   numEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
 }
 
-function setupSimpleAutocomplete(inputId, listId, getSql, transform) {
-  const el = document.getElementById(inputId);
-  const list = document.getElementById(listId);
-  if (!el || !list) return;
-  el.addEventListener('input', () => {
-    clearTimeout(acDebounce[inputId]);
-    acDebounce[inputId] = setTimeout(() => {
-      const val = el.value.trim();
-      if (val.length < 2) { closeAllDropdowns(); return; }
-      const norm = removeAccents(val.toUpperCase());
-      const items = queryDB(getSql(norm), [`%${norm}%`]);
-      showDropdown(list, items, chosen => { el.value = chosen; });
-    }, 220);
-  });
-  el.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
-}
-
-// ─── NORMALIZE ──────────────────────────────────────────────────────
-function removeAccents(str) {
-  var norm = str.normalize('NFD');
-  return norm.replace(/[\u0300-\u036f]/g, '');
-}
-
-function normalizeStreet(input) {
-  // Uppercase + remove accents (legado — mantido para compatibilidade)
-  let s = removeAccents(input.trim().toUpperCase());
-  const prefixes = [
-    'ALAMEDA','AVENIDA','TRAVESSA','ESTRADA','RODOVIA','PRACA','LARGO','RUA',
-    'AL','AV','EST','TV','PC','R'
-  ];
-  for (const p of prefixes) {
-    const re = new RegExp('^' + p + '\\s+');
-    if (re.test(s)) { s = s.replace(re, '').trim(); break; }
-  }
-  return s;
-}
-
-// Normaliza logradouro igual ao banco (logradouro_norm)
+// ─── NORMALIZE ───
+function removeAccents(str) { return str.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 const _NORM_MAP = [
   [/^R\b/,'RUA'],[/^AV\b/,'AVENIDA'],[/^AL\b/,'ALAMEDA'],[/^PC\b/,'PRACA'],
   [/^PCA\b/,'PRACA'],[/^TV\b/,'TRAVESSA'],[/^EST\b/,'ESTRADA'],[/^RD\b/,'RODOVIA'],
@@ -986,11 +606,9 @@ function normalizeLogradouro(s) {
   return s;
 }
 
-// ─── SEARCH ─────────────────────────────────────────────────────────
+// ─── SEARCH ───
 function doSearch() {
   if (!db) return;
-
-  // Collect address cards
   const addresses = [];
   document.querySelectorAll('.address-card').forEach(card => {
     const id = card.id.replace('card-', '');
@@ -998,376 +616,142 @@ function doSearch() {
     const num = document.getElementById(`num-${id}`)?.value?.trim() || '';
     if (rua) addresses.push({ rua, num });
   });
+  if (addresses.length === 0) { alert('Digite pelo menos um endereço para buscar.'); return; }
 
-  if (addresses.length === 0) {
-    alert('Digite pelo menos um endereço para buscar.');
-    return;
-  }
-
-  // Build WHERE clause with positional ? params
-  const conditions = [];
   const params = [];
-
-  var searchClauses = [];
-  addresses.forEach(function(a) {
+  const searchClauses = [];
+  addresses.forEach(a => {
     const normalized = normalizeLogradouro(a.rua);
     params.push('%' + normalized + '%');
     let clause = 'logradouro_norm LIKE ?';
-    if (a.num) {
-      params.push(a.num.trim());
-      clause += ' AND numero LIKE ?';
-    }
+    if (a.num) { params.push(a.num.trim()); clause += ' AND numero LIKE ?'; }
     searchClauses.push('(' + clause + ')');
   });
-  if (searchClauses.length > 0) {
-    conditions.push('(' + searchClauses.join(' OR ') + ')');
-  }
-
-  var sql = 'SELECT sql, data_transacao, logradouro, numero, complemento, bairro, ' +
-    'referencia, area_construida_m2, ' +
-    'valor_transacao, valor_m2, cartorio, matricula ' +
-    'FROM vendas WHERE ' + conditions.join(' AND ') +
-    ' ORDER BY data_transacao DESC LIMIT 2000';
-
-  console.log('SQL:', sql);
-  console.log('PARAMS:', JSON.stringify(params));
+  const sql = 'SELECT data_transacao, logradouro, numero, complemento, bairro, referencia, ' +
+    'area_construida_m2, valor_transacao, valor_m2 FROM vendas WHERE (' + searchClauses.join(' OR ') + ')' +
+    ' ORDER BY data_transacao DESC LIMIT 500';
 
   try {
     var stmt = db.prepare(sql);
     stmt.bind(params);
-    allResults = [];
-    while (stmt.step()) allResults.push(stmt.getAsObject());
+    filteredResults = [];
+    while (stmt.step()) filteredResults.push(stmt.getAsObject());
     stmt.free();
-    console.log('Results found:', allResults.length);
-  } catch (e) {
-    console.error('SQL Error:', e.message);
-    alert('Erro na consulta: ' + e.message);
-    return;
-  }
+  } catch (e) { console.error('SQL Error:', e.message); alert('Erro na consulta: ' + e.message); return; }
 
-  colFilters = {};
-  filteredResults = [...allResults];
-  renderStats();
-  renderTable();
+  renderResults();
 }
 
-// ─── STATS ──────────────────────────────────────────────────────────
-function renderStats() {
-  const data = filteredResults;
-  document.getElementById('statsBar').classList.toggle('hidden', data.length === 0);
-  if (data.length === 0) return;
-
-  document.getElementById('statTotal').textContent = data.length.toLocaleString('pt-BR');
-
-  const vals = data.filter(r => r.valor_transacao > 0).map(r => r.valor_transacao);
-  const media = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
-  document.getElementById('statMedia').textContent = formatMoney(media);
-
-  const dates = data.filter(r => r.data_transacao).map(r => r.data_transacao).sort();
-  document.getElementById('statRecente').textContent = dates.length ? formatDate(dates[dates.length - 1]) : '—';
-  document.getElementById('statAntiga').textContent  = dates.length ? formatDate(dates[0]) : '—';
-}
-
-// ─── TABLE ──────────────────────────────────────────────────────────
-function renderTable() {
+function renderResults() {
   const panel = document.getElementById('resultsPanel');
-  const empty = document.getElementById('emptyState');
-  panel.classList.remove('hidden');
-  var exportBtn = document.getElementById('btnExport');
-  var hasResults = filteredResults.length > 0;
-  if (exportBtn) exportBtn.classList.toggle('hidden', !hasResults);
+  const list = document.getElementById('resultsList');
+  const count = document.getElementById('resultsCount');
+  panel.classList.add('show');
+  document.getElementById('btnExport').classList.toggle('hidden', filteredResults.length === 0);
 
-  document.getElementById('resultsTitle').textContent =
-    `${filteredResults.length.toLocaleString('pt-BR')} resultado${filteredResults.length !== 1 ? 's' : ''}` +
-    (filteredResults.length < allResults.length ? ` (filtrado de ${allResults.length.toLocaleString('pt-BR')})` : '');
-
-  // Use card layout on mobile
-  if (window.innerWidth <= 640) {
-    renderCards();
-    return;
-  }
-
-  // Hide cards view if switching back to desktop
-  var existing = document.querySelector('.mobile-cards-view');
-  if (existing) existing.remove();
-  document.querySelector('.table-wrap').style.display = '';
-
-  // Helper para preferir logradouro_fmt se existir
-  function getCellValue(row, key) {
-    if (key === 'logradouro') {
-      if (row.logradouro_fmt && String(row.logradouro_fmt).trim()) return row.logradouro_fmt;
-      return row.logradouro || '—';
-    }
-    return row[key];
-  }
-
-  // Header
-  const headerRow = document.getElementById('headerRow');
-  headerRow.innerHTML = COLS.map(c => {
-    const isSorted = sortCol === c.key;
-    const icon = isSorted ? (sortDir === 'ASC' ? '↑' : '↓') : '↕';
-    return `<th onclick="sortBy('${c.key}')" class="${isSorted ? 'sorted' : ''}">
-      ${c.label} <span class="sort-icon">${icon}</span>
-    </th>`;
-  }).join('');
-
-  // Filter row
-  const filterRow = document.getElementById('filterRow');
-  filterRow.innerHTML = COLS.map(c =>
-    `<th><input type="text" placeholder="Filtrar" value="${colFilters[c.key] || ''}"
-      oninput="applyColFilter('${c.key}', this.value)" style="min-width:55px;"></th>`
-  ).join('');
-
-  // Body
-  const tbody = document.getElementById('resultsBody');
   if (filteredResults.length === 0) {
-    empty.classList.remove('hidden');
-    tbody.innerHTML = '';
+    count.innerHTML = 'Nenhum resultado encontrado';
+    list.innerHTML = '<div class="results-empty">Não encontramos vendas registradas nesse endereço. Confira a grafia da rua ou tente sem o número.</div>';
     return;
   }
-  empty.classList.add('hidden');
 
-  const rows = filteredResults.map(row => {
-    const cells = COLS.map(c => {
-      const v = getCellValue(row, c.key);
-      if (v === null || v === undefined || v === '') return `<td class="tag">—</td>`;
-      switch (c.fmt) {
-        case 'date':  return `<td class="val-date">${formatDate(v)}</td>`;
-        case 'money': return `<td class="val-money">${formatMoney(v)}</td>`;
-        case 'num':   return `<td>${v ? Number(v).toLocaleString('pt-BR') : '—'}</td>`;
-        case 'cartorio': return `<td class="tag">${shortCartorio(v)}</td>`;
-        default:      return `<td>${v}</td>`;
-      }
-    }).join('');
-    return `<tr>${cells}</tr>`;
+  count.innerHTML = `
+    <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
+    ${filteredResults.length} ${filteredResults.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'} · Fonte: Prefeitura de São Paulo (ITBI)`;
+
+  list.innerHTML = filteredResults.map(row => {
+    const comp = row.complemento ? ' — ' + row.complemento : '';
+    const area = row.area_construida_m2 ? Math.round(row.area_construida_m2) + ' m²' : '';
+    const bairro = row.bairro || '';
+    return `
+      <div class="result-row">
+        <div>
+          <div class="result-addr">${esc(row.logradouro)}, ${esc(row.numero)}${esc(comp)}</div>
+          <div class="result-meta">${esc([area, bairro].filter(Boolean).join(' · '))}</div>
+        </div>
+        <div class="result-price">
+          <div class="val">${formatMoney(row.valor_transacao)}</div>
+          <div class="m2">${formatMoney(row.valor_m2)}/m² · vendido ${formatDate(row.data_transacao)}</div>
+        </div>
+      </div>`;
   }).join('');
-
-  tbody.innerHTML = rows;
-  setupColResize();
 }
+function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-// ─── CARDS (mobile) ──────────────────────────────────────────────────
-function renderCards() {
-  // Hide table
-  document.querySelector('.table-wrap').style.display = 'none';
-  document.getElementById('headerRow').innerHTML = '';
-  document.getElementById('filterRow').innerHTML = '';
-  document.getElementById('resultsBody').innerHTML = '';
-
-  // Remove old cards view
-  var old = document.querySelector('.mobile-cards-view');
-  if (old) old.remove();
-
-  const empty = document.getElementById('emptyState');
-  if (filteredResults.length === 0) {
-    empty.classList.remove('hidden');
-    return;
-  }
-  empty.classList.add('hidden');
-
-  var container = document.createElement('div');
-  container.className = 'mobile-cards-view';
-
-  filteredResults.forEach(function(row) {
-    var addr = (row.logradouro_fmt && String(row.logradouro_fmt).trim()) ? row.logradouro_fmt : (row.logradouro || '—');
-    if (row.numero) addr += ', ' + row.numero;
-    var comp = '';
-    if (row.complemento) comp += row.complemento;
-    if (row.bairro) comp += (comp ? ' · ' : '') + row.bairro;
-
-    var edificio = row.referencia || '';
-    var area = row.area_construida_m2 ? Number(row.area_construida_m2).toLocaleString('pt-BR') + ' m²' : '—';
-    var valor = row.valor_transacao ? formatMoney(row.valor_transacao) : '—';
-    var vm2 = row.valor_m2 ? formatMoney(row.valor_m2) : '—';
-    var data = row.data_transacao ? formatDate(row.data_transacao) : '—';
-    var cart = row.cartorio ? shortCartorio(row.cartorio) : '';
-    var mat = row.matricula || '';
-    var sql = row.sql || '';
-
-    var card = document.createElement('div');
-    card.className = 'result-card';
-    card.innerHTML =
-      '<div class="result-card-addr">' + addr + '</div>' +
-      (comp ? '<div class="result-card-comp">' + comp + '</div>' : '') +
-      (edificio ? '<div class="result-card-edificio">' + edificio + '</div>' : '') +
-      '<div class="result-card-values">' +
-        '<div class="result-card-val">' +
-          '<span class="result-card-val-label">Área</span>' +
-          '<span class="result-card-val-num">' + area + '</span>' +
-        '</div>' +
-        '<div class="result-card-val">' +
-          '<span class="result-card-val-label">Valor</span>' +
-          '<span class="result-card-val-num money">' + valor + '</span>' +
-        '</div>' +
-        '<div class="result-card-val">' +
-          '<span class="result-card-val-label">R$/m²</span>' +
-          '<span class="result-card-val-num m2">' + vm2 + '</span>' +
-        '</div>' +
-      '</div>' +
-      '<div class="result-card-footer">' +
-        '<span class="result-card-tag">' + data + '</span>' +
-        (cart ? '<span class="result-card-tag">' + cart + '</span>' : '') +
-        (mat ? '<span class="result-card-tag">Mat. ' + mat + '</span>' : '') +
-        (sql ? '<span class="result-card-tag">SQL ' + sql + '</span>' : '') +
-      '</div>';
-
-    container.appendChild(card);
-  });
-
-  document.getElementById('resultsPanel').appendChild(container);
-}
-
-function applyColFilter(key, val) {
-  colFilters[key] = val.trim().toUpperCase();
-  filteredResults = allResults.filter(row =>
-    Object.entries(colFilters).every(([k, v]) => {
-      if (!v) return true;
-      const cell = String(row[k] ?? '').toUpperCase();
-      return cell.includes(v);
-    })
-  );
-  renderStats();
-  renderTable();
-}
-
-function sortBy(key) {
-  if (sortCol === key) {
-    sortDir = sortDir === 'DESC' ? 'ASC' : 'DESC';
-  } else {
-    sortCol = key;
-    sortDir = 'DESC';
-  }
-  const col = COLS.find(c => c.key === key);
-  filteredResults.sort((a, b) => {
-    let va = a[key] ?? '', vb = b[key] ?? '';
-    if (col?.fmt === 'money' || col?.fmt === 'num') {
-      va = parseFloat(va) || 0;
-      vb = parseFloat(vb) || 0;
-    } else {
-      va = String(va).toLowerCase();
-      vb = String(vb).toLowerCase();
-    }
-    if (va < vb) return sortDir === 'ASC' ? -1 : 1;
-    if (va > vb) return sortDir === 'ASC' ? 1 : -1;
-    return 0;
-  });
-  renderTable();
-}
-
-// ─── COLUMN RESIZE ───────────────────────────────────────────────────
-function setupColResize() {
-  var headerRow = document.getElementById('headerRow');
-  if (!headerRow) return;
-  var ths = headerRow.querySelectorAll('th');
-  ths.forEach(function(th, i) {
-    // Apply saved width
-    if (colWidths[i]) th.style.width = colWidths[i] + 'px';
-    // Remove old handle if any
-    var old = th.querySelector('.col-resize-handle');
-    if (old) old.remove();
-    // Add handle
-    var handle = document.createElement('span');
-    handle.className = 'col-resize-handle';
-    handle.addEventListener('mousedown', function(e) {
-      e.preventDefault();
-      var startX = e.pageX;
-      var startW = th.offsetWidth;
-      handle.classList.add('col-resize-active');
-      function onMove(e) {
-        var w = Math.max(40, startW + e.pageX - startX);
-        th.style.width = w + 'px';
-        colWidths[i] = w;
-      }
-      function onUp() {
-        handle.classList.remove('col-resize-active');
-        document.removeEventListener('mousemove', onMove);
-        document.removeEventListener('mouseup', onUp);
-      }
-      document.addEventListener('mousemove', onMove);
-      document.addEventListener('mouseup', onUp);
-    });
-    th.appendChild(handle);
-  });
-}
-
-// ─── CLEAR ──────────────────────────────────────────────────────────
-function clearSearch() {
-  // Volta as linhas de endereço para uma só
-  document.getElementById('addressCards').innerHTML = '';
-  cardCount = 0;
-  addAddressCard();
-  // Esconde resultados
-  document.getElementById('resultsPanel').classList.add('hidden');
-  document.getElementById('statsBar').classList.add('hidden');
-  var exp = document.getElementById('btnExport');
-  if (exp) exp.classList.add('hidden');
-  allResults = []; filteredResults = [];
-}
-
-// ─── EXPORT ─────────────────────────────────────────────────────────
-function exportCSV() {
-  if (!filteredResults.length) return;
-  var BOM = '﻿'; // UTF-8 BOM for Excel
-  var headers = COLS.map(function(c) { return '"' + c.label + '"'; }).join(';');
-  var rows = filteredResults.map(function(row) {
-    return COLS.map(function(col) {
-      var v = row[col.key];
-      if (v === null || v === undefined) return '';
-      if (col.fmt === 'date') return formatDate(v);
-      if (col.fmt === 'money') return String(v).replace('.', ',');
-      if (col.fmt === 'num')   return String(v || '').replace('.', ',');
-      if (col.fmt === 'cartorio') return shortCartorio(v);
-      if (col.fmt === 'tag')   return shortIptu(v);
-      return '"' + String(v).replace(/"/g, '""') + '"';
-    }).join(';');
-  });
-  var csv = BOM + headers + '\n' + rows.join('\n');
-  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  var now = new Date();
-  var ts = now.getFullYear() + '-' +
-    String(now.getMonth()+1).padStart(2,'0') + '-' +
-    String(now.getDate()).padStart(2,'0');
-  a.download = 'ITBI_Vendidos_' + ts + '.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-// ─── FORMAT ─────────────────────────────────────────────────────────
 function formatDate(v) {
   if (!v) return '—';
-  const d = String(v).slice(0, 10);
-  const [y, m, dd] = d.split('-');
-  return `${dd}/${m}/${y}`;
+  const [y, m, d] = String(v).slice(0, 10).split('-');
+  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  return `${meses[parseInt(m,10)-1]}/${y}`;
 }
-
 function formatMoney(v) {
   if (!v || isNaN(v)) return '—';
   return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-function shortCartorio(v) {
-  if (!v) return '—';
-  // "5º Cartório de Registro de Imóvel" → "5º CRI"
-  var m = v.match(/^(\d+)[ºª°]?/);
-  if (m) return m[1] + 'º CRI';
-  if (v.toLowerCase().includes('cartório')) return 'CRI';
-  return v.slice(0, 6);
+// ─── EXPORT (Excel, com cabeçalho da marca) ───
+function exportXLSX() {
+  if (!filteredResults.length || typeof XLSX === 'undefined') return;
+  const now = new Date();
+  const dataGeracao = now.toLocaleDateString('pt-BR');
+  const aoa = [
+    ['Pandora Vendidos — Alex Fontes · CRECI 205029-F · (11) 94524-0721 · alexccfontes@gmail.com'],
+    ['Dados oficiais da Prefeitura de São Paulo (ITBI) · gerado em ' + dataGeracao],
+    [],
+    ['Data', 'Rua', 'Número', 'Complemento', 'Bairro', 'Edifício', 'Área (m²)', 'Valor (R$)', 'R$/m²'],
+  ];
+  filteredResults.forEach(row => {
+    aoa.push([
+      formatDate(row.data_transacao), row.logradouro || '', row.numero || '', row.complemento || '',
+      row.bairro || '', row.referencia || '', row.area_construida_m2 || '', row.valor_transacao || '', row.valor_m2 || ''
+    ]);
+  });
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+  ws['!cols'] = [{wch:10},{wch:26},{wch:8},{wch:16},{wch:18},{wch:20},{wch:11},{wch:14},{wch:12}];
+  ws['!merges'] = [{ s: {r:0,c:0}, e: {r:0,c:8} }, { s: {r:1,c:0}, e: {r:1,c:8} }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Vendidos');
+  const ts = now.toISOString().slice(0,10);
+  XLSX.writeFile(wb, `Pandora_Vendidos_${ts}.xlsx`);
 }
 
-function shortIptu(v) {
-  if (!v) return '—';
-  if (v.includes('APARTAMENTO')) return 'APARTAMENTO';
-  if (v.includes('GARAGEM')) return 'GARAGEM';
-  if (v.includes('RESIDÊNCIA COLETIVA')) return 'RES. COLETIVA';
-  if (v.includes('FLAT')) return 'FLAT';
-  if (v.includes('RESIDÊNCIA')) return 'RESIDÊNCIA';
-  return v.slice(0, 12);
-}
+// ─── UI: menu mobile, export modal, formulários ───
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.getElementById('mobileNav').classList.toggle('open');
+});
+
+document.getElementById('btnExport').addEventListener('click', () => {
+  document.getElementById('exportModal').classList.add('show');
+});
+document.getElementById('exportModalClose').addEventListener('click', () => {
+  document.getElementById('exportModal').classList.remove('show');
+});
+document.getElementById('exportForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  await saveLead({
+    origem: 'export',
+    nome: document.getElementById('expNome').value,
+    email: document.getElementById('expEmail').value,
+    telefone: document.getElementById('expTelefone').value,
+    tipo: document.getElementById('expTipo').value,
+  });
+  exportXLSX();
+  e.target.style.display = 'none';
+  document.getElementById('exportThanks').classList.add('show');
+});
+
+document.getElementById('ctaForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  await saveLead({
+    origem: 'home_cta',
+    nome: document.getElementById('ctaNome').value,
+    telefone: document.getElementById('ctaWhats').value,
+    endereco: document.getElementById('ctaEndereco').value,
+    intencao: document.getElementById('ctaIntencao').value,
+  });
+  e.target.style.display = 'none';
+  document.getElementById('ctaThanks').classList.add('show');
+});
 </script>
 </body>
 </html>

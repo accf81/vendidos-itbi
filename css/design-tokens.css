@@ -1,0 +1,188 @@
+/* ═══════════════════════════════════════════════════════════════
+   PANDORA HOMES — Design Tokens v1.0
+   Fonte da verdade: /BRAND/pandora-miv-v2.html
+   Não editar valores sem atualizar o MIV.
+   ═══════════════════════════════════════════════════════════════
+
+   ÍNDICE
+   1. Cores da marca (fixas)
+   2. Tema escuro (padrão)
+   3. Tema claro
+   4. Tipografia
+   5. Espaçamento
+   6. Bordas e raios
+   7. Sombras
+   ═══════════════════════════════════════════════════════════════ */
+
+
+/* ── 1. CORES DA MARCA ──────────────────────────────────────────
+   Valores fixos do MIV. Não mudam com o tema.
+   Use --brand-* para referências diretas à identidade da marca.
+   Use as variáveis de tema (--accent, --bg, etc.) nos componentes.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+
+  /* Orange — cor de energia, destaque e ação */
+  --brand-orange:       #ff6600;
+  --brand-orange-dark:  #cc5200;   /* hover, estados ativos */
+  --brand-orange-light: #ff8533;   /* ícones, ênfase suave */
+  --brand-orange-pale:  #fff3eb;   /* fundos de cards, highlights */
+
+  /* Navy — profundidade e alto padrão */
+  --brand-navy:         #1a2744;
+  --brand-navy-mid:     #2d3f6b;
+  --brand-navy-light:   #4a6090;
+  --brand-navy-pale:    #c8d0e8;
+  --brand-navy-faint:   #eef0f6;
+
+  /* Pandora Gray — cor estrutural histórica da marca */
+  --brand-gray:         #46494d;
+
+  /* Escala de neutros */
+  --brand-black:        #111111;
+  --brand-gray-900:     #2d2f32;
+  --brand-gray-700:     #46494d;
+  --brand-gray-500:     #7a7d82;
+  --brand-gray-300:     #c8cacf;
+  --brand-gray-100:     #f4f4f4;
+  --brand-white:        #ffffff;
+
+
+/* ── 2. TEMA ESCURO (padrão) ────────────────────────────────────
+   Fundo preto. Laranja vibrante sobre escuro.
+   ─────────────────────────────────────────────────────────────── */
+
+  --bg:           #0e0f12;
+  --surface:      #16181d;
+  --surface2:     #1c1f25;
+  --surface3:     #23272e;
+  --text:         #eef0f3;
+  --muted:        #8a9099;
+  --border:       rgba(255, 255, 255, .07);
+
+  --accent:       var(--brand-orange);
+  --accent-dark:  var(--brand-orange-dark);
+  --accent-pale:  rgba(255, 102, 0, .12);
+  --accent-sel:   rgba(255, 102, 0, .09);   /* fundo do estado "selecionado/apertado" */
+  --accent-line:  rgba(255, 102, 0, .32);   /* contorno do estado "selecionado/apertado" */
+
+  /* Profundidade e gloss — borda em degradê (mais clara em cima) + sombra suave */
+  --edge:        linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.02) 45%, rgba(255,255,255,.012));
+  --shadow-card: 0 1px 0 rgba(255,255,255,.04) inset, 0 12px 26px -14px rgba(0,0,0,.6);
+  --shadow-btn:  0 1px 0 rgba(255,255,255,.07) inset, 0 2px 5px rgba(0,0,0,.4);
+
+  /* Cores funcionais — não são cores de marca */
+  --success:      #22c55e;
+  --danger:       #ef4444;
+  --warn:         #f59e0b;
+  --info:         #3b82f6;
+  --success-pale: rgba(34, 197, 94, .12);
+  --danger-pale:  rgba(239, 68, 68, .12);
+  --warn-pale:    rgba(245, 158, 11, .12);
+  --info-pale:    rgba(59, 130, 246, .12);
+}
+
+
+/* ── 3. TEMA CLARO ──────────────────────────────────────────────
+   Fundo Navy Faint. Texto Navy. Superfícies brancas.
+   ─────────────────────────────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:           var(--brand-navy-faint);   /* #eef0f6 */
+  --surface:      var(--brand-white);        /* #ffffff */
+  --surface2:     var(--brand-navy-faint);   /* #eef0f6 */
+  --surface3:     #e3e7f2;
+  --text:         var(--brand-navy);         /* #1a2744 */
+  --muted:        var(--brand-gray-500);     /* #7a7d82 */
+  --border:       var(--brand-navy-pale);    /* #c8d0e8 */
+
+  --accent:       var(--brand-orange);       /* #ff6600 */
+  --accent-dark:  var(--brand-orange-dark);  /* #cc5200 */
+  --accent-pale:  rgba(255, 102, 0, .08);
+  --accent-sel:   rgba(255, 102, 0, .08);
+  --accent-line:  rgba(255, 102, 0, .35);
+
+  --edge:        linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.01));
+  --shadow-card: 0 1px 2px rgba(26,39,68,.06), 0 10px 24px -16px rgba(26,39,68,.25);
+  --shadow-btn:  0 1px 1px rgba(26,39,68,.05), 0 1px 3px rgba(26,39,68,.12);
+}
+
+
+/* ── 4. TIPOGRAFIA ──────────────────────────────────────────────
+   Montserrat: logo, títulos, KPIs, badges, botões
+   Sistema:    dados de tabela, linhas de lista, formulários
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  --font-brand: 'Montserrat', sans-serif;
+  --font-ui:    -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Tamanhos — escala do MIV */
+  --text-display: clamp(40px, 5vw, 64px);  /* capa, hero */
+  --text-h1:      clamp(28px, 3vw, 40px);  /* título principal */
+  --text-h2:      22px;                     /* subtítulo de seção */
+  --text-h3:      18px;                     /* título de card */
+  --text-body:    15px;                     /* texto corrido */
+  --text-ui:      13px;                     /* interface, campos */
+  --text-small:   11px;                     /* metadados, rodapés */
+  --text-label:   10px;                     /* badges, labels */
+
+  /* Pesos */
+  --weight-display: 200;
+  --weight-h1:      200;
+  --weight-h2:      300;
+  --weight-h3:      500;
+  --weight-body:    400;
+  --weight-ui:      400;
+  --weight-small:   500;
+  --weight-label:   800;  /* ExtraBold — obrigatório em badges */
+  --weight-kpi:     900;  /* Black — números de dashboard */
+
+  /* Alturas de linha */
+  --leading-tight:    1.0;
+  --leading-snug:     1.15;
+  --leading-normal:   1.5;
+  --leading-relaxed:  1.75;
+
+  /* Tracking — espaçamento entre letras */
+  --tracking-tight:   -0.03em;
+  --tracking-normal:  0em;
+  --tracking-wide:    0.08em;
+  --tracking-label:   0.12em;  /* obrigatório em labels uppercase */
+}
+
+
+/* ── 5. ESPAÇAMENTO ─────────────────────────────────────────────
+   Densidade real usada desde a migração de Dia/Captação (01/07) —
+   documentada aqui em 05/07 porque a escala de 8px antiga nunca
+   chegou a ser adotada nas áreas migradas. Ferramenta operacional
+   e densa (não site institucional): incrementos mais finos.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  --space-2xs: 6px;   /* gap interno mínimo — ícone+texto, chip */
+  --space-xs:  10px;  /* gap pequeno entre itens de uma lista */
+  --space-sm:  14px;  /* gap padrão entre blocos de uma seção */
+  --space-md:  18px;  /* padding de seção, separação de bloco */
+  --space-lg:  26px;  /* gap entre seções distintas de uma ficha */
+  --space-xl:  32px;  /* separação entre blocos grandes da página */
+}
+
+
+/* ── 6. BORDAS E RAIOS ──────────────────────────────────────────*/
+:root {
+  --radius-sm:   5px;    /* badges, tags pequenas */
+  --radius-md:   8px;    /* botões, inputs */
+  --radius-lg:   10px;   /* cards, modais — pouco arredondado */
+  --radius-xl:   12px;   /* containers grandes */
+  --radius-full: 9999px; /* pílulas, avatares */
+
+  --border-width: 1px;
+}
+
+
+/* ── 7. SOMBRAS ─────────────────────────────────────────────────
+   Usadas com moderação — a identidade Pandora é plana e limpa.
+   ─────────────────────────────────────────────────────────────── */
+:root {
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, .10);  /* cards em hover */
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, .14); /* dropdowns, tooltips */
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, .18); /* modais */
+}
