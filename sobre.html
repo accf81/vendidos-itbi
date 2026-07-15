@@ -78,6 +78,33 @@
   .lead-thanks h3 { font-family: var(--font-brand); color: #fff; font-size: 16px; margin: 0 0 6px; }
   .lead-thanks p { color: var(--brand-navy-pale); font-size: 13.5px; margin: 0; }
 
+  /* ── VITRINE DE IMÓVEIS ── */
+  .img-placeholder { background: repeating-linear-gradient(135deg, var(--surface2), var(--surface2) 12px, var(--surface3) 12px, var(--surface3) 24px); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: var(--muted); font-size: 11.5px; font-weight: 600; text-align: center; }
+  .img-placeholder .icon { width: 30px; height: 30px; opacity: .55; stroke-width: 1.3; }
+  h2.block-title { font-size: clamp(22px, 3vw, 30px); font-weight: 200; color: var(--brand-navy); margin: 0 0 10px; }
+  h2.block-title strong { font-weight: 700; }
+  .block-sub { color: var(--muted); font-size: 15px; margin: 0 0 28px; }
+  .showcase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--site-gap); margin-bottom: 24px; }
+  @media (max-width: 900px) { .showcase-grid { grid-template-columns: 1fr; } }
+  .showcase-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-card); display: flex; flex-direction: column; }
+  .showcase-img { aspect-ratio: 4/3; }
+  .showcase-body { padding: 18px 20px 20px; }
+  .showcase-body .tag { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--brand-orange); margin-bottom: 10px; display: inline-block; }
+  .showcase-body h3 { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 8px; line-height: 1.35; }
+  .showcase-body p { font-size: 13px; color: var(--muted); margin: 0 0 14px; line-height: 1.55; }
+  .showcase-body .read { font-size: 12.5px; font-weight: 700; color: var(--brand-navy); }
+  .showcase-more { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-brand); font-weight: 700; font-size: 13.5px; color: var(--brand-orange); }
+
+  /* ── DESCOBERTA (Home / Blog) ── */
+  .discover-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--site-gap); }
+  @media (max-width: 780px) { .discover-grid { grid-template-columns: 1fr; } }
+  .discover-card { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 20px 22px; box-shadow: var(--shadow-card); }
+  .discover-card-icon { flex: none; width: 42px; height: 42px; border-radius: var(--radius-md); background: var(--accent-pale); display: flex; align-items: center; justify-content: center; }
+  .discover-card-icon .icon { width: 20px; height: 20px; color: var(--brand-orange); }
+  .discover-card h3 { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 4px; }
+  .discover-card p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5; }
+  .discover-card .arrow { flex: none; width: 18px; height: 18px; color: var(--muted); margin-left: auto; }
+
 </style>
 </head>
 <body>
@@ -182,6 +209,69 @@
             <p>Alex vai te chamar no WhatsApp em breve.</p>
           </div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <h2 class="block-title">Imóveis <strong>da carteira Pandora Homes</strong></h2>
+      <p class="block-sub">Uma amostra do que está à venda agora — curadoria, não portal genérico.</p>
+      <div class="showcase-grid">
+        <a class="showcase-card" href="https://pandorahomes.com.br/imoveis/cobertura-com-158m2-3-dormitorios-sendo-1-suite-recem-reformada-PD557" target="_blank">
+          <div class="showcase-img img-placeholder"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Foto do imóvel</div>
+          <div class="showcase-body">
+            <span class="tag">Vila Mariana</span>
+            <h3>Cobertura de 158m², 3 dormitórios (1 suíte)</h3>
+            <p>Reformada, com solarium privativo, hidromassagem e vista panorâmica de São Paulo.</p>
+            <span class="read">Ver imóvel →</span>
+          </div>
+        </a>
+        <a class="showcase-card" href="https://pandorahomes.com.br/imoveis/apartamento-com-area-gourmet-reformado-com-253m2-luxo-e-elegancia-em-higienopolis-proximo-a-praca-buenos-aires-PD439" target="_blank">
+          <div class="showcase-img img-placeholder"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Foto do imóvel</div>
+          <div class="showcase-body">
+            <span class="tag">Higienópolis</span>
+            <h3>Apartamento de 253m², 4 suítes</h3>
+            <p>Área gourmet reformada, ambientes amplos com pé-direito alto, perto da Praça Buenos Aires.</p>
+            <span class="read">Ver imóvel →</span>
+          </div>
+        </a>
+        <a class="showcase-card" href="https://pandorahomes.com.br/imoveis/condominio-de-casas-recem-entregue-PD447" target="_blank">
+          <div class="showcase-img img-placeholder"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Foto do imóvel</div>
+          <div class="showcase-body">
+            <span class="tag">Alto da Boa Vista</span>
+            <h3>Condomínio de casas recém-entregue, 4 suítes</h3>
+            <p>Design inteligente e luz natural abundante, em condomínio novo.</p>
+            <span class="read">Ver imóvel →</span>
+          </div>
+        </a>
+      </div>
+      <a class="showcase-more" href="https://www.pandorahomes.com.br" target="_blank">
+        Ver todos os imóveis no site da Pandora Homes
+        <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <div class="discover-grid">
+        <a class="discover-card" href="index.html">
+          <div class="discover-card-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <div>
+            <h3>Encontre os vendidos de um endereço</h3>
+            <p>Volte pra Home e consulte o preço real de venda de qualquer rua de São Paulo.</p>
+          </div>
+          <svg class="icon arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="discover-card" href="blog/index.html">
+          <div class="discover-card-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div>
+            <h3>Tire suas dúvidas sobre venda ou compra</h3>
+            <p>Artigos curtos sobre preço, documentação e processo de venda no nosso Blog.</p>
+          </div>
+          <svg class="icon arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
       </div>
     </div>
   </section>

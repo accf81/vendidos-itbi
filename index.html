@@ -104,6 +104,16 @@
   .audience-card h3 { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 8px; }
   .audience-card p { font-size: 14px; color: var(--muted); margin: 0; line-height: 1.55; }
 
+  /* ── DESCOBERTA (Sobre / Blog) ── */
+  .discover-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--site-gap); }
+  @media (max-width: 780px) { .discover-grid { grid-template-columns: 1fr; } }
+  .discover-card { display: flex; align-items: center; gap: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); padding: 20px 22px; box-shadow: var(--shadow-card); }
+  .discover-card-icon { flex: none; width: 42px; height: 42px; border-radius: var(--radius-md); background: var(--accent-pale); display: flex; align-items: center; justify-content: center; }
+  .discover-card-icon .icon { width: 20px; height: 20px; color: var(--brand-orange); }
+  .discover-card h3 { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 4px; }
+  .discover-card p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.5; }
+  .discover-card .arrow { flex: none; width: 18px; height: 18px; color: var(--muted); margin-left: auto; }
+
   /* ── CTA final ── */
   .cta-final { background: var(--brand-navy); color: #fff; border-radius: var(--radius-xl); padding: 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; }
   @media (max-width: 780px) { .cta-final { grid-template-columns: 1fr; padding: 26px 20px; } }
@@ -249,6 +259,29 @@
       </div>
     </div>
   </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="discover-grid">
+        <a class="discover-card" href="sobre.html">
+          <div class="discover-card-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg></div>
+          <div>
+            <h3>Conheça a Pandora Data SP e a Pandora Homes</h3>
+            <p>A empresa por trás desse serviço — quem somos e por que criamos essa ferramenta.</p>
+          </div>
+          <svg class="icon arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="discover-card" href="blog/index.html">
+          <div class="discover-card-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div>
+            <h3>Tire suas dúvidas sobre venda ou compra</h3>
+            <p>Artigos curtos sobre preço, documentação e processo de venda no nosso Blog.</p>
+          </div>
+          <svg class="icon arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
 </main>
 
 <div id="siteFooter"></div>
@@ -300,7 +333,6 @@ let filteredResults = [];
 let acDebounce = {};
 
 window.addEventListener('load', () => {
-  if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
   addAddressCard();
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
