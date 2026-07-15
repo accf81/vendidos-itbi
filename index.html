@@ -34,17 +34,6 @@
 <link rel="stylesheet" href="css/site-base.css">
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
-  /* ── LOADING ── */
-  #loading { position: fixed; inset: 0; z-index: 999; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 20px; text-align: center; }
-  #loading svg.wordmark { height: 24px; width: auto; color: var(--brand-navy); margin-bottom: 6px; }
-  #loading h2 { font-size: 16px; font-weight: 700; color: var(--brand-navy); margin: 0; }
-  #loading p { color: var(--muted); font-size: 13px; margin: 0; }
-  .spinner { width: 38px; height: 38px; border: 3px solid var(--border); border-top-color: var(--brand-orange); border-radius: 50%; animation: spin .8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .progress-bar { width: 240px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
-  .progress-fill { height: 100%; background: var(--brand-orange); border-radius: 2px; transition: width .3s; width: 0%; }
-  #app.hidden, #loading.hidden { display: none; }
-
   /* ── HERO ── */
   .hero { padding: var(--site-py-top) 0 var(--site-py-md); background: linear-gradient(180deg, var(--brand-navy-faint), var(--bg) 70%); }
   .hero-copy { margin-bottom: 28px; }
@@ -86,12 +75,23 @@
   .results-source .icon { width: 12px; height: 12px; flex: none; }
   .btn-export { flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); color: var(--brand-navy); font-family: var(--font-brand); font-weight: 700; font-size: 12px; cursor: pointer; }
   .btn-export .icon { width: 14px; height: 14px; color: var(--brand-orange); }
-  .result-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); margin-bottom: 10px; flex-wrap: wrap; }
+  .result-row { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); margin-bottom: 10px; }
   .result-addr { font-weight: 600; font-size: 14px; color: var(--text); }
   .result-meta { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
-  .result-price { text-align: right; }
-  .result-price .val { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-navy); }
-  .result-price .m2 { font-size: 11.5px; color: var(--muted); }
+  .result-bottom { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .result-price-wrap { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .result-price { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-orange); }
+  .result-sep { color: var(--border); font-size: 13px; }
+  .result-m2 { font-weight: 700; font-size: 11.5px; color: var(--brand-navy); }
+  .result-date { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+  @media (max-width: 480px) {
+    .result-bottom { align-items: flex-end; }
+    .result-price-wrap { flex-direction: column; align-items: flex-start; gap: 2px; }
+    .result-price { font-size: 20px; }
+    .result-sep { display: none; }
+    .result-m2 { font-size: 12.5px; }
+    .result-date { font-size: 14px; font-weight: 700; color: var(--text); }
+  }
   .results-empty { padding: 30px 10px; text-align: center; color: var(--muted); font-size: 14px; }
 
   /* ── SEÇÃO GENÉRICA ── */
@@ -156,15 +156,7 @@
 </head>
 <body>
 
-<div id="loading">
-  <svg class="wordmark" viewBox="0 0 1375.79 376.12" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M356.75,22.3v64.36h19.36V14.48l-19.36,7.82ZM14.48,0l7.86,19.37h331.48l7.82-19.37H14.48ZM353.82,356.71H22.34l-7.86,19.41h347.16l-7.82-19.41ZM19.36,22.3L0,14.44v347.25l19.36-7.86V22.3ZM356.75,289.42v64.4l19.36,7.82v-72.22h-19.36Z"/><path d="M200.09,121.97h-48.95v18.17h48.81c19.05,0,30.65,10.13,30.65,27.54s-11.59,28.03-30.65,28.03h-48.81v67.42h21.54v-49.26h27.41c31.67,0,52.06-16.7,52.06-46.33s-20.39-45.57-52.06-45.57Z"/><path d="M377.49,121.97h-23.9l-54.1,141.15h21.85l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM340.85,210.62l24.16-65.07,23.76,65.07h-47.93Z"/><path d="M593.71,121.97v107.26l-72.58-107.26h-23.59v141.15h20.08v-110.37l74.31,110.37h21.85V121.97h-20.08Z"/><path d="M735.75,121.97h-44.55v141.15h44.55c44.11,0,71.11-30.51,71.11-71.24s-25.94-69.91-71.11-69.91ZM734.86,244.33h-21.99v-103.76h21.99c32.56,0,49.83,19.5,49.83,51.3s-17.41,52.46-49.83,52.46Z"/><path d="M939.98,119.04c-40.91,0-71.86,31.49-71.86,73.29s30.96,73.73,71.86,73.73,71.64-32.11,71.64-73.73-30.78-73.29-71.64-73.29ZM939.98,246.55c-29.94,0-49.43-24.03-49.43-54.23s19.5-53.97,49.43-53.97,49.21,23.63,49.21,53.97-19.5,54.23-49.21,54.23Z"/><path d="M1151.49,206.8c21.41-5.11,34.16-20.65,34.16-40.86,0-28.16-19.5-43.97-51.88-43.97h-52.77v17.99h51.43c19.94,0,31.36,9.1,31.36,25.98s-11.42,25.94-31.36,25.94h-51.43v71.24h21.68v-53.08h25.94l35.18,53.08h25.94l-38.24-56.32Z"/><path d="M1322.13,121.97h-23.9l-53.97,141.15h21.72l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM1285.49,210.62l24.16-65.07,23.9,65.07h-48.06Z"/></svg>
-  <div class="spinner"></div>
-  <h2>Pandora Data SP</h2>
-  <p id="loadingMsg">Carregando dados oficiais da Prefeitura de SP...</p>
-  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-</div>
-
-<div id="app" class="hidden">
+<div id="app">
 
 <div id="siteHeader"></div>
 
@@ -332,11 +324,7 @@ let cardCount = 0;
 let filteredResults = [];
 let acDebounce = {};
 
-window.addEventListener('load', () => {
-  addAddressCard();
-  document.getElementById('loading').classList.add('hidden');
-  document.getElementById('app').classList.remove('hidden');
-});
+addAddressCard();
 
 async function sbRpc(fn, body) {
   try {
@@ -522,9 +510,13 @@ function renderResults() {
           <div class="result-addr">${esc(row.logradouro)}, ${esc(row.numero)}${esc(comp)}</div>
           <div class="result-meta">${esc([area, bairro].filter(Boolean).join(' · '))}</div>
         </div>
-        <div class="result-price">
-          <div class="val">${formatMoney(row.valor_transacao)}</div>
-          <div class="m2">${formatMoney(row.valor_m2)}/m² · vendido ${formatDate(row.data_transacao)}</div>
+        <div class="result-bottom">
+          <div class="result-price-wrap">
+            <span class="result-price">${formatMoney(row.valor_transacao)}</span>
+            <span class="result-sep">|</span>
+            <span class="result-m2">${formatMoney(row.valor_m2)}/m²</span>
+          </div>
+          <div class="result-date">vendido ${formatDate(row.data_transacao)}</div>
         </div>
       </div>`;
   }).join('');
