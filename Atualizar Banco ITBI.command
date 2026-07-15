@@ -44,11 +44,16 @@ echo "======================================"
 echo ""
 
 REPO_DIR="$(pwd)"
-TOKEN=$(grep 'TOKEN\|ghp_' deploy_github.command 2>/dev/null | grep -o 'ghp_[A-Za-z0-9]*' | head -1)
+# Token lido de ~/.alex-os-secrets — nunca gravado no script nem na config (regra 12.5)
+SECRETS_FILE="$HOME/.alex-os-secrets"
+[ -f "$SECRETS_FILE" ] && source "$SECRETS_FILE"
+TOKEN="$ALEX_OS_GH_TOKEN"
+if [ -z "$TOKEN" ]; then echo "❌ Token não configurado em ~/.alex-os-secrets"; read -p "Pressione Enter para fechar..."; exit 1; fi
 
+git remote set-url origin "https://github.com/accf81/vendidos-itbi.git" 2>/dev/null || git remote add origin "https://github.com/accf81/vendidos-itbi.git"
 git add ITBI_SP_residencial.db.gz atualizar_banco.py "Atualizar Banco ITBI.command"
 git commit -m "Atualização banco ITBI $(date '+%d/%m/%Y')" || echo "Nada novo para publicar."
-git push
+git -c credential.helper='!f() { echo "username=accf81"; echo "password='"$TOKEN"'"; }; f' push origin main
 
 echo ""
 echo "======================================"

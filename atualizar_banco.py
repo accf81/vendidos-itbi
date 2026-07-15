@@ -38,7 +38,10 @@ TMP_DB    = '/tmp/itbi_update.db'
 BACKUP_FILE = f'ITBI_SP_residencial_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db.gz'
 
 ANO_ATUAL = datetime.now().year
-URL_XLSX  = 'https://prefeitura.sp.gov.br/documents/d/fazenda/guias-de-itbi-pagas-3-xlsx'  # 2026 (atualizado mensalmente)
+PAGINA_ITBI = 'https://prefeitura.sp.gov.br/web/fazenda/w/acesso_a_informacao/31501'
+# O link direto do XLSX muda de endereço sem aviso (a Prefeitura publica um documento novo
+# a cada atualização, não substitui o arquivo no mesmo lugar) — por isso o link é descoberto
+# na página oficial a cada execução, em vez de fixo no código. Ver função obter_url_xlsx().
 
 # Palavras-chave para identificar uso residencial (coluna "Descrição do uso (IPTU)")
 # Os valores reais são textos longos: "APARTAMENTO EM CONDOMÍNIO (...)", "RESIDÊNCIA", etc.
@@ -119,6 +122,73 @@ def parse_str(val):
     s = str(val).strip()
     return s.upper() if s else None
 
+def ler_secret(nome):
+    """Lê uma chave do arquivo local ~/.alex-os-secrets (formato NOME=valor, uma por linha).
+    Nunca colar chave nenhuma direto no código — este arquivo é publicado num repositório
+    público (accf81/vendidos-itbi)."""
+    caminho = os.path.expanduser('~/.alex-os-secrets')
+    if not os.path.exists(caminho):
+        return None
+    with open(caminho) as f:
+        for linha in f:
+            if linha.strip().startswith(f'{nome}='):
+                return linha.strip().split('=', 1)[1]
+    return None
+
+def sincronizar_supabase(novos):
+    """Envia os registros novos pra tabela vendas_itbi no Supabase — é o banco que a
+    busca do site público (Pandora Data SP) consulta. Sem isso, o site fica com dado
+    parado enquanto o arquivo local segue sendo atualizado (achado 15/07/2026, backlog
+    15.1 do Alex OS). Precisa da SUPABASE_SERVICE_ROLE_KEY em ~/.alex-os-secrets — essa
+    chave tem permissão de escrita (a chave pública do site só lê), pegar em
+    supabase.com/dashboard/project/sobmjqounukzbplrmhkr/settings/api."""
+    import json, urllib.request, urllib.error
+
+    key = ler_secret('SUPABASE_SERVICE_ROLE_KEY')
+    if not key:
+        print(f"\n⚠️  Sincronização com o Supabase PULADA — falta SUPABASE_SERVICE_ROLE_KEY em ~/.alex-os-secrets.")
+        print(f"    O banco local foi atualizado normalmente, mas a busca do site público")
+        print(f"    (Pandora Data SP) vai continuar com dado antigo até isso ser configurado.")
+        return
+
+    url = 'https://sobmjqounukzbplrmhkr.supabase.co/rest/v1/vendas_itbi'
+    headers = {'apikey': key, 'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'Prefer': 'return=minimal'}
+    campos = ['sql', 'data_transacao', 'logradouro', 'numero', 'complemento', 'bairro',
+              'referencia', 'area_construida_m2', 'valor_transacao', 'valor_m2',
+              'cartorio', 'matricula', 'ano', 'logradouro_norm']
+
+    print(f"\n8. Sincronizando {len(novos):,} registros novos com o Supabase (site público)...")
+    total = 0
+    for i in range(0, len(novos), 1000):
+        lote = novos[i:i+1000]
+        payload = [dict(zip(campos, linha)) for linha in lote]
+        req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), method='POST', headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                resp.read()
+            total += len(lote)
+        except urllib.error.HTTPError as e:
+            print(f"   ✗ Erro no lote {i}-{i+len(lote)}: {e.code} {e.read().decode()[:300]}")
+            print(f"    Rode a sincronização de novo depois, ou avise numa sessão DEV.")
+            return
+    print(f"   ✓ {total:,} registros sincronizados com o Supabase")
+
+def obter_url_xlsx(ano, headers):
+    """Busca na página oficial o link do XLSX do ano corrente — o endereço muda
+    a cada republicação, não dá pra manter fixo no código (achado 15/07/2026:
+    o link antigo estava parado numa versão de maio enquanto a Prefeitura já
+    tinha publicado uma nova em julho, sem quebrar o download, só devolvendo
+    dado velho)."""
+    r = requests.get(PAGINA_ITBI, headers=headers, timeout=30)
+    r.raise_for_status()
+    m = re.search(rf'<strong>{ano}\s*\(<a href="([^"]+)"[^>]*>Excel/xlsx</a>', r.text)
+    if not m:
+        raise RuntimeError(f"Não achei o link do XLSX de {ano} na página oficial — o layout da página pode ter mudado.")
+    url = m.group(1)
+    if url.startswith('/'):
+        url = 'https://prefeitura.sp.gov.br' + url
+    return url
+
 # ─── Main ──────────────────────────────────────────────────────────
 def main():
     print(f"\n{'='*55}")
@@ -140,17 +210,29 @@ def main():
     cur.execute("SELECT COUNT(*) FROM vendas"); total_antes = cur.fetchone()[0]
     print(f"   Registros antes: {total_antes:,}")
 
-    # 2. Carregar SQLs existentes para deduplicação rápida
-    print(f"\n3. Carregando SQLs existentes...")
-    cur.execute("SELECT sql FROM vendas WHERE sql IS NOT NULL")
-    sqls_existentes = {r[0] for r in cur.fetchall()}
-    print(f"   ✓ {len(sqls_existentes):,} SQLs carregados")
+    # 2. Carregar chaves existentes para deduplicação rápida
+    # Chave = (sql, numero, complemento) — um mesmo código de SQL (cadastro/lote) pode
+    # cobrir várias unidades vendidas juntas (prédio inteiro, por exemplo); usar só o
+    # sql como chave descartaria erroneamente as unidades além da primeira.
+    print(f"\n3. Carregando registros existentes...")
+    cur.execute("SELECT sql, numero, complemento FROM vendas WHERE sql IS NOT NULL")
+    chaves_existentes = {(r[0], r[1], r[2]) for r in cur.fetchall()}
+    print(f"   ✓ {len(chaves_existentes):,} registros carregados")
 
-    # 3. Baixar XLSX
-    print(f"\n4. Baixando XLSX {ANO_ATUAL} da Prefeitura...")
+    # 3. Descobrir e baixar XLSX
     headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'}
+    print(f"\n4. Descobrindo o link do XLSX {ANO_ATUAL} na página oficial...")
     try:
-        r = requests.get(URL_XLSX, headers=headers, timeout=120, allow_redirects=True)
+        url_xlsx = obter_url_xlsx(ANO_ATUAL, headers)
+        print(f"   ✓ {url_xlsx}")
+    except Exception as e:
+        print(f"   ✗ Erro ao achar o link: {e}")
+        conn.close(); os.remove(TMP_DB)
+        sys.exit(1)
+
+    print(f"\n   Baixando XLSX {ANO_ATUAL} da Prefeitura...")
+    try:
+        r = requests.get(url_xlsx, headers=headers, timeout=120, allow_redirects=True)
         r.raise_for_status()
         print(f"   ✓ {len(r.content)/1024/1024:.1f} MB baixados")
     except Exception as e:
@@ -208,10 +290,6 @@ def main():
             if not sql_val:
                 total_invalido += 1; continue
 
-            # Deduplicação
-            if sql_val in sqls_existentes:
-                total_duplicata += 1; continue
-
             # Extrair campos
             def get(field, parser=parse_str):
                 idx = col_idx.get(field)
@@ -220,6 +298,14 @@ def main():
             logradouro    = get('logradouro')
             numero        = get('numero')
             complemento   = get('complemento')
+
+            numero_norm = 'S/N' if str(numero or '').strip() == '99999' else str(numero or '').strip()
+
+            # Deduplicação — por (sql, numero, complemento), não só sql (ver nota acima)
+            chave = (sql_val, numero_norm, complemento)
+            if chave in chaves_existentes:
+                total_duplicata += 1; continue
+
             bairro        = get('bairro')
             referencia    = get('referencia')
             valor         = get('valor_transacao', parse_float)
@@ -234,7 +320,6 @@ def main():
             # Normalizações
             logradouro_norm = normalize_logradouro(logradouro)
             cartorio_norm   = normalize_cartorio(cartorio)
-            numero_norm     = 'S/N' if str(numero or '').strip() == '99999' else str(numero or '').strip()
             valor_m2        = round(valor / area, 2) if area and area > 0 else None
 
             # Ano a partir da data
@@ -248,7 +333,7 @@ def main():
                 bairro, referencia, area, valor, valor_m2,
                 cartorio_norm, matricula, ano, logradouro_norm
             ))
-            sqls_existentes.add(sql_val)
+            chaves_existentes.add(chave)
 
     print(f"\n   Estatísticas de leitura:")
     print(f"   Total linhas lidas:    {total_lido:,}")
@@ -279,6 +364,8 @@ def main():
     print(f"   ✓ {inseridos:,} registros inseridos (total: {total_depois:,})")
 
     conn.close()
+
+    sincronizar_supabase(novos)
 
     # 6. Recomprimir
     print(f"\n7. Recomprimindo banco...")
