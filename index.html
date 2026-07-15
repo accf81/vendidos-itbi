@@ -32,8 +32,6 @@
 
 <link rel="stylesheet" href="css/design-tokens.css">
 <link rel="stylesheet" href="css/site-base.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
   /* ── LOADING ── */
@@ -60,6 +58,7 @@
 
   /* ── BUSCA (motor real) ── */
   .search-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-card); padding: 22px; }
+  .search-card-title { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--brand-navy); margin: 0 0 14px; }
   .address-card { display: flex; gap: 10px; align-items: flex-end; margin-bottom: 12px; }
   .address-num { flex: none; width: 20px; padding-bottom: 13px; font-family: var(--font-brand); font-weight: 800; color: var(--brand-orange); font-size: 14px; }
   .autocomplete-wrapper { position: relative; flex: 1 1 260px; min-width: 0; }
@@ -108,6 +107,7 @@
   /* ── CTA final ── */
   .cta-final { background: var(--brand-navy); color: #fff; border-radius: var(--radius-xl); padding: 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; }
   @media (max-width: 780px) { .cta-final { grid-template-columns: 1fr; padding: 26px 20px; } }
+  .cta-eyebrow { display: inline-flex; align-items: center; font-family: var(--font-brand); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--brand-orange-light); background: rgba(255,255,255,.1); padding: 6px 12px; border-radius: var(--radius-full); margin-bottom: 14px; }
   .cta-final h2 { font-size: clamp(22px, 3vw, 29px); font-weight: 200; color: #fff; margin: 0 0 14px; line-height: 1.22; }
   .cta-final h2 strong { font-weight: 700; color: var(--brand-orange-light); }
   .cta-intro { color: var(--brand-navy-pale); font-size: 14.5px; line-height: 1.65; margin: 0 0 20px; }
@@ -164,10 +164,11 @@
       <div class="hero-copy">
         <h1 class="hero-title">O preço real de venda — <strong>não uma estimativa.</strong></h1>
         <p class="hero-sub">Dados oficiais da Prefeitura de São Paulo (ITBI): o valor que cada imóvel realmente foi vendido, não o valor anunciado.</p>
-        <p class="hero-stat"><b>718 mil</b> transações registradas desde 2020 · atualizado todo mês <span class="hero-stat-source"><svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Dado oficial da Prefeitura de São Paulo</span></p>
+        <p class="hero-stat"><b>657 mil</b> transações registradas desde 2020 · atualizado todo mês <span class="hero-stat-source"><svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Dado oficial da Prefeitura de São Paulo</span></p>
       </div>
 
       <div class="search-card">
+        <div class="search-card-title">Consulte um ou mais endereços</div>
         <div id="addressCards"></div>
         <button type="button" class="add-address" id="addAddressBtn" onclick="addAddressCard()">
           <svg class="icon" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M12 5v14M5 12h14"/></svg>
@@ -202,7 +203,7 @@
   <section class="block">
     <div class="wrap">
       <h2 class="block-title">Pra quem é o <strong>Pandora Data SP</strong></h2>
-      <p class="block-sub">A mesma base de dados serve a três pessoas diferentes, cada uma com um motivo próprio pra usar.</p>
+      <p class="block-sub">A mesma base de dados serve a três perfis de pessoas diferentes, cada um com um motivo próprio pra usar.</p>
       <div class="audience-grid">
         <div class="audience-card"><h3>Proprietário</h3><p>Saiba, com dado real, quanto vale seu imóvel antes de decidir o preço.</p></div>
         <div class="audience-card"><h3>Comprador</h3><p>Veja se o preço pedido faz sentido com o que a região vendeu de verdade.</p></div>
@@ -215,8 +216,9 @@
     <div class="wrap">
       <div class="cta-final">
         <div>
-          <h2>Quanto vale <strong>o seu imóvel</strong> — não a média do edifício.</h2>
-          <p class="cta-intro">O ITBI mostra o que já foi vendido. Uma avaliação completa vai além — e é isso que você recebe ao falar comigo:</p>
+          <div class="cta-eyebrow">Cadastre-se para uma avaliação completa</div>
+          <h2>Descubra quanto vale <strong>o seu imóvel</strong> — não só a média do seu edifício.</h2>
+          <p class="cta-intro">Para entender quanto o mercado vai pagar no seu imóvel, saber o valor dos vendidos no seu edifício é só uma das coisas que ajuda a vender bem. Pra uma análise comparativa de mercado completa, também entra:</p>
           <ul class="cta-points">
             <li><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Vendidos de prédios parecidos na sua região — não só as vendas do seu próprio endereço</span></li>
             <li><svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>Concorrentes disponíveis no mercado agora — o que o comprador do seu imóvel também vai ver</span></li>
@@ -290,63 +292,26 @@
 initSiteChrome('inicio', '');
 
 // ══════════════════════════════════════════════════════════════════
-// MOTOR DE BUSCA — mesma lógica do buscador original
+// MOTOR DE BUSCA — consulta o Supabase direto, sem baixar banco nenhum
 // ══════════════════════════════════════════════════════════════════
-const DB_URL = './ITBI_SP_residencial.db.gz';
-let db = null;
+const SB_HEADERS = { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' };
 let cardCount = 0;
 let filteredResults = [];
 let acDebounce = {};
 
-window.addEventListener('load', async () => {
+window.addEventListener('load', () => {
   if ('serviceWorker' in navigator) { navigator.serviceWorker.register('./sw.js').catch(() => {}); }
   addAddressCard();
-  await loadDatabase();
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
 });
 
-async function loadDatabase() {
+async function sbRpc(fn, body) {
   try {
-    setProgress(5, 'Carregando motor de busca...');
-    const SQL = await initSqlJs({ locateFile: f => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/${f}` });
-    setProgress(20, 'Baixando dados oficiais...');
-    const res = await fetch(DB_URL);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const reader = res.body.getReader();
-    const total = parseInt(res.headers.get('content-length') || '0');
-    let received = 0;
-    const chunks = [];
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      received += value.length;
-      if (total > 0) {
-        const pct = 20 + Math.round((received / total) * 50);
-        setProgress(pct, `Carregando dados oficiais... ${Math.round(received/1024/1024)}MB de ${Math.round(total/1024/1024)}MB`);
-      }
-    }
-    setProgress(72, 'Preparando...');
-    const compressed = new Uint8Array(received);
-    let offset = 0;
-    for (const chunk of chunks) { compressed.set(chunk, offset); offset += chunk.length; }
-    const decompressed = pako.inflate(compressed);
-    setProgress(90, 'Quase lá...');
-    db = new SQL.Database(decompressed);
-    setProgress(100, 'Pronto!');
-    setTimeout(() => {
-      document.getElementById('loading').classList.add('hidden');
-      document.getElementById('app').classList.remove('hidden');
-    }, 300);
-  } catch (e) {
-    document.getElementById('loadingMsg').textContent = 'Erro ao carregar: ' + e.message;
-    document.getElementById('loadingMsg').style.color = '#ef4444';
-    console.error(e);
-  }
-}
-
-function setProgress(pct, msg) {
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('loadingMsg').textContent = msg;
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(body) });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch (e) { console.warn('Erro na busca:', e.message); return []; }
 }
 
 // ─── ADDRESS CARDS ───
@@ -401,22 +366,6 @@ function showDropdown(listEl, items, onSelect) {
 function closeAllDropdowns() { document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden')); }
 document.addEventListener('click', e => { if (!e.target.closest('.autocomplete-wrapper')) closeAllDropdowns(); });
 
-function queryDB(sql, params) {
-  if (!db) return [];
-  try {
-    var stmt = db.prepare(sql);
-    stmt.bind(params);
-    var rows = [];
-    while (stmt.step()) {
-      var r = stmt.getAsObject();
-      var v = Object.values(r)[0];
-      if (v !== null && v !== undefined && v !== '') rows.push(v);
-    }
-    stmt.free();
-    return rows;
-  } catch(e) { console.warn('queryDB error:', e.message); return []; }
-}
-
 function setupCardAutocomplete(id) {
   const ruaEl = document.getElementById(`rua-${id}`);
   const numEl = document.getElementById(`num-${id}`);
@@ -425,35 +374,36 @@ function setupCardAutocomplete(id) {
 
   ruaEl.addEventListener('input', () => {
     clearTimeout(acDebounce[`rua-${id}`]);
-    acDebounce[`rua-${id}`] = setTimeout(() => {
+    acDebounce[`rua-${id}`] = setTimeout(async () => {
       const val = ruaEl.value.trim();
       if (val.length < 2) { closeAllDropdowns(); return; }
       const norm = normalizeLogradouro(val);
-      const items = queryDB(`SELECT DISTINCT logradouro_norm FROM vendas WHERE logradouro_norm LIKE ? ORDER BY logradouro_norm LIMIT 15`, [`%${norm}%`]);
-      showDropdown(ruaList, items, chosen => {
+      const rows = await sbRpc('buscar_ruas_itbi', { termo: norm });
+      const items = rows.map(r => r.logradouro_norm);
+      showDropdown(ruaList, items, async chosen => {
         ruaEl.value = chosen;
         numEl.focus();
-        const nums = queryDB(`SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`, [chosen]);
-        showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
+        const numRows = await sbRpc('buscar_numeros_itbi', { rua: chosen, termo: '' });
+        showDropdown(numList, numRows.map(r => r.numero), n => { numEl.value = n; doSearch(); });
       });
     }, 220);
   });
   ruaEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
 
-  numEl.addEventListener('focus', () => {
+  numEl.addEventListener('focus', async () => {
     const street = ruaEl.value.trim();
     if (!street || numEl.value) return;
-    const nums = queryDB(`SELECT DISTINCT numero FROM vendas WHERE logradouro_norm=? ORDER BY CAST(numero AS INTEGER) LIMIT 30`, [normalizeLogradouro(street)]);
-    showDropdown(numList, nums, n => { numEl.value = n; doSearch(); });
+    const numRows = await sbRpc('buscar_numeros_itbi', { rua: normalizeLogradouro(street), termo: '' });
+    showDropdown(numList, numRows.map(r => r.numero), n => { numEl.value = n; doSearch(); });
   });
   numEl.addEventListener('input', () => {
     clearTimeout(acDebounce[`num-${id}`]);
-    acDebounce[`num-${id}`] = setTimeout(() => {
+    acDebounce[`num-${id}`] = setTimeout(async () => {
       const street = ruaEl.value.trim();
       const val = numEl.value.trim();
       if (!val) return;
-      const items = queryDB(`SELECT DISTINCT numero FROM vendas WHERE logradouro_norm LIKE ? AND numero LIKE ? ORDER BY CAST(numero AS INTEGER) LIMIT 20`, [`%${normalizeLogradouro(street)}%`, `${val}%`]);
-      showDropdown(numList, items, n => { numEl.value = n; doSearch(); });
+      const numRows = await sbRpc('buscar_numeros_itbi', { rua: normalizeLogradouro(street), termo: val });
+      showDropdown(numList, numRows.map(r => r.numero), n => { numEl.value = n; doSearch(); });
     }, 200);
   });
   numEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
@@ -481,8 +431,7 @@ function normalizeLogradouro(s) {
 }
 
 // ─── SEARCH ───
-function doSearch() {
-  if (!db) return;
+async function doSearch() {
   const addresses = [];
   document.querySelectorAll('.address-card').forEach(card => {
     const id = card.id.replace('card-', '');
@@ -492,26 +441,24 @@ function doSearch() {
   });
   if (addresses.length === 0) { alert('Digite pelo menos um endereço para buscar.'); return; }
 
-  const params = [];
-  const searchClauses = [];
-  addresses.forEach(a => {
+  const orGroups = addresses.map(a => {
     const normalized = normalizeLogradouro(a.rua);
-    params.push('%' + normalized + '%');
-    let clause = 'logradouro_norm LIKE ?';
-    if (a.num) { params.push(a.num.trim()); clause += ' AND numero LIKE ?'; }
-    searchClauses.push('(' + clause + ')');
+    const parts = [`logradouro_norm.ilike.*${normalized}*`];
+    if (a.num) parts.push(`numero.eq.${a.num.trim()}`);
+    return `and(${parts.join(',')})`;
   });
-  const sql = 'SELECT data_transacao, logradouro, numero, complemento, bairro, referencia, ' +
-    'area_construida_m2, valor_transacao, valor_m2 FROM vendas WHERE (' + searchClauses.join(' OR ') + ')' +
-    ' ORDER BY data_transacao DESC LIMIT 500';
+  const params = new URLSearchParams({
+    select: 'data_transacao,logradouro,numero,complemento,bairro,referencia,area_construida_m2,valor_transacao,valor_m2',
+    or: `(${orGroups.join(',')})`,
+    order: 'data_transacao.desc',
+    limit: '500',
+  });
 
   try {
-    var stmt = db.prepare(sql);
-    stmt.bind(params);
-    filteredResults = [];
-    while (stmt.step()) filteredResults.push(stmt.getAsObject());
-    stmt.free();
-  } catch (e) { console.error('SQL Error:', e.message); alert('Erro na consulta: ' + e.message); return; }
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/vendas_itbi?${params}`, { headers: SB_HEADERS });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    filteredResults = await res.json();
+  } catch (e) { console.error('Erro na busca:', e.message); alert('Erro na consulta: ' + e.message); return; }
 
   renderResults();
 }

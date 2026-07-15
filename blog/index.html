@@ -351,6 +351,17 @@
 <script src="../js/site-chrome.js"></script>
 <script>
 initSiteChrome('blog', '../');
+document.querySelectorAll('.blog-cat').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.blog-cat').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const wanted = btn.textContent.trim();
+    document.querySelectorAll('.blog-grid .blog-card').forEach(card => {
+      const tag = card.querySelector('.tag')?.textContent.trim();
+      card.style.display = (wanted === 'Todos' || tag === wanted) ? '' : 'none';
+    });
+  });
+});
 document.getElementById('ctaForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   await saveLead({

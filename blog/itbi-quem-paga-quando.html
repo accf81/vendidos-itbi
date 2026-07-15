@@ -27,6 +27,39 @@
   "publisher": { "@type": "Organization", "name": "Pandora Homes" }
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "O ITBI é pago antes ou depois da escritura?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Antes — é condição para o registro do imóvel em cartório." }
+    },
+    {
+      "@type": "Question",
+      "name": "O que é o Valor Venal de Referência?",
+      "acceptedAnswer": { "@type": "Answer", "text": "É o valor que a Prefeitura de São Paulo atribui ao imóvel com base em dados cadastrais e de mercado, usado como piso para o cálculo do ITBI." }
+    },
+    {
+      "@type": "Question",
+      "name": "Existe isenção de ITBI em São Paulo?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Sim, para quem compra o primeiro imóvel residencial dentro de um limite de valor definido pela Prefeitura, e para aquisições no programa Minha Casa, Minha Vida." }
+    },
+    {
+      "@type": "Question",
+      "name": "O ITBI entra na declaração de Imposto de Renda?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Não é dedutível diretamente, mas o valor pago soma ao custo de aquisição do imóvel na declaração de bens, reduzindo o ganho de capital em uma venda futura." }
+    },
+    {
+      "@type": "Question",
+      "name": "ITBI incide sobre herança?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Não. Em transmissão por herança ou doação incide o ITCMD, que é um imposto estadual, não municipal." }
+    }
+  ]
+}
+</script>
 <link rel="stylesheet" href="../css/design-tokens.css">
 <link rel="stylesheet" href="../css/site-base.css">
 <style>
@@ -102,7 +135,7 @@
       <p>Se você já vendeu ou comprou um imóvel — ou está pesquisando pra fazer isso agora — provavelmente já esbarrou nessa sigla: ITBI. E também é bem provável que ninguém tenha te explicado direito o que ela significa na prática.</p>
 
       <h2>O que é o ITBI</h2>
-      <p>ITBI é o Imposto de Transmissão de Bens Imóveis. Toda vez que um imóvel muda de dono em São Paulo, esse imposto é recolhido pela Prefeitura — e é justamente esse registro que usamos aqui no Pandora Data SP pra mostrar o preço real de cada venda. Na capital, a alíquota padrão é de 3% sobre o maior valor entre o preço declarado na transação e o Valor Venal de Referência calculado pela própria Prefeitura — ou seja, mesmo que a escritura registre um valor menor, o imposto pode ser calculado sobre o valor venal, se ele for mais alto.</p>
+      <p>ITBI é o Imposto de Transmissão de Bens Imóveis — um imposto <strong>municipal</strong>, ou seja, cobrado pela Prefeitura, não pelo Estado ou pela União. Toda vez que um imóvel muda de dono em São Paulo por compra e venda, esse imposto é recolhido, e é justamente esse registro que usamos aqui no Pandora Data SP pra mostrar o preço real de cada venda. Na capital, a alíquota padrão é de 3% sobre o maior valor entre o preço declarado na transação e o Valor Venal de Referência calculado pela própria Prefeitura — ou seja, mesmo que a escritura registre um valor menor, o imposto pode ser calculado sobre o valor venal, se ele for mais alto.</p>
 
       <div class="article-inline-cta">
         <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
@@ -110,7 +143,10 @@
       </div>
 
       <h2>Quem paga: comprador ou vendedor?</h2>
-      <p>Na prática do mercado, é o comprador quem paga o ITBI — é uma condição pra registrar o imóvel no nome dele em cartório. O vendedor não é responsável por esse imposto específico (ele tem outros custos, como o Imposto de Renda sobre o ganho de capital, se houver). Existe uma exceção que vale conhecer: em financiamentos pelo Sistema Financeiro de Habitação, a alíquota é menor sobre a parte financiada — mas isso é uma conta que o próprio banco ou o cartório costuma calcular na hora, não é algo que o vendedor precisa se preocupar.</p>
+      <p>Na prática do mercado, é o comprador quem paga o ITBI — é uma condição pra registrar o imóvel no nome dele em cartório. O vendedor não é responsável por esse imposto específico (ele tem outros custos, como o Imposto de Renda sobre o ganho de capital, se houver).</p>
+
+      <h2>Alíquota diferenciada em financiamento e isenções</h2>
+      <p>A alíquota muda em alguns casos específicos. Em financiamentos pelo Sistema Financeiro de Habitação (SFH), PAR ou consórcio, a alíquota cai para 0,5% sobre a parte financiada até um teto que a Prefeitura atualiza periodicamente (hoje em torno de R$ 120 mil) — acima desse valor, volta a valer o 3% normal sobre o restante. Existe também isenção total pra quem compra o primeiro imóvel residencial dentro de um limite de valor (hoje em torno de R$ 235 mil, também atualizado anualmente) e para aquisições dentro do programa Minha Casa, Minha Vida. Se o seu caso se encaixa em alguma dessas situações, vale confirmar o valor exato vigente com o cartório ou a Prefeitura, já que os tetos mudam com o tempo.</p>
 
       <h2>Quando ele é pago</h2>
       <p>O ITBI precisa ser pago antes do registro da escritura em cartório — sem ele, o cartório não formaliza a transferência. Por isso, o dado fica público logo depois da venda, e é isso que permite atualizar nossa base todo mês.</p>
@@ -122,6 +158,13 @@
         <svg class="icon" viewBox="0 0 24 24"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
         <p>Quer saber quanto o seu imóvel vale de verdade? <a class="link" href="https://wa.me/5511945240721" target="_blank">Fale com Alex</a>.</p>
       </div>
+
+      <h2>Perguntas frequentes sobre o ITBI</h2>
+      <p><strong>O ITBI é pago antes ou depois da escritura?</strong><br>Antes — é condição para o registro em cartório.</p>
+      <p><strong>O que é o Valor Venal de Referência?</strong><br>É o valor que a Prefeitura atribui ao imóvel com base em dados cadastrais e de mercado, usado como piso pro cálculo do imposto — se a transação declarada for menor que ele, o ITBI incide sobre o valor venal.</p>
+      <p><strong>Existe isenção de ITBI?</strong><br>Sim, pra quem compra o primeiro imóvel residencial dentro de um limite de valor, e pra aquisições no programa Minha Casa, Minha Vida.</p>
+      <p><strong>O ITBI entra na declaração de Imposto de Renda?</strong><br>Não é dedutível diretamente, mas o valor pago soma ao custo de aquisição do imóvel na sua declaração de bens — o que reduz o ganho de capital numa venda futura.</p>
+      <p><strong>ITBI incide sobre herança?</strong><br>Não. Em transmissão por herança ou doação, o imposto é outro: o ITCMD, que é estadual, não municipal.</p>
     </div>
   </div>
 

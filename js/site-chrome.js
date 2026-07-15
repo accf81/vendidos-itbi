@@ -46,6 +46,7 @@ function renderHeader(current, base) {
         <span class="logo-sub">Data SP</span>
       </span>
       ${SITE_SYMBOL}
+      <span class="logo-mobile-text">Pandora Data SP</span>
     </a>
     <nav class="site-nav">${siteNavLinks(current, base)}</nav>
     <a href="https://wa.me/5511945240721" target="_blank" class="nav-cta desktop-only">
@@ -122,6 +123,18 @@ function applyPhoneMask(el) {
   });
 }
 
+// Mesmo padrão de máscara de moeda usado no Alex OS (js/masks.js: applyBrCurrencyMask)
+function applyBrCurrencyMask(el) {
+  if (!el) return;
+  el.setAttribute('inputmode', 'numeric');
+  el.addEventListener('input', () => {
+    const raw = el.value.replace(/\D/g, '');
+    if (!raw) { el.value = ''; return; }
+    const num = parseInt(raw, 10) / 100;
+    el.value = 'R$ ' + num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  });
+}
+
 function initSiteChrome(current, base) {
   renderHeader(current, base);
   renderFooter(base);
@@ -132,4 +145,6 @@ function initSiteChrome(current, base) {
   }
   applyPhoneMask(document.getElementById('ctaWhats'));
   applyPhoneMask(document.getElementById('expTelefone'));
+  applyPhoneMask(document.getElementById('ctaWhatsB'));
+  applyBrCurrencyMask(document.getElementById('ctaValorB'));
 }

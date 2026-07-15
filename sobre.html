@@ -51,8 +51,9 @@
   .pandora-pilar span { font-size: 16px; color: var(--brand-navy-pale); line-height: 1.5; }
   .pandora-pilar span strong { color: #fff; }
   .pandora-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; text-align: center; }
-  @media (max-width: 480px) { .pandora-stats { grid-template-columns: 1fr; text-align: left; } }
+  @media (max-width: 480px) { .pandora-stats { grid-template-columns: 1fr; } }
   .pandora-stats div b { display: block; font-family: var(--font-brand); font-size: 26px; font-weight: 800; color: #fff; }
+  @media (max-width: 480px) { .pandora-stats div b { font-size: 30px; } }
   .pandora-stats div span { font-size: 12px; color: var(--brand-navy-pale); }
   .pandora-link { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; box-sizing: border-box; padding: 14px; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: var(--font-brand); font-weight: 700; font-size: 14px; }
 
@@ -151,8 +152,9 @@
     <div class="wrap">
       <div class="cta-final">
         <div>
-          <h2>Quanto vale <strong>o seu imóvel</strong> — não a média do edifício.</h2>
-          <p class="cta-intro">O ITBI mostra o que já foi vendido. Uma avaliação completa vai além — e é isso que você recebe ao falar comigo:</p>
+          <div class="cta-eyebrow">Cadastre-se para uma avaliação completa</div>
+          <h2>Descubra quanto vale <strong>o seu imóvel</strong> — não só a média do seu edifício.</h2>
+          <p class="cta-intro">Para entender quanto o mercado vai pagar no seu imóvel, saber o valor dos vendidos no seu edifício é só uma das coisas que ajuda a vender bem. Pra uma análise comparativa de mercado completa, também entra:</p>
           <ul class="cta-points">
             <li><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Vendidos de prédios parecidos na sua região — não só as vendas do seu próprio endereço</span></li>
             <li><svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>Concorrentes disponíveis no mercado agora — o que o comprador do seu imóvel também vai ver</span></li>
