@@ -1,0 +1,77 @@
+/* ══════════════════════════════════════════════════════════════════
+   SITE BASE — reset, tipografia e cabeçalho/rodapé compartilhados
+   entre todas as páginas do Pandora Vendidos (Início, Sobre, Blog
+   e artigos). Editar aqui muda em todas as páginas de uma vez.
+   ══════════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;600;700;800;900&display=swap');
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; font-family: var(--font-ui); font-size: var(--text-body); line-height: var(--leading-normal); background: var(--bg); color: var(--text); }
+h1, h2, h3 { font-family: var(--font-brand); letter-spacing: var(--tracking-tight); }
+a { color: inherit; text-decoration: none; }
+img, svg { display: block; max-width: 100%; }
+button, input, select, textarea { font-family: inherit; }
+
+:root {
+  --site-py-top: 28px; --site-py-sm: 40px; --site-py-md: 64px; --site-py-lg: 88px;
+  --site-gap: 28px; --site-max: 1120px;
+}
+@media (max-width: 640px) { :root { --site-py-top: 18px; --site-py-sm: 28px; --site-py-md: 40px; --site-py-lg: 48px; } }
+.wrap { max-width: var(--site-max); margin: 0 auto; padding: 0 20px; }
+@media (max-width: 640px) { .wrap { padding: 0 16px; } }
+.icon { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.6; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── SEÇÃO GENÉRICA ── */
+section.block { padding: var(--site-py-md) 0; }
+section.block.top { padding-top: var(--site-py-top); }
+section.block.alt { background: var(--surface2); }
+
+/* ── HEADER ── */
+header.site { background: var(--brand-orange); border-bottom: 1px solid var(--brand-orange-dark); position: sticky; top: 0; z-index: 90; padding-top: env(safe-area-inset-top); }
+.header-inner { display: flex; align-items: center; justify-content: space-between; height: 52px; gap: 16px; }
+.logo-lockup { display: flex; align-items: center; gap: 10px; }
+.logo-full { display: flex; align-items: center; gap: 10px; }
+.logo-lockup svg.wordmark { height: 17px; width: auto; color: #fff; }
+.logo-divider { width: 1px; height: 16px; background: rgba(255,255,255,.4); }
+.logo-sub { font-family: var(--font-brand); font-size: 12px; font-weight: 600; color: #fff; }
+.logo-sym { display: none; width: 22px; height: 22px; color: #fff; }
+@media (max-width: 860px) { .logo-full { display: none; } .logo-sym { display: block; } }
+nav.site-nav { display: flex; align-items: center; gap: 4px; }
+nav.site-nav a { font-family: var(--font-brand); font-size: 13px; font-weight: 600; padding: 7px 13px; border-radius: var(--radius-md); color: rgba(255,255,255,.8); }
+nav.site-nav a:hover, nav.site-nav a.current { color: #fff; background: rgba(255,255,255,.16); }
+.nav-cta { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: var(--radius-md); background: #fff; color: var(--brand-orange-dark); font-family: var(--font-brand); font-size: 12.5px; font-weight: 700; }
+.menu-btn { display: none; background: none; border: 1px solid rgba(255,255,255,.5); border-radius: var(--radius-md); width: 36px; height: 36px; align-items: center; justify-content: center; cursor: pointer; color: #fff; }
+@media (max-width: 860px) { nav.site-nav { display: none; } .nav-cta.desktop-only { display: none; } .menu-btn { display: inline-flex; } }
+.mobile-nav { display: none; flex-direction: column; gap: 2px; padding: 10px 16px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
+.mobile-nav.open { display: flex; }
+.mobile-nav a { padding: 12px 10px; border-radius: var(--radius-md); font-family: var(--font-brand); font-weight: 600; font-size: 14px; color: var(--text); }
+.mobile-nav .nav-cta { justify-content: center; margin-top: 6px; background: var(--accent); color: #fff; }
+
+/* ── FOOTER ── */
+footer.site { background: var(--surface); color: var(--text); border-top: 1px solid var(--border); padding: var(--site-py-md) 0 28px; }
+.footer-grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 32px; }
+@media (max-width: 780px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
+footer.site svg.wordmark { height: 18px; width: auto; color: var(--brand-navy); margin-bottom: 14px; }
+.footer-desc { font-size: 13px; line-height: 1.6; color: var(--muted); max-width: 260px; margin: 0 0 16px; }
+.footer-pilar { display: flex; align-items: center; gap: 8px; }
+.footer-pilar img { height: 15px; width: auto; }
+.footer-pilar span { font-size: 11.5px; color: var(--muted); }
+.footer-col h4 { font-family: var(--font-brand); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--brand-navy); margin: 0 0 14px; }
+.footer-col a { display: block; font-size: 13.5px; margin-bottom: 10px; color: var(--brand-orange-dark); font-weight: 600; }
+.footer-col a:hover { text-decoration: underline; }
+.footer-col div.line { display: block; font-size: 13.5px; margin-bottom: 10px; color: var(--text); }
+.footer-social { display: flex; gap: 8px; margin-top: 2px; }
+.footer-social a { width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--bg); display: flex; align-items: center; justify-content: center; color: var(--brand-navy); }
+.footer-social a:hover { color: var(--brand-orange); }
+.footer-social .icon { width: 16px; height: 16px; }
+.footer-bottom { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+@media (max-width: 480px) {
+  .footer-grid { text-align: center; }
+  .footer-grid > div:first-child { display: flex; flex-direction: column; align-items: center; }
+  .footer-col { display: flex; flex-direction: column; align-items: center; }
+  .footer-pilar { justify-content: center; }
+  .footer-social { justify-content: center; }
+  .footer-bottom { flex-direction: column; align-items: center; text-align: center; }
+}
