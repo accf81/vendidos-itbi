@@ -84,15 +84,23 @@
   h2.block-title { font-size: clamp(22px, 3vw, 30px); font-weight: 200; color: var(--brand-navy); margin: 0 0 10px; }
   h2.block-title strong { font-weight: 700; }
   .block-sub { color: var(--muted); font-size: 15px; margin: 0 0 28px; }
-  .showcase-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--site-gap); margin-bottom: 24px; }
-  @media (max-width: 900px) { .showcase-grid { grid-template-columns: 1fr; } }
-  .showcase-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-card); display: flex; flex-direction: column; }
-  .showcase-img { aspect-ratio: 4/3; }
-  .showcase-body { padding: 18px 20px 20px; }
-  .showcase-body .tag { font-size: 10.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--brand-orange); margin-bottom: 10px; display: inline-block; }
-  .showcase-body h3 { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 8px; line-height: 1.35; }
-  .showcase-body p { font-size: 13px; color: var(--muted); margin: 0 0 14px; line-height: 1.55; }
-  .showcase-body .read { font-size: 12.5px; font-weight: 700; color: var(--brand-navy); }
+  .carteira-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--site-gap); margin-bottom: 24px; }
+  @media (max-width: 900px) { .carteira-grid { grid-template-columns: 1fr; } }
+  .carteira-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-card); display: block; text-decoration: none; }
+  .carteira-card-img-wrap { position: relative; aspect-ratio: 4/3; background: var(--surface2); }
+  .carteira-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .carteira-badge-codigo { position: absolute; top: 10px; left: 10px; background: rgba(15,20,30,.72); color: #fff; font-family: var(--font-brand); font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: var(--radius-sm); }
+  .carteira-badge-status { position: absolute; top: 10px; right: 10px; background: var(--brand-orange); color: #fff; font-family: var(--font-brand); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 4px 10px; border-radius: var(--radius-sm); }
+  .carteira-card-body { padding: 16px 18px 18px; }
+  .carteira-card-addr { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 3px; }
+  .carteira-card-sub { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+  .carteira-card-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+  .carteira-card-meta span { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
+  .carteira-card-meta svg { width: 13px; height: 13px; color: var(--muted); }
+  .carteira-chip { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-full); background: var(--accent-pale); color: var(--brand-orange); margin-bottom: 14px; }
+  .carteira-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; }
+  .carteira-card-preco { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-navy); }
+  .carteira-card-link { font-size: 12px; font-weight: 700; color: var(--brand-orange); }
   .showcase-more { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-brand); font-weight: 700; font-size: 13.5px; color: var(--brand-orange); }
 
   /* ── DESCOBERTA (Home / Blog) ── */
@@ -216,33 +224,71 @@
   <section class="block">
     <div class="wrap">
       <h2 class="block-title">Imóveis <strong>da carteira Pandora Homes</strong></h2>
-      <p class="block-sub">Uma amostra do que está à venda agora — curadoria, não portal genérico.</p>
-      <div class="showcase-grid">
-        <a class="showcase-card" href="https://pandorahomes.com.br/imoveis/cobertura-com-158m2-3-dormitorios-sendo-1-suite-recem-reformada-PD557" target="_blank">
-          <div class="showcase-img img-placeholder"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Foto do imóvel</div>
-          <div class="showcase-body">
-            <span class="tag">Vila Mariana</span>
-            <h3>Cobertura de 158m², 3 dormitórios (1 suíte)</h3>
-            <p>Reformada, com solarium privativo, hidromassagem e vista panorâmica de São Paulo.</p>
-            <span class="read">Ver imóvel →</span>
+      <p class="block-sub">Uma amostra do que está à venda agora — mesmo padrão de ficha do nosso sistema interno, com dados reais da carteira.</p>
+      <div class="carteira-grid">
+        <a class="carteira-card" href="https://pandorahomes.com.br/imoveis/cobertura-com-158m2-3-dormitorios-sendo-1-suite-recem-reformada-PD557" target="_blank">
+          <div class="carteira-card-img-wrap">
+            <img src="https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNjlhZjJiNWFlNTMyYTQ0YjBhYTM0YmM5L2ltYWdlcy9hODRmYzAzMC0yOWE2LTRkYzItYTc4Ny0wYzI4NTU3NmMyOTcuanBlZyIsImVkaXRzIjp7ImZvcm1hdCI6IndlYnAiLCJyZXNpemUiOnsid2lkdGgiOjEwODAsImZpdCI6ImNvdmVyIn0sInJvdGF0ZSI6bnVsbH19" alt="Cobertura na Rua Pereira Caldas, Vila Mariana" loading="lazy">
+            <span class="carteira-badge-codigo">PD557</span>
+            <span class="carteira-badge-status">Exclusivo</span>
+          </div>
+          <div class="carteira-card-body">
+            <div class="carteira-card-addr">Rua Pereira Caldas, 90</div>
+            <div class="carteira-card-sub">Apto 193 · Vila Mariana</div>
+            <div class="carteira-card-meta">
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>158 m²</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>3</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>1 suíte</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.2"/><circle cx="16.5" cy="17" r="1.2"/></svg>2</span>
+            </div>
+            <span class="carteira-chip">Cobertura</span>
+            <div class="carteira-card-footer">
+              <span class="carteira-card-preco">R$ 2.200.000</span>
+              <span class="carteira-card-link">Ver imóvel →</span>
+            </div>
           </div>
         </a>
-        <a class="showcase-card" href="https://pandorahomes.com.br/imoveis/apartamento-com-area-gourmet-reformado-com-253m2-luxo-e-elegancia-em-higienopolis-proximo-a-praca-buenos-aires-PD439" target="_blank">
-          <div class="showcase-img img-placeholder"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Foto do imóvel</div>
-          <div class="showcase-body">
-            <span class="tag">Higienópolis</span>
-            <h3>Apartamento de 253m², 4 suítes</h3>
-            <p>Área gourmet reformada, ambientes amplos com pé-direito alto, perto da Praça Buenos Aires.</p>
-            <span class="read">Ver imóvel →</span>
+        <a class="carteira-card" href="https://pandorahomes.com.br/imoveis/apartamento-com-area-gourmet-reformado-com-253m2-luxo-e-elegancia-em-higienopolis-proximo-a-praca-buenos-aires-PD439" target="_blank">
+          <div class="carteira-card-img-wrap">
+            <img src="https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNjg0MzA1OWMzZTA0ZjkyZjQ1MGUyOTc1L2ltYWdlcy13YXRlcm1hcmsvN2IxMmYxYTItOTVmNS00NTUwLWFlODQtODEzZGJkODhjMjQxLmpwZWciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjIwMDB9LCJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0=" alt="Apartamento na Rua Sergipe, Higienópolis" loading="lazy">
+            <span class="carteira-badge-codigo">PD439</span>
+            <span class="carteira-badge-status">Exclusivo</span>
+          </div>
+          <div class="carteira-card-body">
+            <div class="carteira-card-addr">Rua Sergipe, 327</div>
+            <div class="carteira-card-sub">Apto 11 · Higienópolis</div>
+            <div class="carteira-card-meta">
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>253 m²</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>4</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>4 suítes</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.2"/><circle cx="16.5" cy="17" r="1.2"/></svg>2</span>
+            </div>
+            <span class="carteira-chip">Apartamento</span>
+            <div class="carteira-card-footer">
+              <span class="carteira-card-preco">R$ 3.600.000</span>
+              <span class="carteira-card-link">Ver imóvel →</span>
+            </div>
           </div>
         </a>
-        <a class="showcase-card" href="https://pandorahomes.com.br/imoveis/condominio-de-casas-recem-entregue-PD447" target="_blank">
-          <div class="showcase-img img-placeholder"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Foto do imóvel</div>
-          <div class="showcase-body">
-            <span class="tag">Alto da Boa Vista</span>
-            <h3>Condomínio de casas recém-entregue, 4 suítes</h3>
-            <p>Design inteligente e luz natural abundante, em condomínio novo.</p>
-            <span class="read">Ver imóvel →</span>
+        <a class="carteira-card" href="https://pandorahomes.com.br/imoveis/condominio-de-casas-recem-entregue-PD447" target="_blank">
+          <div class="carteira-card-img-wrap">
+            <img src="https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNjg3MTVmOTNhMjkzMzM4NWNjYmRhODRjL2ltYWdlcy13YXRlcm1hcmsvMThkZGE3Y2YtOTk4NC00YWQ2LTk5ZjEtYzBlMmI4Y2Y2YzY4LmpwZWciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjIwMDB9LCJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0=" alt="Condomínio de casas na Rua Heron Domingues, Jardim Cordeiro" loading="lazy">
+            <span class="carteira-badge-codigo">PD447</span>
+          </div>
+          <div class="carteira-card-body">
+            <div class="carteira-card-addr">Rua Heron Domingues, 140</div>
+            <div class="carteira-card-sub">Jardim Cordeiro</div>
+            <div class="carteira-card-meta">
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>535 m²</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>4</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>4 suítes</span>
+              <span><svg class="icon" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.2"/><circle cx="16.5" cy="17" r="1.2"/></svg>4</span>
+            </div>
+            <span class="carteira-chip">Casa</span>
+            <div class="carteira-card-footer">
+              <span class="carteira-card-preco">R$ 6.550.000</span>
+              <span class="carteira-card-link">Ver imóvel →</span>
+            </div>
           </div>
         </a>
       </div>
