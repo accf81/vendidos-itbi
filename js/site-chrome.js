@@ -1,6 +1,6 @@
 // ══════════════════════════════════════════════════════════════════
 // SITE CHROME — cabeçalho, rodapé e leads compartilhados entre as
-// páginas do Pandora Vendidos (Início, Sobre, Blog e artigos).
+// páginas do Pandora Data SP (Início, Sobre, Blog e artigos).
 // Editar aqui muda em todas as páginas de uma vez.
 // ══════════════════════════════════════════════════════════════════
 
@@ -43,7 +43,7 @@ function renderHeader(current, base) {
       <span class="logo-full">
         ${SITE_WORDMARK}
         <div class="logo-divider"></div>
-        <span class="logo-sub">Vendidos SP</span>
+        <span class="logo-sub">Data SP</span>
       </span>
       ${SITE_SYMBOL}
     </a>
