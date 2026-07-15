@@ -40,13 +40,14 @@ header.site { background: var(--brand-orange); border-bottom: 1px solid var(--br
 nav.site-nav { display: flex; align-items: center; gap: 4px; }
 nav.site-nav a { font-family: var(--font-brand); font-size: 13px; font-weight: 600; padding: 7px 13px; border-radius: var(--radius-md); color: rgba(255,255,255,.8); }
 nav.site-nav a:hover, nav.site-nav a.current { color: #fff; background: rgba(255,255,255,.16); }
-.nav-cta { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: var(--radius-md); background: #fff; color: var(--brand-orange-dark); font-family: var(--font-brand); font-size: 12.5px; font-weight: 700; }
+.nav-cta { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: var(--radius-md); background: transparent; border: 1.5px solid rgba(255,255,255,.65); color: #fff; font-family: var(--font-brand); font-size: 12.5px; font-weight: 700; }
+.nav-cta:hover { background: rgba(255,255,255,.12); }
 .menu-btn { display: none; background: none; border: 1px solid rgba(255,255,255,.5); border-radius: var(--radius-md); width: 36px; height: 36px; align-items: center; justify-content: center; cursor: pointer; color: #fff; }
 @media (max-width: 860px) { nav.site-nav { display: none; } .nav-cta.desktop-only { display: none; } .menu-btn { display: inline-flex; } }
 .mobile-nav { display: none; flex-direction: column; gap: 2px; padding: 10px 16px 16px; border-bottom: 1px solid var(--border); background: var(--surface); }
 .mobile-nav.open { display: flex; }
 .mobile-nav a { padding: 12px 10px; border-radius: var(--radius-md); font-family: var(--font-brand); font-weight: 600; font-size: 14px; color: var(--text); }
-.mobile-nav .nav-cta { justify-content: center; margin-top: 6px; background: var(--accent); color: #fff; }
+.mobile-nav .nav-cta { justify-content: center; margin-top: 6px; background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* ── FOOTER ── */
 footer.site { background: var(--surface); color: var(--text); border-top: 1px solid var(--border); padding: var(--site-py-md) 0 28px; }

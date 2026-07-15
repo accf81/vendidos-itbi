@@ -87,7 +87,7 @@
    Fundo Navy Faint. Texto Navy. Superfícies brancas.
    ─────────────────────────────────────────────────────────────── */
 [data-theme="light"] {
-  --bg:           var(--brand-navy-faint);   /* #eef0f6 */
+  --bg:           var(--brand-white);        /* #ffffff */
   --surface:      var(--brand-white);        /* #ffffff */
   --surface2:     var(--brand-navy-faint);   /* #eef0f6 */
   --surface3:     #e3e7f2;
