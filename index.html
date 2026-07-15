@@ -75,22 +75,26 @@
   .results-source .icon { width: 12px; height: 12px; flex: none; }
   .btn-export { flex: none; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface); color: var(--brand-navy); font-family: var(--font-brand); font-weight: 700; font-size: 12px; cursor: pointer; }
   .btn-export .icon { width: 14px; height: 14px; color: var(--brand-orange); }
-  .result-row { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); margin-bottom: 10px; }
+  .result-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); margin-bottom: 10px; flex-wrap: wrap; }
   .result-addr { font-weight: 600; font-size: 14px; color: var(--text); }
   .result-meta { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
-  .result-bottom { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
-  .result-price-wrap { display: flex; align-items: baseline; gap: 6px; flex-wrap: wrap; }
+  .result-figures { text-align: right; }
+  .result-price-wrap { display: flex; align-items: baseline; gap: 6px; justify-content: flex-end; flex-wrap: wrap; }
   .result-price { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-orange); }
   .result-sep { color: var(--border); font-size: 13px; }
   .result-m2 { font-weight: 700; font-size: 11.5px; color: var(--brand-navy); }
-  .result-date { font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+  .result-date { font-size: 13px; font-weight: 700; color: var(--text); margin-top: 2px; }
+  .result-date-label { font-weight: 700; }
   @media (max-width: 480px) {
-    .result-bottom { align-items: flex-end; }
+    .result-top { flex: 1 1 100%; }
+    .result-figures { flex: 1 1 100%; display: flex; align-items: flex-end; justify-content: space-between; text-align: left; }
     .result-price-wrap { flex-direction: column; align-items: flex-start; gap: 2px; }
     .result-price { font-size: 20px; }
     .result-sep { display: none; }
     .result-m2 { font-size: 12.5px; }
-    .result-date { font-size: 14px; font-weight: 700; color: var(--text); }
+    .result-date { display: flex; flex-direction: column-reverse; align-items: flex-end; text-align: right; margin-top: 0; }
+    .result-date-val { display: block; font-size: 16px; font-weight: 700; color: var(--text); }
+    .result-date-label { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
   }
   .results-empty { padding: 30px 10px; text-align: center; color: var(--muted); font-size: 14px; }
 
@@ -506,17 +510,17 @@ function renderResults() {
     const bairro = row.bairro || '';
     return `
       <div class="result-row">
-        <div>
+        <div class="result-top">
           <div class="result-addr">${esc(row.logradouro)}, ${esc(row.numero)}${esc(comp)}</div>
           <div class="result-meta">${esc([area, bairro].filter(Boolean).join(' · '))}</div>
         </div>
-        <div class="result-bottom">
+        <div class="result-figures">
           <div class="result-price-wrap">
             <span class="result-price">${formatMoney(row.valor_transacao)}</span>
             <span class="result-sep">|</span>
             <span class="result-m2">${formatMoney(row.valor_m2)}/m²</span>
           </div>
-          <div class="result-date">vendido ${formatDate(row.data_transacao)}</div>
+          <div class="result-date"><span class="result-date-label">vendido</span> <span class="result-date-val">${formatDate(row.data_transacao)}</span></div>
         </div>
       </div>`;
   }).join('');
