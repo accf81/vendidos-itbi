@@ -87,19 +87,19 @@
   .carteira-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--site-gap); margin-bottom: 24px; }
   @media (max-width: 900px) { .carteira-grid { grid-template-columns: 1fr; } }
   .carteira-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); overflow: hidden; box-shadow: var(--shadow-card); display: block; text-decoration: none; }
-  .carteira-card-img-wrap { position: relative; aspect-ratio: 4/3; background: var(--surface2); }
+  .carteira-card-img-wrap { position: relative; aspect-ratio: 3/2; background: var(--surface2); }
   .carteira-card-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .carteira-badge-codigo { position: absolute; top: 10px; left: 10px; background: rgba(15,20,30,.72); color: #fff; font-family: var(--font-brand); font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: var(--radius-sm); }
   .carteira-badge-status { position: absolute; top: 10px; right: 10px; background: var(--brand-orange); color: #fff; font-family: var(--font-brand); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; padding: 4px 10px; border-radius: var(--radius-sm); }
-  .carteira-card-body { padding: 16px 18px 18px; }
+  .carteira-badge-tipo { position: absolute; bottom: 10px; left: 10px; background: rgba(15,20,30,.72); color: #fff; font-family: var(--font-brand); font-size: 10.5px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-sm); }
+  .carteira-card-body { padding: 14px 18px 16px; }
   .carteira-card-addr { font-family: var(--font-brand); font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 3px; }
   .carteira-card-sub { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
   .carteira-card-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
   .carteira-card-meta span { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); }
   .carteira-card-meta svg { width: 13px; height: 13px; color: var(--muted); }
-  .carteira-chip { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: var(--radius-full); background: var(--accent-pale); color: var(--brand-orange); margin-bottom: 14px; }
   .carteira-card-footer { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; }
-  .carteira-card-preco { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-navy); }
+  .carteira-card-preco { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-orange); }
   .carteira-card-link { font-size: 12px; font-weight: 700; color: var(--brand-orange); }
   .showcase-more { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-brand); font-weight: 700; font-size: 13.5px; color: var(--brand-orange); }
 
@@ -231,6 +231,7 @@
             <img src="https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNjlhZjJiNWFlNTMyYTQ0YjBhYTM0YmM5L2ltYWdlcy9hODRmYzAzMC0yOWE2LTRkYzItYTc4Ny0wYzI4NTU3NmMyOTcuanBlZyIsImVkaXRzIjp7ImZvcm1hdCI6IndlYnAiLCJyZXNpemUiOnsid2lkdGgiOjEwODAsImZpdCI6ImNvdmVyIn0sInJvdGF0ZSI6bnVsbH19" alt="Cobertura na Rua Pereira Caldas, Vila Mariana" loading="lazy">
             <span class="carteira-badge-codigo">PD557</span>
             <span class="carteira-badge-status">Exclusivo</span>
+            <span class="carteira-badge-tipo">Cobertura</span>
           </div>
           <div class="carteira-card-body">
             <div class="carteira-card-addr">Rua Pereira Caldas, 90</div>
@@ -241,7 +242,6 @@
               <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>1 suíte</span>
               <span><svg class="icon" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.2"/><circle cx="16.5" cy="17" r="1.2"/></svg>2</span>
             </div>
-            <span class="carteira-chip">Cobertura</span>
             <div class="carteira-card-footer">
               <span class="carteira-card-preco">R$ 2.200.000</span>
               <span class="carteira-card-link">Ver imóvel →</span>
@@ -253,6 +253,7 @@
             <img src="https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNjg0MzA1OWMzZTA0ZjkyZjQ1MGUyOTc1L2ltYWdlcy13YXRlcm1hcmsvN2IxMmYxYTItOTVmNS00NTUwLWFlODQtODEzZGJkODhjMjQxLmpwZWciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjIwMDB9LCJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0=" alt="Apartamento na Rua Sergipe, Higienópolis" loading="lazy">
             <span class="carteira-badge-codigo">PD439</span>
             <span class="carteira-badge-status">Exclusivo</span>
+            <span class="carteira-badge-tipo">Apartamento</span>
           </div>
           <div class="carteira-card-body">
             <div class="carteira-card-addr">Rua Sergipe, 327</div>
@@ -263,7 +264,6 @@
               <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>4 suítes</span>
               <span><svg class="icon" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.2"/><circle cx="16.5" cy="17" r="1.2"/></svg>2</span>
             </div>
-            <span class="carteira-chip">Apartamento</span>
             <div class="carteira-card-footer">
               <span class="carteira-card-preco">R$ 3.600.000</span>
               <span class="carteira-card-link">Ver imóvel →</span>
@@ -274,6 +274,7 @@
           <div class="carteira-card-img-wrap">
             <img src="https://d1988evaubdc7a.cloudfront.net/eyJidWNrZXQiOiJibGludHotcHJvcGVydGllcy1zYW5kYm94Iiwia2V5IjoiNjg3MTVmOTNhMjkzMzM4NWNjYmRhODRjL2ltYWdlcy13YXRlcm1hcmsvMThkZGE3Y2YtOTk4NC00YWQ2LTk5ZjEtYzBlMmI4Y2Y2YzY4LmpwZWciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjIwMDB9LCJmb3JtYXQiOiJ3ZWJwIiwicm90YXRlIjpudWxsfX0=" alt="Condomínio de casas na Rua Heron Domingues, Jardim Cordeiro" loading="lazy">
             <span class="carteira-badge-codigo">PD447</span>
+            <span class="carteira-badge-tipo">Casa</span>
           </div>
           <div class="carteira-card-body">
             <div class="carteira-card-addr">Rua Heron Domingues, 140</div>
@@ -284,7 +285,6 @@
               <span><svg class="icon" viewBox="0 0 24 24"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4"/></svg>4 suítes</span>
               <span><svg class="icon" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17" r="1.2"/><circle cx="16.5" cy="17" r="1.2"/></svg>4</span>
             </div>
-            <span class="carteira-chip">Casa</span>
             <div class="carteira-card-footer">
               <span class="carteira-card-preco">R$ 6.550.000</span>
               <span class="carteira-card-link">Ver imóvel →</span>
