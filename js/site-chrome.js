@@ -8,12 +8,17 @@ const SUPABASE_URL = 'https://sobmjqounukzbplrmhkr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_o5fTXnmp8hhp76WymPJ_MQ_MuJUhvfY';
 async function saveLead(payload) {
   try {
-    await fetch(SUPABASE_URL + '/rest/v1/leads_vendidos', {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/leads_vendidos', {
       method: 'POST',
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
       body: JSON.stringify(payload)
     });
-  } catch (e) { console.error('Erro ao salvar lead:', e); }
+    if (!res.ok) {
+      console.error('Erro ao salvar lead:', res.status, await res.text());
+      return false;
+    }
+    return true;
+  } catch (e) { console.error('Erro ao salvar lead:', e); return false; }
 }
 
 const SITE_WORDMARK = `<svg class="wordmark" viewBox="0 0 1375.79 376.12" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M356.75,22.3v64.36h19.36V14.48l-19.36,7.82ZM14.48,0l7.86,19.37h331.48l7.82-19.37H14.48ZM353.82,356.71H22.34l-7.86,19.41h347.16l-7.82-19.41ZM19.36,22.3L0,14.44v347.25l19.36-7.86V22.3ZM356.75,289.42v64.4l19.36,7.82v-72.22h-19.36Z"/><path d="M200.09,121.97h-48.95v18.17h48.81c19.05,0,30.65,10.13,30.65,27.54s-11.59,28.03-30.65,28.03h-48.81v67.42h21.54v-49.26h27.41c31.67,0,52.06-16.7,52.06-46.33s-20.39-45.57-52.06-45.57Z"/><path d="M377.49,121.97h-23.9l-54.1,141.15h21.85l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM340.85,210.62l24.16-65.07,23.76,65.07h-47.93Z"/><path d="M593.71,121.97v107.26l-72.58-107.26h-23.59v141.15h20.08v-110.37l74.31,110.37h21.85V121.97h-20.08Z"/><path d="M735.75,121.97h-44.55v141.15h44.55c44.11,0,71.11-30.51,71.11-71.24s-25.94-69.91-71.11-69.91ZM734.86,244.33h-21.99v-103.76h21.99c32.56,0,49.83,19.5,49.83,51.3s-17.41,52.46-49.83,52.46Z"/><path d="M939.98,119.04c-40.91,0-71.86,31.49-71.86,73.29s30.96,73.73,71.86,73.73,71.64-32.11,71.64-73.73-30.78-73.29-71.64-73.29ZM939.98,246.55c-29.94,0-49.43-24.03-49.43-54.23s19.5-53.97,49.43-53.97,49.21,23.63,49.21,53.97-19.5,54.23-49.21,54.23Z"/><path d="M1151.49,206.8c21.41-5.11,34.16-20.65,34.16-40.86,0-28.16-19.5-43.97-51.88-43.97h-52.77v17.99h51.43c19.94,0,31.36,9.1,31.36,25.98s-11.42,25.94-31.36,25.94h-51.43v71.24h21.68v-53.08h25.94l35.18,53.08h25.94l-38.24-56.32Z"/><path d="M1322.13,121.97h-23.9l-53.97,141.15h21.72l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM1285.49,210.62l24.16-65.07,23.9,65.07h-48.06Z"/></svg>`;

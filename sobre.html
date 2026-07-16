@@ -200,10 +200,15 @@
           <form class="lead-form" id="ctaForm">
             <div class="f"><label>Nome</label><input type="text" id="ctaNome" placeholder="Seu nome" required></div>
             <div class="f"><label>WhatsApp</label><input type="text" id="ctaWhats" placeholder="(11) 90000-0000" required></div>
-            <div class="f"><label>Endereço do imóvel</label><input type="text" id="ctaEndereco" placeholder="Rua e número"></div>
+            <div class="f"><label>Rua</label><input type="text" id="ctaRua" placeholder="Nome da rua" required></div>
+            <div class="f-row">
+              <div class="f"><label>Número</label><input type="text" id="ctaNumero" placeholder="Nº" required></div>
+              <div class="f"><label>Apto <span style="opacity:.6;font-weight:400;text-transform:none">(opcional)</span></label><input type="text" id="ctaApto" placeholder="Opcional"></div>
+            </div>
             <div class="f">
               <label>Sobre a venda</label>
-              <select id="ctaIntencao">
+              <select id="ctaIntencao" required>
+                <option value="" disabled selected>Selecione</option>
                 <option value="ja_decidi_vender">Já decidi vender</option>
                 <option value="pesquisando">Ainda estou pesquisando</option>
                 <option value="so_valor">Só quero entender o valor</option>
@@ -330,15 +335,21 @@
 initSiteChrome('sobre', '');
 document.getElementById('ctaForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  await saveLead({
+  const ok = await saveLead({
     origem: 'home_cta',
     nome: document.getElementById('ctaNome').value,
     telefone: document.getElementById('ctaWhats').value,
-    endereco: document.getElementById('ctaEndereco').value,
+    rua: document.getElementById('ctaRua').value,
+    num: document.getElementById('ctaNumero').value,
+    apto: document.getElementById('ctaApto').value,
     intencao: document.getElementById('ctaIntencao').value,
   });
-  e.target.style.display = 'none';
-  document.getElementById('ctaThanks').classList.add('show');
+  if (ok) {
+    e.target.style.display = 'none';
+    document.getElementById('ctaThanks').classList.add('show');
+  } else {
+    alert('Algo deu errado ao enviar. Tenta de novo ou chama no WhatsApp: (11) 94524-0721.');
+  }
 });
 </script>
 </body>

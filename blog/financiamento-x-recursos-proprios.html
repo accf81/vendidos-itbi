@@ -204,7 +204,7 @@
 initSiteChrome('blog', '../');
 document.getElementById('ctaForm').addEventListener('submit', async (e) => {
   e.preventDefault();
-  await saveLead({
+  const ok = await saveLead({
     origem: 'blog_comprador',
     nome: document.getElementById('ctaNome').value,
     telefone: document.getElementById('ctaWhats').value,
@@ -212,8 +212,12 @@ document.getElementById('ctaForm').addEventListener('submit', async (e) => {
     faixa_valor: document.getElementById('ctaFaixa').value,
     intencao: 'comprador',
   });
-  e.target.style.display = 'none';
-  document.getElementById('ctaThanks').classList.add('show');
+  if (ok) {
+    e.target.style.display = 'none';
+    document.getElementById('ctaThanks').classList.add('show');
+  } else {
+    alert('Algo deu errado ao enviar. Tenta de novo ou chama no WhatsApp: (11) 94524-0721.');
+  }
 });
 </script>
 </body>

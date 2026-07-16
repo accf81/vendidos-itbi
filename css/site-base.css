@@ -78,3 +78,7 @@ footer.site svg.wordmark { height: 18px; width: auto; color: var(--brand-navy); 
   .footer-social { justify-content: center; }
   .footer-bottom { flex-direction: column; align-items: center; text-align: center; }
 }
+
+/* ── FORMULÁRIO DE LEAD — linha dividida (ex.: Número + Apto) ── */
+.lead-form .f-row { display: flex; gap: 12px; }
+.lead-form .f-row .f { flex: 1; margin-bottom: 14px; }
