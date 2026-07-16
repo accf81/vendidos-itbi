@@ -2,13 +2,27 @@
 <html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2MMBB67JCM"></script>
+<!-- Google tag (gtag.js) — com exclusão de tráfego interno do Alex -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-2MMBB67JCM');
+  // Abrir qualquer página com ?noga=1 desliga a medição NESTE aparelho pra sempre.
+  // ?noga=0 religa. Fica gravado no navegador; não afeta nenhum visitante.
+  (function(){
+    try {
+      var p = new URLSearchParams(location.search);
+      if (p.get('noga') === '1') localStorage.setItem('pandora_noga', '1');
+      if (p.get('noga') === '0') localStorage.removeItem('pandora_noga');
+    } catch (e) {}
+  })();
+  if (!(function(){ try { return localStorage.getItem('pandora_noga') === '1'; } catch (e) { return false; } })()) {
+    var _ga = document.createElement('script');
+    _ga.async = true;
+    _ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-2MMBB67JCM';
+    document.head.appendChild(_ga);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', 'G-2MMBB67JCM');
+  }
 </script>
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -44,7 +58,6 @@
 
 <link rel="stylesheet" href="css/design-tokens.css">
 <link rel="stylesheet" href="css/site-base.css">
-<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <style>
   /* ── HERO ── */
   .hero { padding: var(--site-py-top) 0 var(--site-py-md); background: linear-gradient(180deg, var(--brand-navy-faint), var(--bg) 70%); }
@@ -109,6 +122,9 @@
     .result-date-label { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
   }
   .results-empty { padding: 30px 10px; text-align: center; color: var(--muted); font-size: 14px; }
+  .btn-buscar:disabled { opacity: .75; cursor: default; }
+  .icon.spin { animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
   /* ── SEÇÃO GENÉRICA ── */
   h2.block-title { font-size: clamp(22px, 3vw, 30px); font-weight: 200; color: var(--brand-navy); margin: 0 0 10px; }
@@ -477,7 +493,32 @@ function normalizeLogradouro(s) {
 }
 
 // ─── SEARCH ───
+const SEARCH_LIMIT = 500;
+let searching = false;
+
+// Mostra uma mensagem dentro do painel de resultados (sem alert do navegador)
+function showSearchMessage(msg) {
+  const panel = document.getElementById('resultsPanel');
+  const list = document.getElementById('resultsList');
+  const count = document.getElementById('resultsCount');
+  panel.classList.add('show');
+  document.getElementById('btnExport').classList.add('hidden');
+  count.innerHTML = '';
+  list.innerHTML = `<div class="results-empty">${esc(msg)}</div>`;
+}
+
+function setSearchLoading(on) {
+  searching = on;
+  const btn = document.querySelector('.btn-buscar');
+  if (!btn) return;
+  btn.disabled = on;
+  btn.innerHTML = on
+    ? `<svg class="icon spin" viewBox="0 0 24 24" style="width:16px;height:16px;color:#fff"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></svg> Buscando…`
+    : `<svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px;color:#fff"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg> Buscar vendidos`;
+}
+
 async function doSearch() {
+  if (searching) return;
   const addresses = [];
   document.querySelectorAll('.address-card').forEach(card => {
     const id = card.id.replace('card-', '');
@@ -485,26 +526,36 @@ async function doSearch() {
     const num = document.getElementById(`num-${id}`)?.value?.trim() || '';
     if (rua) addresses.push({ rua, num });
   });
-  if (addresses.length === 0) { alert('Digite pelo menos um endereço para buscar.'); return; }
+  if (addresses.length === 0) { showSearchMessage('Digite pelo menos um endereço (a rua) para buscar.'); return; }
 
   const orGroups = addresses.map(a => {
-    const normalized = normalizeLogradouro(a.rua);
+    // normaliza e remove qualquer caractere que quebre a sintaxe do filtro (vírgula,
+    // parênteses, asterisco, ponto) — rua não tem esses caracteres na base
+    const normalized = normalizeLogradouro(a.rua).replace(/[(),*.]/g, ' ').replace(/\s+/g, ' ').trim();
     const parts = [`logradouro_norm.ilike.*${normalized}*`];
-    if (a.num) parts.push(`numero.eq.${a.num.trim()}`);
+    const num = (a.num || '').replace(/\D/g, '');   // número: só dígitos
+    if (num) parts.push(`numero.eq.${num}`);
     return `and(${parts.join(',')})`;
   });
   const params = new URLSearchParams({
     select: 'data_transacao,logradouro,logradouro_norm,numero,complemento,bairro,referencia,area_construida_m2,valor_transacao,valor_m2',
     or: `(${orGroups.join(',')})`,
     order: 'data_transacao.desc',
-    limit: '500',
+    limit: String(SEARCH_LIMIT),
   });
 
+  setSearchLoading(true);
   try {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/vendas_itbi?${params}`, { headers: SB_HEADERS });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     filteredResults = await res.json();
-  } catch (e) { console.error('Erro na busca:', e.message); alert('Erro na consulta: ' + e.message); return; }
+  } catch (e) {
+    console.error('Erro na busca:', e.message);
+    showSearchMessage('Não deu pra completar a busca agora. Confira sua conexão e tente de novo em instantes.');
+    return;
+  } finally {
+    setSearchLoading(false);
+  }
 
   renderResults();
 }
@@ -522,9 +573,13 @@ function renderResults() {
     return;
   }
 
+  const noLimite = filteredResults.length >= SEARCH_LIMIT;
+  const contagem = noLimite
+    ? `Mostrando as ${SEARCH_LIMIT} vendas mais recentes — busque com o número pra refinar`
+    : `${filteredResults.length} ${filteredResults.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'}`;
   count.innerHTML = `
     <svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>
-    ${filteredResults.length} ${filteredResults.length === 1 ? 'imóvel encontrado' : 'imóveis encontrados'} · Fonte: Prefeitura de São Paulo (ITBI)`;
+    ${contagem} · Fonte: Prefeitura de São Paulo (ITBI)`;
 
   list.innerHTML = filteredResults.map(row => {
     const comp = row.complemento ? ' — ' + row.complemento : '';
@@ -594,7 +649,23 @@ function formatMoney(v) {
 }
 
 // ─── EXPORT (Excel, com cabeçalho da marca) ───
-function exportXLSX() {
+// A biblioteca (~900 KB) só é baixada quando alguém exporta de verdade — não pesa
+// no carregamento da página pra quem só consulta.
+let _xlsxPromise = null;
+function loadXLSX() {
+  if (typeof XLSX !== 'undefined') return Promise.resolve();
+  if (_xlsxPromise) return _xlsxPromise;
+  _xlsxPromise = new Promise((resolve, reject) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js';
+    s.onload = resolve;
+    s.onerror = () => { _xlsxPromise = null; reject(new Error('falha ao carregar a biblioteca')); };
+    document.head.appendChild(s);
+  });
+  return _xlsxPromise;
+}
+
+function buildXLSX() {
   if (!filteredResults.length || typeof XLSX === 'undefined') return;
   const now = new Date();
   const dataGeracao = now.toLocaleDateString('pt-BR');
@@ -628,6 +699,16 @@ document.getElementById('exportModalClose').addEventListener('click', () => {
 });
 document.getElementById('exportForm').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const btnHtml = btn ? btn.innerHTML : '';
+  if (btn) { btn.disabled = true; btn.innerHTML = 'Preparando planilha…'; }
+  try {
+    await loadXLSX();
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.innerHTML = btnHtml; }
+    alert('Não deu pra gerar a planilha agora. Confira sua conexão e tente de novo.');
+    return;
+  }
   await saveLead({
     origem: 'export',
     nome: document.getElementById('expNome').value,
@@ -635,7 +716,7 @@ document.getElementById('exportForm').addEventListener('submit', async (e) => {
     telefone: document.getElementById('expTelefone').value,
     tipo: document.getElementById('expTipo').value,
   });
-  exportXLSX();
+  buildXLSX();
   e.target.style.display = 'none';
   document.getElementById('exportThanks').classList.add('show');
 });

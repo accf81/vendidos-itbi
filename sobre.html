@@ -2,13 +2,27 @@
 <html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2MMBB67JCM"></script>
+<!-- Google tag (gtag.js) — com exclusão de tráfego interno do Alex -->
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-2MMBB67JCM');
+  // Abrir qualquer página com ?noga=1 desliga a medição NESTE aparelho pra sempre.
+  // ?noga=0 religa. Fica gravado no navegador; não afeta nenhum visitante.
+  (function(){
+    try {
+      var p = new URLSearchParams(location.search);
+      if (p.get('noga') === '1') localStorage.setItem('pandora_noga', '1');
+      if (p.get('noga') === '0') localStorage.removeItem('pandora_noga');
+    } catch (e) {}
+  })();
+  if (!(function(){ try { return localStorage.getItem('pandora_noga') === '1'; } catch (e) { return false; } })()) {
+    var _ga = document.createElement('script');
+    _ga.async = true;
+    _ga.src = 'https://www.googletagmanager.com/gtag/js?id=G-2MMBB67JCM';
+    document.head.appendChild(_ga);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function(){ dataLayer.push(arguments); };
+    gtag('js', new Date());
+    gtag('config', 'G-2MMBB67JCM');
+  }
 </script>
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
