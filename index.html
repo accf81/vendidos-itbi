@@ -2,6 +2,14 @@
 <html lang="pt-BR" data-theme="light">
 <head>
 <meta charset="UTF-8">
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2MMBB67JCM"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-2MMBB67JCM');
+</script>
 <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -413,11 +421,11 @@ function setupCardAutocomplete(id) {
       if (val.length < 2) { closeAllDropdowns(); return; }
       const norm = normalizeLogradouro(val);
       const rows = await sbRpc('buscar_ruas_itbi', { termo: norm });
-      const items = rows.map(r => r.logradouro_norm);
+      const items = rows.map(r => formatLogradouro(r.logradouro_norm));
       showDropdown(ruaList, items, async chosen => {
         ruaEl.value = chosen;
         numEl.focus();
-        const numRows = await sbRpc('buscar_numeros_itbi', { rua: chosen, termo: '' });
+        const numRows = await sbRpc('buscar_numeros_itbi', { rua: normalizeLogradouro(chosen), termo: '' });
         showDropdown(numList, numRows.map(r => r.numero), n => { numEl.value = n; doSearch(); });
       });
     }, 220);
@@ -447,8 +455,10 @@ function setupCardAutocomplete(id) {
 function removeAccents(str) { return str.normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 const _NORM_MAP = [
   [/^R\b/,'RUA'],[/^AV\b/,'AVENIDA'],[/^AL\b/,'ALAMEDA'],[/^PC\b/,'PRACA'],
-  [/^PCA\b/,'PRACA'],[/^TV\b/,'TRAVESSA'],[/^EST\b/,'ESTRADA'],[/^RD\b/,'RODOVIA'],
-  [/^VL\b/,'VILA'],[/\bENG\b/g,'ENGENHEIRO'],[/\bDR\b/g,'DOUTOR'],[/\bDRA\b/g,'DOUTORA'],
+  [/^PCA\b/,'PRACA'],[/^TV\b/,'TRAVESSA'],[/^EST\b/,'ESTRADA'],[/^ESTR\b/,'ESTRADA'],
+  [/^RD\b/,'RODOVIA'],[/^ROD\b/,'RODOVIA'],[/^VL\b/,'VILA'],[/^LGO\b/,'LARGO'],
+  [/^VD\b/,'VIADUTO'],[/^PQ\b/,'PARQUE'],[/^LAD\b/,'LADEIRA'],[/^PSG\b/,'PASSARELA'],
+  [/\bENG\b/g,'ENGENHEIRO'],[/\bDR\b/g,'DOUTOR'],[/\bDRA\b/g,'DOUTORA'],
   [/\bPROF\b/g,'PROFESSOR'],[/\bPROFA\b/g,'PROFESSORA'],[/\bPDE\b/g,'PADRE'],
   [/\bCEL\b/g,'CORONEL'],[/\bBRIG\b/g,'BRIGADEIRO'],[/\bBR\b/g,'BARAO'],
   [/\bCONS\b/g,'CONSELHEIRO'],[/\bMAL\b/g,'MARECHAL'],[/\bGEN\b/g,'GENERAL'],
@@ -459,7 +469,9 @@ const _NORM_MAP = [
 ];
 function normalizeLogradouro(s) {
   if (!s) return s;
-  s = removeAccents(s.trim().toUpperCase()).replace(/\s+/g,' ');
+  // remove pontuação de abreviação (ex.: "Av." → "AV") antes de expandir, senão o
+  // ponto sobra colado na palavra expandida ("AVENIDA." em vez de "AVENIDA")
+  s = removeAccents(s.trim().toUpperCase()).replace(/\./g,'').replace(/\s+/g,' ');
   for (const [p,r] of _NORM_MAP) s = s.replace(p, r);
   return s;
 }
