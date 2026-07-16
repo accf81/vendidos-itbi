@@ -88,12 +88,56 @@ NORMALIZE_MAP = [
     (r'\bSTE\b','SANTO'),
 ]
 
+# Correções específicas: variantes DE/DO/DA confirmadas como mesma rua
+# (verificado por bairros em comum) — mesma lista do normalizar_banco.py.
+# Achado 15/07/2026: essa lista existia só no script manual, o script mensal
+# nunca aplicava — por isso ruas como "Ministro Alvaro de Souza Lima" voltavam
+# a aparecer separadas (Rua/Avenida) a cada atualização.
+SPECIFIC_CORRECTIONS = {
+    "AVENIDA DOS CARINAS": "AVENIDA DAS CARINAS",
+    "AVENIDA DOS MINUANOS": "AVENIDA MINUANOS",
+    "AVENIDA DOUTOR SALOMAO DE VASCONCELOS": "AVENIDA DOUTOR SALOMAO VASCONCELOS",
+    "AVENIDA NOSSA SENHORA DE SABARA": "AVENIDA NOSSA SENHORA DO SABARA",
+    "ESTRADA DO M BOI MIRIM": "ESTRADA M BOI MIRIM",
+    "RUA ALCATRAZES": "RUA DOS ALCATRAZES",
+    "RUA BANDEIRANTES": "RUA DOS BANDEIRANTES",
+    "RUA BARAO DE SANTA EULALIA": "RUA BARAO SANTA EULALIA",
+    "RUA A BELEM": "RUA BELEM",
+    "RUA CATILEIAS": "RUA DAS CATILEIAS",
+    "RUA CORNETEIRO DE JESUS": "RUA CORNETEIRO JESUS",
+    "RUA CORONEL MELO OLIVEIRA": "RUA CORONEL MELO DE OLIVEIRA",
+    "RUA CUSTODIO NASCIMENTO": "RUA CUSTODIO DO NASCIMENTO",
+    "RUA DAS FIANDEIRAS": "RUA FIANDEIRAS",
+    "RUA DAS GIESTAS": "RUA GIESTAS",
+    "RUA DAS IMBIRAS": "RUA IMBIRAS",
+    "RUA DO HIPODROMO": "RUA HIPODROMO",
+    "RUA DO MANIFESTO": "RUA MANIFESTO",
+    "RUA DO ORFANATO": "RUA ORFANATO",
+    "RUA DOS ALIADOS": "RUA ALIADOS",
+    "RUA DOS CAETES": "RUA CAETES",
+    "RUA DOS COROADOS": "RUA COROADOS",
+    "RUA DOS MORAS": "RUA MORAS",
+    "RUA DOS TAPES": "RUA TAPES",
+    "RUA DOUTOR PLINIO AMARAL": "RUA DOUTOR PLINIO DO AMARAL",
+    "RUA DA GRANJA JULIETA": "RUA GRANJA JULIETA",
+    "RUA GREGORIO MATOS": "RUA GREGORIO DE MATOS",
+    "RUA GUAICURI": "RUA DO GUAICURI",
+    "RUA JOAO CASTELHANOS": "RUA JOAO DE CASTELHANOS",
+    "RUA JOSE TAVARES DE SIQUEIRA": "RUA JOSE TAVARES SIQUEIRA",
+    "RUA LEOPOLDO COUTO DE MAGALHAES JUNIOR": "RUA LEOPOLDO COUTO MAGALHAES JUNIOR",
+    "RUA MARQUES OLINDA": "RUA MARQUES DE OLINDA",
+    "RUA SERRA DO JAPI": "RUA SERRA DE JAPI",
+    "RUA SITIANTES": "RUA DOS SITIANTES",
+    "RUA MINISTRO ALVARO DE SOUZA LIMA": "AVENIDA MINISTRO ALVARO DE SOUZA LIMA",
+}
+
 def normalize_logradouro(s):
     if not s: return s
     s = str(s).upper().strip()
     s = re.sub(r'\s+', ' ', s)
     for pattern, replacement in NORMALIZE_MAP:
         s = re.sub(pattern, replacement, s)
+    s = SPECIFIC_CORRECTIONS.get(s, s)
     return s
 
 def normalize_cartorio(s):
@@ -114,6 +158,14 @@ def parse_data(val):
 
 def parse_float(val):
     if val is None: return None
+    # A Prefeitura manda o valor de duas formas na mesma planilha: às vezes como
+    # texto formatado ("227.862,67"), às vezes como número já nativo do Excel
+    # (227862.67). Achado 15/07/2026: tratar sempre como texto corrompia os
+    # valores nativos — o ponto decimal virava "separador de milhar" e inflava
+    # o valor em 100x (R$227 mil virava R$22,7 milhões). Número nativo já vem
+    # certo, não precisa (e não pode) passar pela troca de . e ,.
+    if isinstance(val, (int, float)):
+        return float(val)
     try: return float(str(val).replace('R$','').replace('.','').replace(',','.').strip())
     except: return None
 
