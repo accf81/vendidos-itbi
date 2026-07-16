@@ -682,8 +682,21 @@ function buildXLSX() {
     ]);
   });
   const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{wch:10},{wch:26},{wch:8},{wch:16},{wch:18},{wch:20},{wch:11},{wch:14},{wch:12}];
+  ws['!cols'] = [{wch:10},{wch:26},{wch:8},{wch:16},{wch:18},{wch:20},{wch:11},{wch:16},{wch:14}];
   ws['!merges'] = [{ s: {r:0,c:0}, e: {r:0,c:8} }, { s: {r:1,c:0}, e: {r:1,c:8} }];
+  // formata as colunas de preço (H = Valor, I = R$/m²) como moeda brasileira:
+  // R$ 8.518.376,65 em vez de 8518376.65. Área (G) fica como número com 1 casa.
+  // [$R$-416] força a localidade pt-BR (ponto pra milhar, vírgula pra centavo)
+  // independente da configuração do Excel de quem abre: R$ 8.518.376,65
+  const FMT_REAIS = '[$R$-416] #,##0.00';
+  for (let r = 4; r < aoa.length; r++) {   // linha 5 (índice 4) em diante = dados
+    ['H', 'I'].forEach(col => {
+      const cell = ws[`${col}${r + 1}`];
+      if (cell && cell.t === 'n') cell.z = FMT_REAIS;
+    });
+    const areaCell = ws[`G${r + 1}`];
+    if (areaCell && areaCell.t === 'n') areaCell.z = '#,##0.0';
+  }
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Data SP');
   const ts = now.toISOString().slice(0,10);
