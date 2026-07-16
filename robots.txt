@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /Mockups/
+
+Sitemap: https://vendidos.pandorahomes.com.br/sitemap.xml

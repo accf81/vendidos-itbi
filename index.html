@@ -7,15 +7,19 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Pandora Data SP">
 <meta name="theme-color" content="#ff6600">
-<title>Pandora Data SP — o preço real de venda, não uma estimativa</title>
+<title>Pandora Data SP — o preço real de venda de imóveis em São Paulo</title>
 <meta name="description" content="Preço real de venda de imóveis em São Paulo, direto da Prefeitura (ITBI). Busque grátis, sem cadastro. Ferramenta da Pandora Homes.">
 <link rel="manifest" href="manifest.json">
 
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Pandora Data SP">
-<meta property="og:title" content="Pandora Data SP — o preço real de venda, não uma estimativa">
+<meta property="og:title" content="Pandora Data SP — o preço real de venda de imóveis em São Paulo">
 <meta property="og:description" content="Dados oficiais da Prefeitura de São Paulo (ITBI). Busque grátis, sem cadastro.">
 <meta property="og:url" content="https://vendidos.pandorahomes.com.br/">
+<meta property="og:image" content="https://vendidos.pandorahomes.com.br/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pandora Data SP — por quanto os imóveis realmente venderam em São Paulo">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://vendidos.pandorahomes.com.br/">
 <script type="application/ld+json">
@@ -168,7 +172,7 @@
   <section class="hero">
     <div class="wrap">
       <div class="hero-copy">
-        <h1 class="hero-title">O preço real de venda — <strong>não uma estimativa.</strong></h1>
+        <h1 class="hero-title">O preço real de venda de imóveis em São Paulo — <strong>não uma estimativa.</strong></h1>
         <p class="hero-sub">Dados oficiais da Prefeitura de São Paulo (ITBI): o valor que cada imóvel realmente foi vendido, não o valor anunciado.</p>
         <p class="hero-stat"><b>657 mil</b> transações registradas desde 2020 · atualizado todo mês <span class="hero-stat-source"><svg class="icon" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>Dado oficial da Prefeitura de São Paulo</span></p>
       </div>
@@ -478,7 +482,7 @@ async function doSearch() {
     return `and(${parts.join(',')})`;
   });
   const params = new URLSearchParams({
-    select: 'data_transacao,logradouro,numero,complemento,bairro,referencia,area_construida_m2,valor_transacao,valor_m2',
+    select: 'data_transacao,logradouro,logradouro_norm,numero,complemento,bairro,referencia,area_construida_m2,valor_transacao,valor_m2',
     or: `(${orGroups.join(',')})`,
     order: 'data_transacao.desc',
     limit: '500',
@@ -517,7 +521,7 @@ function renderResults() {
     return `
       <div class="result-row">
         <div class="result-top">
-          <div class="result-addr">${esc(row.logradouro)}, ${esc(row.numero)}${esc(comp)}</div>
+          <div class="result-addr">${esc(formatLogradouro(row.logradouro_norm || row.logradouro))}, ${esc(row.numero)}${esc(comp)}</div>
           <div class="result-meta">${esc([area, bairro].filter(Boolean).join(' · '))}</div>
         </div>
         <div class="result-figures">
@@ -532,6 +536,39 @@ function renderResults() {
   }).join('');
 }
 function esc(s) { return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+// ─── Formatação de logradouro pra exibição (só visual — busca continua usando logradouro_norm cru) ───
+const PREFIXO_ABREVIADO = {
+  'RUA': 'R.', 'AVENIDA': 'Av.', 'ALAMEDA': 'Al.', 'PRACA': 'Pça.',
+  'TRAVESSA': 'Tv.', 'ESTRADA': 'Estr.', 'RODOVIA': 'Rod.', 'VILA': 'Vl.',
+  'LARGO': 'Lgo.', 'VIADUTO': 'Vd.', 'PARQUE': 'Pq.', 'LADEIRA': 'Lad.',
+  'PASSARELA': 'Psg.',
+};
+const PALAVRAS_MINUSCULAS = new Set([
+  'DE','DO','DA','DOS','DAS','E','EM','NO','NA','NOS','NAS',
+  'POR','PARA','COM','SOB','SOBRE','ATE','ATÉ','AO','AOS','A','PELA','PELO'
+]);
+function tituloPalavra(palavra, primeira) {
+  const limpa = palavra.replace(/[^\wÀ-ÿ]/g, '');
+  // números romanos (II, III, IV...) ficam em maiúsculo
+  if (/^[IVXLCDM]+$/.test(limpa) && limpa.length <= 4) return palavra.toUpperCase();
+  if (!primeira && PALAVRAS_MINUSCULAS.has(limpa.toUpperCase())) return palavra.toLowerCase();
+  return palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase();
+}
+function formatLogradouro(nome) {
+  if (!nome) return '';
+  const palavras = String(nome).trim().split(/\s+/);
+  let prefixo = palavras[0].toUpperCase();
+  let resto = palavras.slice(1);
+  if (prefixo === 'VIA' && (resto[0] || '').toUpperCase() === 'PARQUE') {
+    prefixo = 'VIA PARQUE';
+    resto = resto.slice(1);
+  }
+  const abreviado = PREFIXO_ABREVIADO[prefixo];
+  const restoFormatado = resto.map((p, i) => tituloPalavra(p, false)).join(' ');
+  const prefixoFormatado = abreviado || prefixo.split(' ').map(p => tituloPalavra(p, true)).join(' ');
+  return restoFormatado ? `${prefixoFormatado} ${restoFormatado}` : prefixoFormatado;
+}
 
 function formatDate(v) {
   if (!v) return '—';
