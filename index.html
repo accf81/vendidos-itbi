@@ -98,12 +98,13 @@
 
   /* ── RESUMO ESTATÍSTICO (mockup aprovado 17/07) ── */
   .stat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-  .stat-tile { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .stat-tile { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 9px 11px; display: flex; align-items: flex-end; justify-content: space-between; gap: 6px; }
   .stat-tile .txt { min-width: 0; }
   .stat-tile .val { font-family: var(--font-brand); font-weight: 800; font-size: 16px; color: var(--brand-navy); line-height: 1.2; white-space: nowrap; }
   .stat-tile .lbl { font-size: 10.5px; color: var(--muted); margin-top: 1px; line-height: 1.2; }
-  .stat-tile .icon { width: 30px; height: 30px; color: var(--brand-orange); flex: none; stroke-width: 1.7; }
-  @media (max-width: 420px) { .stat-tiles { grid-template-columns: 1fr; } .stat-tile .icon { width: 26px; height: 26px; } }
+  .stat-tile .icon { width: 18px; height: 18px; color: var(--brand-orange); flex: none; stroke-width: 1.7; margin-bottom: 1px; }
+  @media (max-width: 640px) { .stat-tile { padding: 8px 9px; } .stat-tile .val { font-size: 15px; } }
+  @media (max-width: 420px) { .stat-tiles { grid-template-columns: 1fr; } }
   .stat-cta { background: var(--accent-pale); border: 1px solid var(--accent-line); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 14px; }
   .stat-cta p { font-size: 13px; color: var(--text); margin: 0 0 12px; line-height: 1.4; text-align: center; }
   .stat-cta p b { color: var(--brand-navy); }
