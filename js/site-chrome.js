@@ -107,6 +107,7 @@ function renderFooter(base) {
   </div>
   <div class="wrap footer-bottom">
     <span>© 2026 Pandora Homes</span>
+    <a href="${base}privacidade.html">Política de Privacidade</a>
     <span>Dados: Prefeitura de São Paulo (ITBI)</span>
   </div>
 </footer>`;

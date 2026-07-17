@@ -69,6 +69,7 @@ footer.site svg.wordmark { height: 18px; width: auto; color: var(--brand-navy); 
 .footer-social a:hover { color: var(--brand-orange); }
 .footer-social .icon { width: 16px; height: 16px; }
 .footer-bottom { border-top: 1px solid var(--border); margin-top: 40px; padding-top: 20px; font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.footer-bottom a:hover { text-decoration: underline; }
 @media (max-width: 480px) {
   .footer-grid { text-align: center; }
   .footer-grid > div:first-child { display: flex; flex-direction: column; align-items: center; }
@@ -81,3 +82,10 @@ footer.site svg.wordmark { height: 18px; width: auto; color: var(--brand-navy); 
 /* ── FORMULÁRIO DE LEAD — linha dividida (ex.: Número + Apto) ── */
 .lead-form .f-row { display: flex; gap: 12px; }
 .lead-form .f-row .f { flex: 1; margin-bottom: 14px; }
+
+/* ── AVISO DE PRIVACIDADE — nos formulários que coletam dado (17/07) ── */
+.form-privacy-note { font-size: 11px; line-height: 1.5; text-align: center; margin-top: 10px; color: var(--brand-navy-pale); }
+.form-privacy-note a { color: inherit; text-decoration: underline; font-weight: 600; }
+/* dentro do modal de exportação (fundo claro) e do card claro do blog, o texto muted/link laranja lê melhor */
+.modal-card .form-privacy-note, .cta-light .form-privacy-note { color: var(--muted); }
+.modal-card .form-privacy-note a, .cta-light .form-privacy-note a { color: var(--brand-orange); }
