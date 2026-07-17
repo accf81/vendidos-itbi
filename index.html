@@ -65,9 +65,9 @@
   h1.hero-title { font-size: clamp(24px, 3.3vw, 38px); font-weight: 200; line-height: 1.2; color: var(--brand-navy); margin: 0 0 16px; }
   h1.hero-title strong { font-weight: 700; color: var(--text); }
   .hero-sub { font-size: 16px; color: var(--muted); line-height: 1.6; margin: 0 0 6px; }
-  .hero-stat { font-size: 13px; color: var(--muted); margin-top: 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .hero-stat { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.6; }
   .hero-stat b { color: var(--brand-navy); font-weight: 700; }
-  .hero-stat-source { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; }
+  .hero-stat-source { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; margin-left: 8px; vertical-align: middle; }
   .hero-stat-source .icon { width: 12px; height: 12px; color: var(--brand-orange); flex: none; }
 
   /* ── BUSCA (motor real) ── */
@@ -115,6 +115,8 @@
   .stat-cta p { font-size: 13px; color: var(--text); margin: 0 0 12px; line-height: 1.4; text-align: center; }
   .stat-cta p b { color: var(--brand-navy); }
   .stat-cta .btn-cta { display: block; width: 100%; padding: 13px 18px; border: none; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: var(--font-brand); font-weight: 700; font-size: 13.5px; cursor: pointer; }
+  .stat-area-note { font-size: 11.5px; color: var(--muted); line-height: 1.5; display: flex; gap: 6px; align-items: flex-start; margin-bottom: 14px; }
+  .stat-area-note .icon { width: 13px; height: 13px; color: var(--brand-orange); flex: none; margin-top: 1px; }
   .results-source { font-size: 12px; color: var(--muted); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
   .results-source .src-txt { display: flex; align-items: center; gap: 6px; }
   .results-source .icon { width: 12px; height: 12px; flex: none; }
@@ -565,6 +567,10 @@ function renderStatsSummary() {
     <div class="stat-cta">
       <p><b>Vendidos no seu edifício.</b> Peça uma avaliação completa do seu imóvel em São Paulo.</p>
       <button type="button" class="btn-cta" onclick="document.querySelector('.cta-final').scrollIntoView({behavior:'smooth'})">Quero uma avaliação</button>
+    </div>
+    <div class="stat-area-note">
+      <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
+      R$/m² calculado sobre a área construída total (inclui paredes e áreas comuns) — maior que a área útil, por isso o valor por m² aqui tende a ser menor que o anunciado.
     </div>`;
 }
 
@@ -840,12 +846,16 @@ async function buildXLSX() {
     }
   });
 
-  // ── Legenda final
+  // ── Legenda final (2 linhas)
   const legRow = 4 + filteredResults.length + 1;
   ws.mergeCells(`C${legRow}:K${legRow}`);
   const leg = ws.getCell(`C${legRow}`);
   leg.value = '— campo não informado pela Prefeitura de São Paulo';
   leg.font = { size: 9, color: { argb: CINZA } };
+  ws.mergeCells(`C${legRow + 1}:K${legRow + 1}`);
+  const leg2 = ws.getCell(`C${legRow + 1}`);
+  leg2.value = 'R$/m² calculado sobre a área construída total (inclui paredes e áreas comuns) — maior que a área útil, por isso o valor por m² aqui tende a ser menor que o anunciado.';
+  leg2.font = { size: 9, color: { argb: CINZA } };
 
   // ── Download
   const buf = await wb.xlsx.writeBuffer();

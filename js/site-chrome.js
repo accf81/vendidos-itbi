@@ -81,7 +81,7 @@ function renderFooter(base) {
     <div>
       ${SITE_WORDMARK}
       <p class="footer-desc">Ferramenta gratuita de consulta de imóveis vendidos, com dados oficiais da Prefeitura de São Paulo (ITBI).</p>
-      <div class="footer-pilar"><img src="${base}img/logo_pandora.png" alt="Logo da Rede Pilar"><span>Parceiro Rede Pilar</span></div>
+      <div class="footer-pilar"><img src="${base}img/logo_pilar_navy.png" alt="Parceiro Pilar"></div>
     </div>
     <div class="footer-col">
       <h4>Navegação</h4>

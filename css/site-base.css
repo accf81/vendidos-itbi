@@ -58,9 +58,8 @@ footer.site { background: var(--surface); color: var(--text); border-top: 1px so
 @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
 footer.site svg.wordmark { height: 18px; width: auto; color: var(--brand-navy); margin-bottom: 14px; }
 .footer-desc { font-size: 13px; line-height: 1.6; color: var(--muted); max-width: 260px; margin: 0 0 16px; }
-.footer-pilar { display: flex; align-items: center; gap: 8px; }
-.footer-pilar img { height: 15px; width: auto; }
-.footer-pilar span { font-size: 11.5px; color: var(--muted); }
+.footer-pilar { display: flex; align-items: center; }
+.footer-pilar img { height: 20px; width: auto; }
 .footer-col h4 { font-family: var(--font-brand); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--brand-navy); margin: 0 0 14px; }
 .footer-col a { display: block; font-size: 13.5px; margin-bottom: 10px; color: var(--brand-orange-dark); font-weight: 600; }
 .footer-col a:hover { text-decoration: underline; }
