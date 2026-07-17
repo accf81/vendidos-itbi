@@ -83,7 +83,7 @@
   .autocomplete-list { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-md); max-height: 220px; overflow-y: auto; z-index: 20; }
   .autocomplete-list.hidden { display: none; }
   .autocomplete-item { padding: 10px 14px; font-size: 13.5px; cursor: pointer; }
-  .autocomplete-item:hover { background: var(--accent-pale); color: var(--brand-orange); }
+  .autocomplete-item:hover, .autocomplete-item.active { background: var(--accent-pale); color: var(--brand-orange); }
   .btn-remove { flex: none; width: 44px; height: 44px; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--surface2); color: var(--muted); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; line-height: 1; }
   .btn-remove:hover { color: var(--danger); border-color: var(--danger); }
   .search-help { font-size: 13px; color: var(--muted); margin-top: 14px; display: flex; align-items: flex-start; gap: 8px; }
@@ -435,6 +435,9 @@ function removeCard(id) {
 // ─── AUTOCOMPLETE ───
 function showDropdown(listEl, items, onSelect) {
   closeAllDropdowns();
+  listEl._acItems = items || [];
+  listEl._acOnSelect = onSelect;
+  listEl._acIndex = -1;
   if (!items || items.length === 0) return;
   listEl.innerHTML = '';
   items.forEach(item => {
@@ -448,6 +451,44 @@ function showDropdown(listEl, items, onSelect) {
 }
 function closeAllDropdowns() { document.querySelectorAll('.autocomplete-list').forEach(el => el.classList.add('hidden')); }
 document.addEventListener('click', e => { if (!e.target.closest('.autocomplete-wrapper')) closeAllDropdowns(); });
+
+// Navegação por teclado (setas) nas listas de sugestão — rua e número
+function acHighlight(listEl) {
+  [...listEl.children].forEach((el, i) => el.classList.toggle('active', i === listEl._acIndex));
+  const active = listEl.children[listEl._acIndex];
+  if (active) active.scrollIntoView({ block: 'nearest' });
+}
+// Retorna true se tratou a tecla (quem chamou não deve fazer mais nada com ela)
+function acHandleKeydown(e, listEl) {
+  const open = listEl && !listEl.classList.contains('hidden') && listEl._acItems && listEl._acItems.length;
+  if (e.key === 'ArrowDown') {
+    if (!open) return false;
+    e.preventDefault();
+    listEl._acIndex = Math.min(listEl._acIndex + 1, listEl._acItems.length - 1);
+    acHighlight(listEl);
+    return true;
+  }
+  if (e.key === 'ArrowUp') {
+    if (!open) return false;
+    e.preventDefault();
+    listEl._acIndex = Math.max(listEl._acIndex - 1, -1);
+    acHighlight(listEl);
+    return true;
+  }
+  if (e.key === 'Escape') {
+    if (!open) return false;
+    closeAllDropdowns();
+    return true;
+  }
+  if (e.key === 'Enter' && open && listEl._acIndex >= 0) {
+    e.preventDefault();
+    const chosen = listEl._acItems[listEl._acIndex];
+    listEl._acOnSelect(chosen);
+    closeAllDropdowns();
+    return true;
+  }
+  return false;
+}
 
 function setupCardAutocomplete(id) {
   const ruaEl = document.getElementById(`rua-${id}`);
@@ -471,7 +512,10 @@ function setupCardAutocomplete(id) {
       });
     }, 220);
   });
-  ruaEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
+  ruaEl.addEventListener('keydown', e => {
+    if (acHandleKeydown(e, ruaList)) return;
+    if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); }
+  });
 
   numEl.addEventListener('focus', async () => {
     const street = ruaEl.value.trim();
@@ -489,7 +533,10 @@ function setupCardAutocomplete(id) {
       showDropdown(numList, numRows.map(r => r.numero), n => { numEl.value = n; doSearch(); });
     }, 200);
   });
-  numEl.addEventListener('keydown', e => { if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); } });
+  numEl.addEventListener('keydown', e => {
+    if (acHandleKeydown(e, numList)) return;
+    if (e.key === 'Enter') { closeAllDropdowns(); doSearch(); }
+  });
 }
 
 // ─── NORMALIZE ───
