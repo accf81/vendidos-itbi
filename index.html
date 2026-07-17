@@ -648,16 +648,16 @@ function formatMoney(v) {
   return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
-// ─── EXPORT (Excel, com cabeçalho da marca) ───
-// A biblioteca (~900 KB) só é baixada quando alguém exporta de verdade — não pesa
+// ─── EXPORT (Excel estilizado com a marca — layout do mockup aprovado 16/07) ───
+// A biblioteca (~940 KB) só é baixada quando alguém exporta de verdade — não pesa
 // no carregamento da página pra quem só consulta.
 let _xlsxPromise = null;
 function loadXLSX() {
-  if (typeof XLSX !== 'undefined') return Promise.resolve();
+  if (window.ExcelJS) return Promise.resolve();
   if (_xlsxPromise) return _xlsxPromise;
   _xlsxPromise = new Promise((resolve, reject) => {
     const s = document.createElement('script');
-    s.src = 'https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js';
+    s.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
     s.onload = resolve;
     s.onerror = () => { _xlsxPromise = null; reject(new Error('falha ao carregar a biblioteca')); };
     document.head.appendChild(s);
@@ -665,42 +665,132 @@ function loadXLSX() {
   return _xlsxPromise;
 }
 
-function buildXLSX() {
-  if (!filteredResults.length || typeof XLSX === 'undefined') return;
+// Logo (símbolo P laranja) embutido na planilha — buscado uma vez, em paralelo
+let _logoPromise = null;
+function loadLogoPng() {
+  if (_logoPromise) return _logoPromise;
+  _logoPromise = fetch('img/logo-symbol.png')
+    .then(r => r.ok ? r.arrayBuffer() : null)
+    .catch(() => null);   // sem logo não é motivo pra travar a exportação
+  return _logoPromise;
+}
+
+async function buildXLSX() {
+  if (!filteredResults.length || !window.ExcelJS) return;
   const now = new Date();
   const dataGeracao = now.toLocaleDateString('pt-BR');
-  const aoa = [
-    ['Pandora Data SP — Alex Fontes · CRECI 205029-F · (11) 94524-0721 · alexccfontes@gmail.com'],
-    ['Dados oficiais da Prefeitura de São Paulo (ITBI) · gerado em ' + dataGeracao],
-    [],
-    ['Data', 'Rua', 'Número', 'Complemento', 'Bairro', 'Edifício', 'Área (m²)', 'Valor (R$)', 'R$/m²'],
-  ];
-  filteredResults.forEach(row => {
-    aoa.push([
-      formatDate(row.data_transacao), row.logradouro || '', row.numero || '', row.complemento || '',
-      row.bairro || '', row.referencia || '', row.area_construida_m2 || '', row.valor_transacao || '', row.valor_m2 || ''
-    ]);
-  });
-  const ws = XLSX.utils.aoa_to_sheet(aoa);
-  ws['!cols'] = [{wch:10},{wch:26},{wch:8},{wch:16},{wch:18},{wch:20},{wch:11},{wch:16},{wch:14}];
-  ws['!merges'] = [{ s: {r:0,c:0}, e: {r:0,c:8} }, { s: {r:1,c:0}, e: {r:1,c:8} }];
-  // formata as colunas de preço (H = Valor, I = R$/m²) como moeda brasileira:
-  // R$ 8.518.376,65 em vez de 8518376.65. Área (G) fica como número com 1 casa.
-  // [$R$-416] força a localidade pt-BR (ponto pra milhar, vírgula pra centavo)
-  // independente da configuração do Excel de quem abre: R$ 8.518.376,65
+
+  // Paleta da marca (formato ARGB do Excel)
+  const NAVY = 'FF1A2744', LARANJA = 'FFFF6600', CINZA = 'FF7A7D82',
+        CINZA_CLARO = 'FFB8BCC6', ZEBRA = 'FFF6F7FA', NUM_FUNDO = 'FFFAFBFC',
+        BORDA = 'FFE2E5EC', BRANCO = 'FFFFFFFF';
+  const bordaFina = { style: 'thin', color: { argb: BORDA } };
+  const bordas = { top: bordaFina, left: bordaFina, bottom: bordaFina, right: bordaFina };
+  // [$R$-416] trava a moeda no padrão brasileiro (R$ 8.518.376,65)
+  // independente da configuração do Excel de quem abre
   const FMT_REAIS = '[$R$-416] #,##0.00';
-  for (let r = 4; r < aoa.length; r++) {   // linha 5 (índice 4) em diante = dados
-    ['H', 'I'].forEach(col => {
-      const cell = ws[`${col}${r + 1}`];
-      if (cell && cell.t === 'n') cell.z = FMT_REAIS;
-    });
-    const areaCell = ws[`G${r + 1}`];
-    if (areaCell && areaCell.t === 'n') areaCell.z = '#,##0.0';
+
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet('Data SP', { views: [{ state: 'frozen', ySplit: 3 }] });
+  ws.columns = [
+    { width: 3 },   // A — margem
+    { width: 5 },   // B — nº da linha (logo fica aqui em cima)
+    { width: 10 },  // C — Data
+    { width: 26 },  // D — Rua
+    { width: 9 },   // E — Número
+    { width: 17 },  // F — Complemento
+    { width: 19 },  // G — Bairro
+    { width: 22 },  // H — Edifício
+    { width: 10 },  // I — Área
+    { width: 17 },  // J — Valor
+    { width: 14 },  // K — R$/m²
+  ];
+
+  // ── Linhas 1-2: barra da marca (logo + duas linhas de texto alinhadas com "Data")
+  ws.mergeCells('C1:K1');
+  ws.getCell('C1').value = { richText: [
+    { text: 'Pandora Data SP', font: { bold: true, size: 11, color: { argb: LARANJA } } },
+    { text: ' — Alex Fontes · CRECI 205029-F · (11) 94524-0721 · alexccfontes@gmail.com', font: { size: 11, color: { argb: NAVY } } },
+  ]};
+  ws.mergeCells('C2:K2');
+  ws.getCell('C2').value = 'Dados oficiais da Prefeitura de São Paulo (ITBI) · gerado em ' + dataGeracao;
+  ws.getCell('C2').font = { size: 10, color: { argb: CINZA } };
+  ws.getRow(1).height = 16;
+  ws.getRow(2).height = 14;
+  const logoBuf = await loadLogoPng();
+  if (logoBuf) {
+    const logoId = wb.addImage({ buffer: logoBuf, extension: 'png' });
+    ws.addImage(logoId, { tl: { col: 1.15, row: 0.15 }, ext: { width: 30, height: 30 }, editAs: 'oneCell' });
   }
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Data SP');
-  const ts = now.toISOString().slice(0,10);
-  XLSX.writeFile(wb, `Pandora_Data_SP_${ts}.xlsx`);
+
+  // ── Linha 3: cabeçalho navy
+  const TITULOS = ['', 'Data', 'Rua', 'Número', 'Complemento', 'Bairro', 'Edifício', 'Área (m²)', 'Valor (R$)', 'R$/m²'];
+  const hdr = ws.getRow(3);
+  TITULOS.forEach((t, i) => {
+    const cell = hdr.getCell(i + 2);   // começa na coluna B
+    cell.value = t;
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: NAVY } };
+    cell.font = { bold: true, size: 10, color: { argb: BRANCO } };
+    cell.border = bordas;
+    cell.alignment = { vertical: 'middle', horizontal: i >= 7 ? 'right' : 'left' };
+  });
+  hdr.height = 17;
+
+  // ── Dados (linha 4 em diante), zebra alternada, "—" onde a Prefeitura não informou
+  const vazio = (cell) => {
+    cell.value = '—';
+    cell.font = { color: { argb: CINZA_CLARO } };
+    cell.alignment = { horizontal: 'center' };
+  };
+  filteredResults.forEach((r, i) => {
+    const row = ws.getRow(4 + i);
+    const numCell = row.getCell(2);   // B — numeração
+    numCell.value = i + 1;
+    numCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: NUM_FUNDO } };
+    numCell.font = { bold: true, size: 9, color: { argb: CINZA_CLARO } };
+    numCell.alignment = { horizontal: 'center' };
+
+    const valores = [
+      formatDate(r.data_transacao), r.logradouro || null, r.numero || null, r.complemento || null,
+      r.bairro || null, r.referencia || null,
+      r.area_construida_m2 != null ? Number(r.area_construida_m2) : null,
+      r.valor_transacao != null ? Number(r.valor_transacao) : null,
+      r.valor_m2 != null ? Number(r.valor_m2) : null,
+    ];
+    valores.forEach((v, j) => {
+      const cell = row.getCell(3 + j);   // C em diante
+      if (v == null || v === '') vazio(cell);
+      else {
+        cell.value = v;
+        if (j === 6) { cell.numFmt = '#,##0'; cell.alignment = { horizontal: 'right' }; }        // Área
+        if (j === 7 || j === 8) { cell.numFmt = FMT_REAIS; cell.alignment = { horizontal: 'right' }; }  // R$
+      }
+    });
+    // borda + zebra em toda a linha (B..K)
+    for (let c = 2; c <= 11; c++) {
+      const cell = row.getCell(c);
+      cell.border = bordas;
+      if (i % 2 === 1 && c > 2) cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ZEBRA } };
+    }
+  });
+
+  // ── Legenda final
+  const legRow = 4 + filteredResults.length + 1;
+  ws.mergeCells(`C${legRow}:K${legRow}`);
+  const leg = ws.getCell(`C${legRow}`);
+  leg.value = '— campo não informado pela Prefeitura de São Paulo';
+  leg.font = { size: 9, color: { argb: CINZA } };
+
+  // ── Download
+  const buf = await wb.xlsx.writeBuffer();
+  const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `Pandora_Data_SP_${now.toISOString().slice(0, 10)}.xlsx`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
 }
 
 // ─── UI: export modal, formulários ───
@@ -716,6 +806,7 @@ document.getElementById('exportForm').addEventListener('submit', async (e) => {
   const btnHtml = btn ? btn.innerHTML : '';
   if (btn) { btn.disabled = true; btn.innerHTML = 'Preparando planilha…'; }
   try {
+    loadLogoPng();          // logo baixa em paralelo com a biblioteca
     await loadXLSX();
   } catch (err) {
     if (btn) { btn.disabled = false; btn.innerHTML = btnHtml; }
@@ -729,7 +820,7 @@ document.getElementById('exportForm').addEventListener('submit', async (e) => {
     telefone: document.getElementById('expTelefone').value,
     tipo: document.getElementById('expTipo').value,
   });
-  buildXLSX();
+  await buildXLSX();
   e.target.style.display = 'none';
   document.getElementById('exportThanks').classList.add('show');
 });
