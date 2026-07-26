@@ -178,10 +178,28 @@ def parse_float(val):
     try: return float(str(val).replace('R$','').replace('.','').replace(',','.').strip())
     except: return None
 
+RE_DECIMAL_EXCEL = re.compile(r'\d+\.0+')
+
+def tirar_decimal_excel(s):
+    """Devolve '758' pra '758.0'.
+
+    A Prefeitura manda os campos de código (número do imóvel, cadastro/SQL, matrícula,
+    complemento) como texto na maioria dos anos e como número nativo do Excel na planilha
+    de 2024 — e número do Excel sempre chega com casa decimal. Achado 26/07/2026: sem essa
+    limpeza, 106 mil registros de 2024 ficavam com o endereço escrito de um jeito que a
+    busca (que compara texto exato) nunca encontrava — o imóvel estava no banco e sumia da
+    tela — e a matrícula aparecia como '34689.0' na ficha."""
+    return s.split('.')[0] if RE_DECIMAL_EXCEL.fullmatch(s) else s
+
 def parse_str(val):
     if val is None: return None
-    s = str(val).strip()
+    s = tirar_decimal_excel(str(val).strip())
     return s.upper() if s else None
+
+def normalize_numero(val):
+    """Número do imóvel — '99999' é o código da Prefeitura pra "sem número"."""
+    s = tirar_decimal_excel(str(val or '').strip())
+    return 'S/N' if s == '99999' else s
 
 def ler_secret(nome):
     """Lê uma chave do arquivo local ~/.alex-os-secrets (formato NOME=valor, uma por linha).
@@ -234,6 +252,22 @@ def sincronizar_supabase(novos):
             print(f"    Rode a sincronização de novo depois, ou avise numa sessão DEV.")
             return
     print(f"   ✓ {total:,} registros sincronizados com o Supabase")
+
+    # Atualiza a lista de ruas que alimenta o autopreencher do site — sem isso, rua que
+    # aparece pela primeira vez no mês não é sugerida na busca (a lista é uma cópia
+    # separada, criada em 26/07/2026 porque a busca por texto na tabela inteira passou a
+    # estourar o tempo limite depois dos 795 mil registros).
+    try:
+        req = urllib.request.Request(
+            f'https://sobmjqounukzbplrmhkr.supabase.co/rest/v1/rpc/atualizar_ruas_itbi',
+            data=b'{}', method='POST', headers=headers)
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            resp.read()
+        print(f"   ✓ Lista de ruas do autopreencher atualizada")
+    except Exception as e:
+        print(f"   ⚠ Não deu pra atualizar a lista de ruas do autopreencher: {e}")
+        print(f"     (as vendas novas já estão no site; só ruas inéditas podem não aparecer")
+        print(f"      no autopreencher até isso rodar — avise numa sessão DEV)")
 
 def obter_url_xlsx(ano, headers):
     """Busca na página oficial o link do XLSX do ano corrente — o endereço muda
@@ -366,7 +400,7 @@ def main():
             numero        = get('numero')
             complemento   = get('complemento')
 
-            numero_norm = 'S/N' if str(numero or '').strip() == '99999' else str(numero or '').strip()
+            numero_norm = normalize_numero(numero)
 
             valor         = get('valor_transacao', parse_float)
             data_str      = get('data_transacao', parse_data)

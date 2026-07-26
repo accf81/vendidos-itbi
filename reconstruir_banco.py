@@ -35,7 +35,8 @@ COLS = ['sql','data_transacao','logradouro','numero','complemento','bairro','ref
         'logradouro_norm','logradouro_fmt','proporcao_transmitida']
 COL_PROP_NOME = 'Proporção Transmitida (%)'  # % do imóvel transmitida na transação (100 = imóvel inteiro)
 
-def norm_num(n): return 'S/N' if str(n or '').strip()=='99999' else str(n or '').strip()
+norm_num = ab.normalize_numero  # '99999' -> S/N e tira o '.0' do número que vem como
+                                # número do Excel (planilha de 2024) — ver ab.normalize_numero
 
 def processar(path):
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
