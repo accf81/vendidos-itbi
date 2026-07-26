@@ -20,6 +20,11 @@ O script:
 import sqlite3, gzip, shutil, re, os, time, sys, io
 from datetime import datetime
 
+# Versão de exibição do logradouro ("Rua Padre João Manuel") — mesma função usada pelo
+# reconstruir_banco.py, pra o dado mensal sair idêntico ao do banco reconstruído.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from normalizar_banco import title_case_logradouro
+
 try:
     import requests
 except ImportError:
@@ -35,7 +40,10 @@ except ImportError:
 # ─── Configuração ──────────────────────────────────────────────────
 DB_FILE   = 'ITBI_SP_residencial.db.gz'
 TMP_DB    = '/tmp/itbi_update.db'
-BACKUP_FILE = f'ITBI_SP_residencial_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db.gz'
+# Backups vão pra pasta de dados (fora do repositório público do site) — antes ficavam
+# soltos aqui na pasta do site, 70 MB cada, dentro de um repositório público.
+BACKUP_DIR = '/Users/accf81/Documents/IA/Claude/Projects/Dados ITBI/backups_banco'
+BACKUP_FILE = os.path.join(BACKUP_DIR, f'ITBI_SP_residencial_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.db.gz')
 
 ANO_ATUAL = datetime.now().year
 PAGINA_ITBI = 'https://prefeitura.sp.gov.br/web/fazenda/w/acesso_a_informacao/31501'
@@ -61,6 +69,7 @@ COLUNAS_XLSX = {
     'Cartório de Registro':                'cartorio',
     'Matrícula do Imóvel':                 'matricula',
     'Área Construída (m2)':                'area_construida_m2',
+    'Proporção Transmitida (%)':           'proporcao_transmitida',
     'Descrição do uso (IPTU)':             '_uso',  # filtro, não armazenado
 }
 
@@ -207,7 +216,8 @@ def sincronizar_supabase(novos):
     headers = {'apikey': key, 'Authorization': f'Bearer {key}', 'Content-Type': 'application/json', 'Prefer': 'return=minimal'}
     campos = ['sql', 'data_transacao', 'logradouro', 'numero', 'complemento', 'bairro',
               'referencia', 'area_construida_m2', 'valor_transacao', 'valor_m2',
-              'cartorio', 'matricula', 'ano', 'logradouro_norm']
+              'cartorio', 'matricula', 'ano', 'logradouro_norm',
+              'logradouro_fmt', 'proporcao_transmitida']
 
     print(f"\n8. Sincronizando {len(novos):,} registros novos com o Supabase (site público)...")
     total = 0
@@ -249,6 +259,7 @@ def main():
 
     # 1. Backup e descomprimir banco atual
     print(f"1. Backup → {BACKUP_FILE}")
+    os.makedirs(BACKUP_DIR, exist_ok=True)
     shutil.copy2(DB_FILE, BACKUP_FILE)
     print(f"   ✓ {os.path.getsize(BACKUP_FILE)/1024/1024:.1f} MB")
 
@@ -263,12 +274,16 @@ def main():
     print(f"   Registros antes: {total_antes:,}")
 
     # 2. Carregar chaves existentes para deduplicação rápida
-    # Chave = (sql, numero, complemento) — um mesmo código de SQL (cadastro/lote) pode
-    # cobrir várias unidades vendidas juntas (prédio inteiro, por exemplo); usar só o
-    # sql como chave descartaria erroneamente as unidades além da primeira.
+    # Chave = (sql, numero, complemento, data, valor) — a MESMA do reconstruir_banco.py.
+    # Um mesmo código de SQL (cadastro/lote) pode cobrir várias unidades vendidas juntas
+    # (prédio inteiro), então o sql sozinho descartaria as unidades além da primeira. E,
+    # sem a data e o valor na chave (como era até 25/07/2026), o MESMO apartamento vendido
+    # de novo em outro ano era tratado como repetição e a revenda era descartada —
+    # ~124 mil transações perdidas. Com data e valor, só a mesma declaração republicada
+    # (todos os campos iguais) é descartada.
     print(f"\n3. Carregando registros existentes...")
-    cur.execute("SELECT sql, numero, complemento FROM vendas WHERE sql IS NOT NULL")
-    chaves_existentes = {(r[0], r[1], r[2]) for r in cur.fetchall()}
+    cur.execute("SELECT sql, numero, complemento, data_transacao, valor_transacao FROM vendas WHERE sql IS NOT NULL")
+    chaves_existentes = {(r[0], r[1], r[2], (r[3] or '')[:19], r[4]) for r in cur.fetchall()}
     print(f"   ✓ {len(chaves_existentes):,} registros carregados")
 
     # 3. Descobrir e baixar XLSX
@@ -353,37 +368,43 @@ def main():
 
             numero_norm = 'S/N' if str(numero or '').strip() == '99999' else str(numero or '').strip()
 
-            # Deduplicação — por (sql, numero, complemento), não só sql (ver nota acima)
-            chave = (sql_val, numero_norm, complemento)
+            valor         = get('valor_transacao', parse_float)
+            data_str      = get('data_transacao', parse_data)
+
+            # Validação mínima — antes da chave, porque valor e data fazem parte dela
+            if valor is None or valor < 100: total_invalido += 1; continue
+
+            # Deduplicação — (sql, numero, complemento, data, valor), ver nota acima
+            chave = (sql_val, numero_norm, complemento, (data_str or '')[:19], valor)
             if chave in chaves_existentes:
                 total_duplicata += 1; continue
 
             bairro        = get('bairro')
             referencia    = get('referencia')
-            valor         = get('valor_transacao', parse_float)
-            data_str      = get('data_transacao', parse_data)
             cartorio      = get('cartorio')
             matricula     = get('matricula')
             area          = get('area_construida_m2', parse_float)
-
-            # Validação mínima
-            if valor is None or valor < 100: total_invalido += 1; continue
+            proporcao     = get('proporcao_transmitida', parse_float)
 
             # Normalizações
             logradouro_norm = normalize_logradouro(logradouro)
+            logradouro_fmt  = title_case_logradouro(logradouro_norm) if logradouro_norm else None
             cartorio_norm   = normalize_cartorio(cartorio)
             valor_m2        = round(valor / area, 2) if area and area > 0 else None
 
-            # Ano a partir da data
+            # Ano SEMPRE derivado da data da transação (nunca o ano corrente: as planilhas
+            # trazem transações antigas declaradas com atraso — achado 25/07/2026, o
+            # fallback pro ano corrente desalinhava 8.784 registros do ano real)
             try:
-                ano = int(data_str[:4]) if data_str else ANO_ATUAL
+                ano = int(data_str[:4]) if data_str else None
             except:
-                ano = ANO_ATUAL
+                ano = None
 
             novos.append((
                 sql_val, data_str, logradouro, numero_norm, complemento,
                 bairro, referencia, area, valor, valor_m2,
-                cartorio_norm, matricula, ano, logradouro_norm
+                cartorio_norm, matricula, ano, logradouro_norm,
+                logradouro_fmt, proporcao
             ))
             chaves_existentes.add(chave)
 
@@ -406,8 +427,8 @@ def main():
         INSERT OR IGNORE INTO vendas
           (sql, data_transacao, logradouro, numero, complemento,
            bairro, referencia, area_construida_m2, valor_transacao, valor_m2,
-           cartorio, matricula, ano, logradouro_norm)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+           cartorio, matricula, ano, logradouro_norm, logradouro_fmt, proporcao_transmitida)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     """, novos)
     conn.commit()
 
