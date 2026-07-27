@@ -1,2 +1,4 @@
 deploy_github.command
 fix_deploy.command
+ITBI_SP_residencial.db.gz
+ITBI_SP_residencial_backup_*.db.gz
