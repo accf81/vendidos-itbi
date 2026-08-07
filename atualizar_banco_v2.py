@@ -39,6 +39,12 @@ BASE = f'https://{PROJETO}.supabase.co'
 PAGINA_ITBI = 'https://prefeitura.sp.gov.br/web/fazenda/w/acesso_a_informacao/31501'
 PLAN_DIR = '/Users/accf81/Documents/IA/Claude/Projects/Dados ITBI/planilhas_originais'
 BOLETINS_DIR = '/Users/accf81/Documents/IA/Claude/Projects/Dados ITBI/boletins'
+# O banco completo local — fonte do arquivo que o ACM baixa. Fica em pasta DURÁVEL, não na
+# pasta temporária do sistema: o macOS limpa a temporária, e entre uma rodada e outra passam
+# 30 dias. Com o caminho antigo, a rotina simplesmente não publicaria o arquivo do ACM na
+# rodada seguinte — e o ACM voltaria a congelar em silêncio, que é o problema que este
+# programa existe para resolver. (Achado da auditoria de 07/08/2026.)
+BANCO_LOCAL = '/Users/accf81/Documents/IA/Claude/Projects/Dados ITBI/banco_local/itbi_completo.db'
 ANO = time.localtime().tm_year
 
 # Colunas do arquivo que o ACM do Alex OS baixa — RECORTE, não a base inteira.
@@ -75,6 +81,25 @@ def baixar_planilha(ano):
     print(f'  baixando {url[:90]}...')
     resp = requests.get(url, headers=h, timeout=600)
     resp.raise_for_status()
+
+    # CONFERIR ANTES DE SOBRESCREVER (achado da auditoria de 07/08/2026).
+    # `raise_for_status()` não basta: um servidor pode devolver uma página de erro em HTML
+    # com status 200, e aí gravaríamos o HTML por cima da planilha original — que é a nossa
+    # única fonte de verdade, guardada justamente para nunca precisar baixar de novo.
+    # Um .xlsx é um arquivo zip: começa com 'PK'.
+    if resp.content[:2] != b'PK':
+        raise RuntimeError(
+            f'O que veio da Prefeitura não é uma planilha (começa com {resp.content[:16]!r}). '
+            f'A planilha guardada em {destino} NÃO foi tocada.')
+    if len(resp.content) < 1_000_000:
+        raise RuntimeError(
+            f'A planilha veio pequena demais ({len(resp.content)/1024:.0f} KB) — as do ITBI '
+            f'passam de 15 MB. A planilha guardada em {destino} NÃO foi tocada.')
+
+    # Guarda a anterior até o novo estar gravado: se o disco encher no meio da escrita,
+    # não ficamos sem nenhuma das duas.
+    if os.path.exists(destino):
+        shutil.copy2(destino, destino + '.anterior')
     with open(destino, 'wb') as f:
         f.write(resp.content)
     print(f'  arquivado em {destino} ({len(resp.content)/1048576:.0f} MB)')
@@ -138,8 +163,18 @@ def main():
     t0 = time.time()
 
     # ─── 1. Baixar e arquivar a planilha do ano ──────────────────────────────
-    print('1. Baixando a planilha da Prefeitura')
-    caminho = baixar_planilha(args.ano)
+    # No modo ensaio NÃO baixa: "não escreve nada" tem de valer também para a pasta das
+    # planilhas originais, que é a nossa fonte de verdade. Antes o ensaio sobrescrevia a
+    # planilha no passo 1 e só parava no passo 3 (achado da auditoria de 07/08/2026).
+    if args.ensaio:
+        caminho = os.path.join(PLAN_DIR, f'{args.ano}.xlsx')
+        print(f'1. (ensaio) NÃO baixando — usando a planilha já arquivada: {caminho}')
+        if not os.path.exists(caminho):
+            print('   ✗ ela não existe. Rode sem --ensaio para baixar.')
+            sys.exit(1)
+    else:
+        print('1. Baixando a planilha da Prefeitura')
+        caminho = baixar_planilha(args.ano)
 
     # ─── 2. Ler com o MESMO leitor da reconstrução ───────────────────────────
     print('\n2. Lendo a planilha (mesmo leitor da base)')
@@ -195,11 +230,11 @@ def main():
     # ─── 5. Republicar o arquivo do ACM (recorte residencial, 2019+) ────────
     # Isto NÃO existia antes: o arquivo ficava parado até alguém subir à mão.
     print('\n5. Republicando o arquivo do ACM')
-    publicar_arquivo_acm(key)
+    acm_ok = publicar_arquivo_acm(key)
 
     # ─── 6. Boletim no caderno de bordo (L-21) ──────────────────────────────
     print('\n6. Gravando o boletim')
-    aviso = montar_aviso(novas, nao_lidas)
+    aviso = montar_aviso(novas, nao_lidas, acm_ok)
     gravar_boletim(H, args.ano, lidas, entendidas, novas, depois, contas, aviso)
 
     print(f'\n✅ Terminado em {time.time()-t0:.0f}s')
@@ -207,8 +242,13 @@ def main():
     conn.close()
 
 
-def montar_aviso(novas, nao_lidas):
-    """A mensagem que chega ao Alex. Desde a L-21 ela diz também o que ficou DE FORA."""
+def montar_aviso(novas, nao_lidas, acm_ok=True):
+    """A mensagem que chega ao Alex. Desde a L-21 ela diz também o que ficou DE FORA.
+
+    O `acm_ok` entrou em 07/08/2026, pela auditoria: quando o arquivo do ACM não era
+    publicado, o programa imprimia "PULADO" no terminal e o aviso ao Alex continuava
+    dizendo só "atualizado, N vendas novas". Ou seja, a mesma doença que a L-21 conserta
+    no dado estava viva no arquivo — falha que não reclama."""
     if novas == 0:
         base = 'Banco ITBI conferido — sem vendas novas este mês.'
     else:
@@ -216,6 +256,9 @@ def montar_aviso(novas, nao_lidas):
     if nao_lidas:
         nomes = ', '.join(c.nome for c in nao_lidas)
         base += f' Atenção: parte da planilha não pôde ser lida ({nomes}) e ficou de fora.'
+    if not acm_ok:
+        base += (' ATENÇÃO: o arquivo que o ACM usa NÃO foi atualizado — o ACM segue com '
+                 'o dado do mês passado. Precisa olhar numa sessão DEV.')
     return base
 
 
@@ -230,13 +273,13 @@ def publicar_arquivo_acm(key):
     # não: o ACM precisa da base INTEIRA, não só do mês. Baixa a base do Supabase por
     # páginas seria demorado — então o arquivo é regerado a partir do banco completo
     # local quando ele existe, e senão é pulado com aviso claro.
-    completo = os.path.join(tempfile.gettempdir(), 'itbi_completo_atual.db')
+    completo = BANCO_LOCAL
     if not os.path.exists(completo):
-        print('   ⚠ PULADO: não há banco completo local para gerar o recorte.')
-        print('     O arquivo do ACM continua com o conteúdo da última publicação.')
-        print('     Para regerar: python3 reconstruir_banco_v2.py --anos 2006-2026 --saida '
-              + completo)
-        return
+        print('   ✗ NÃO PUBLIQUEI o arquivo do ACM: falta o banco completo local.')
+        print(f'     Esperado em: {completo}')
+        print('     Para refazer (leva ~9 min): python3 reconstruir_banco_v2.py '
+              f'--anos 2006-2026 --saida {completo}')
+        return False
     src = sqlite3.connect(completo)
     dst = sqlite3.connect(origem)
     dst.execute('PRAGMA page_size=8192')
@@ -268,8 +311,9 @@ def publicar_arquivo_acm(key):
             data=f, timeout=900)
     if r.status_code >= 300:
         print(f'   ✗ Falhou ao publicar: {r.status_code} {r.text[:200]}')
-        return
+        return False
     print(f'   ✓ {n:,} vendas · {tam/1048576:.1f} MB publicados no cofre')
+    return True
 
 
 def gravar_boletim(H, ano, lidas, entendidas, novas, total, contas, aviso):
