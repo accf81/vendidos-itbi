@@ -6,3 +6,11 @@ ITBI_SP_residencial_backup_*.db.gz
 # Documentos internos da esteira (requisitos, arquitetura, QA) — este repositório é PÚBLICO.
 # Adicionado em 01/08/2026 para impedir que planejamento interno vá parar no site.
 Esteira/
+
+# Trava de publicação (07/08/2026): a ficha da etapa e a porta são LOCAIS,
+# nunca publicadas. A ficha diz o que é desta etapa; a porta tem o caminho
+# da máquina do Alex.
+.trava/
+publicar.command
+publicar.command.antes-da-trava
+deploy_github.command.antes-da-trava
