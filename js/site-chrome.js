@@ -4,8 +4,29 @@
 // Editar aqui muda em todas as páginas de uma vez.
 // ══════════════════════════════════════════════════════════════════
 
+// ─── DOIS BANCOS, DE PROPÓSITO — não unifique estas constantes ──────────────
+//
+// Desde 07/08/2026 o site fala com DOIS projetos diferentes:
+//
+//   SUPABASE_*  → projeto ANTIGO (Alex OS). É onde vive a tabela `leads_vendidos`,
+//                 que guarda quem preenche o formulário do site. NÃO foi migrada.
+//   ITBI_*      → projeto NOVO (Pandora OS). É onde vive a base de vendas do ITBI,
+//                 agora com 2,66 milhões de transações de 2006 a 2026.
+//
+// ARMADILHA QUE ISSO EVITA: trocar um endereço só, achando que é "o banco do site",
+// faz o formulário de contato parar de salvar **em silêncio** — o visitante preenche,
+// vê "enviado", e o lead se perde. `leads_vendidos` não existe no projeto novo
+// (conferido em 07/08/2026). Se um dia ela for migrada, aí sim as duas viram uma.
 const SUPABASE_URL = 'https://sobmjqounukzbplrmhkr.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_o5fTXnmp8hhp76WymPJ_MQ_MuJUhvfY';
+
+// Base de vendas do ITBI — projeto Pandora OS.
+const ITBI_URL = 'https://ijyxkyxovhvifrtfnqvs.supabase.co';
+const ITBI_KEY = 'sb_publishable_eZ0rMfbD9H5Qf6w1bUOL9Q_Q371CKPE';
+// A busca lê a JANELA do recorte residencial, nunca a tabela cheia: a base guarda
+// todos os tipos de imóvel (loja, terreno, galpão) e o site mostra só residencial,
+// como sempre mostrou. Trocar isto por `vendas_itbi` faz comercial aparecer na tela.
+const ITBI_TABELA_SITE = 'vendas_itbi_residencial';
 async function saveLead(payload) {
   try {
     const res = await fetch(SUPABASE_URL + '/rest/v1/leads_vendidos', {

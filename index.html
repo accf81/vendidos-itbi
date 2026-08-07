@@ -382,7 +382,9 @@ initSiteChrome('inicio', '');
 // ══════════════════════════════════════════════════════════════════
 // MOTOR DE BUSCA — consulta o Supabase direto, sem baixar banco nenhum
 // ══════════════════════════════════════════════════════════════════
-const SB_HEADERS = { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' };
+// Cabeçalhos da base de VENDAS (projeto Pandora OS). Os leads usam SUPABASE_* e
+// continuam no projeto antigo — ver a nota em js/site-chrome.js.
+const SB_HEADERS = { apikey: ITBI_KEY, Authorization: 'Bearer ' + ITBI_KEY, 'Content-Type': 'application/json' };
 let cardCount = 0;
 let filteredResults = [];
 let acDebounce = {};
@@ -391,7 +393,7 @@ addAddressCard();
 
 async function sbRpc(fn, body) {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(body) });
+    const res = await fetch(`${ITBI_URL}/rest/v1/rpc/${fn}`, { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(body) });
     if (!res.ok) return [];
     return await res.json();
   } catch (e) { console.warn('Erro na busca:', e.message); return []; }
@@ -644,15 +646,44 @@ async function doSearch() {
   });
   if (addresses.length === 0) { showSearchMessage('Digite pelo menos um endereço (a rua) para buscar.'); return; }
 
-  const orGroups = addresses.map(a => {
+  // ─── BUSCA EM DUAS PARADAS (07/08/2026) ───────────────────────────────────
+  // ANTES: procurava o texto digitado dentro da tabela de vendas inteira
+  // (`logradouro_norm.ilike.*termo*`). Com 795 mil linhas aguentava; com 2,66
+  // milhões, quem digitasse só "rua" pedia uma varredura da base toda, ordenada
+  // por data — resposta lenta ou tempo esgotado.
+  //
+  // AGORA: duas paradas.
+  //   1ª) acha quais ruas casam com o texto, na LISTA DE RUAS (~32 mil linhas,
+  //       com índice de texto) — instantâneo;
+  //   2ª) busca as vendas DESSAS ruas por igualdade exata, que usa índice.
+  //
+  // O limite de ruas é 200 (a função aceita até isso). O autopreencher continua
+  // pedindo 15, o padrão — por isso ele não mudou de comportamento.
+  const LIMITE_RUAS_BUSCA = 200;
+  const orGroups = [];
+  let termoLargoDemais = false;
+  for (const a of addresses) {
     // normaliza e remove qualquer caractere que quebre a sintaxe do filtro (vírgula,
     // parênteses, asterisco, ponto) — rua não tem esses caracteres na base
     const normalized = normalizeLogradouro(a.rua).replace(/[(),*.]/g, ' ').replace(/\s+/g, ' ').trim();
-    const parts = [`logradouro_norm.ilike.*${normalized}*`];
+    const ruas = await sbRpc('buscar_ruas_itbi', { termo: normalized, lim: LIMITE_RUAS_BUSCA });
+    if (ruas.length >= LIMITE_RUAS_BUSCA) { termoLargoDemais = true; break; }
+    if (!ruas.length) continue;   // nenhuma rua com esse nome: este endereço não entra
+    // aspas duplas: nome de rua tem espaço, e o filtro exige o valor entre aspas
+    const lista = ruas.map(r => `"${r.logradouro_norm}"`).join(',');
+    const parts = [`logradouro_norm.in.(${lista})`];
     const num = (a.num || '').replace(/\D/g, '');   // número: só dígitos
     if (num) parts.push(`numero.eq.${num}`);
-    return `and(${parts.join(',')})`;
-  });
+    orGroups.push(`and(${parts.join(',')})`);
+  }
+  if (termoLargoDemais) {
+    showSearchMessage('Esse trecho aparece em ruas demais. Digite um pouco mais do nome da rua.');
+    return;
+  }
+  if (orGroups.length === 0) {
+    showSearchMessage('Não encontramos nenhuma rua com esse nome. Confira a grafia e tente de novo.');
+    return;
+  }
   const params = new URLSearchParams({
     select: 'data_transacao,logradouro,logradouro_norm,numero,complemento,bairro,referencia,area_construida_m2,valor_transacao,valor_m2',
     or: `(${orGroups.join(',')})`,
@@ -662,7 +693,7 @@ async function doSearch() {
 
   setSearchLoading(true);
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/vendas_itbi?${params}`, { headers: SB_HEADERS });
+    const res = await fetch(`${ITBI_URL}/rest/v1/${ITBI_TABELA_SITE}?${params}`, { headers: SB_HEADERS });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     filteredResults = await res.json();
   } catch (e) {
