@@ -95,6 +95,30 @@ def enviar_lote(url, headers, dados, tentativas=5):
             time.sleep(4 * (t + 1))
 
 
+def contar(H):
+    """Total de linhas na base.
+
+    Duas formas foram testadas em 07/08/2026, nesta tabela de 2,66 milhões de linhas:
+
+      1. `select=count` (agregado)  — devolveu 500 sob carga. O agregado varre a tabela
+         inteira e estoura o tempo limite quando o banco está ocupado. Instável nesta
+         escala, por isso NÃO é usada aqui.
+      2. `limit=1` + `Prefer: count=exact`, lendo o cabeçalho `content-range` — devolve
+         `0-0/2663725`. É a forma canônica do PostgREST e a que se usa.
+
+    Cuidado que motivou este comentário: a primeira versão desta função quebrou DEPOIS do
+    envio já ter dado certo. Contador que falha no fim faz uma rodada bem-sucedida parecer
+    falha — e o passo seguinte (publicar o arquivo do ACM) deixa de acontecer."""
+    r = requests.get(f'{BASE}/rest/v1/vendas_itbi?select=id&limit=1',
+                     headers={**H, 'Prefer': 'count=exact'}, timeout=180)
+    r.raise_for_status()
+    faixa = r.headers.get('content-range', '')
+    total = faixa.split('/')[-1] if '/' in faixa else ''
+    if not total.isdigit():
+        raise RuntimeError(f'Não consegui contar as linhas da base (content-range: {faixa!r}).')
+    return int(total)
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument('--ano', type=int, default=ANO)
@@ -148,8 +172,7 @@ def main():
 
     # ─── 3. Enviar ao banco (o banco ignora o que já tem) ────────────────────
     print('\n3. Enviando ao banco (repetido é ignorado pela impressão digital)')
-    antes = requests.get(f'{BASE}/rest/v1/vendas_itbi?select=count', headers={**H, 'Prefer': 'count=exact'},
-                         timeout=60).headers.get('content-range', '/?').split('/')[-1]
+    antes = contar(H)
     url = f'{BASE}/rest/v1/vendas_itbi?on_conflict=chave_dedup'
     hh = {**H, 'Prefer': 'return=minimal,resolution=ignore-duplicates'}
     cur = conn.execute(f"select {','.join(leitor.COLS_BANCO)} from vendas")
@@ -160,11 +183,9 @@ def main():
             break
         enviar_lote(url, hh, [dict(zip(leitor.COLS_BANCO, l)) for l in linhas])
         enviados += len(linhas)
-    depois = requests.get(f'{BASE}/rest/v1/vendas_itbi?select=count', headers={**H, 'Prefer': 'count=exact'},
-                          timeout=60).headers.get('content-range', '/?').split('/')[-1]
-    novas = int(depois) - int(antes)
-    print(f'   {enviados:,} enviados · base foi de {int(antes):,} para {int(depois):,} '
-          f'({novas:,} novas)')
+    depois = contar(H)
+    novas = depois - antes
+    print(f'   {enviados:,} enviados · base foi de {antes:,} para {depois:,} ({novas:,} novas)')
 
     # ─── 4. Atualizar a lista de ruas do autopreencher ──────────────────────
     print('\n4. Atualizando a lista de ruas')
@@ -179,7 +200,7 @@ def main():
     # ─── 6. Boletim no caderno de bordo (L-21) ──────────────────────────────
     print('\n6. Gravando o boletim')
     aviso = montar_aviso(novas, nao_lidas)
-    gravar_boletim(H, args.ano, lidas, entendidas, novas, int(depois), contas, aviso)
+    gravar_boletim(H, args.ano, lidas, entendidas, novas, depois, contas, aviso)
 
     print(f'\n✅ Terminado em {time.time()-t0:.0f}s')
     print(f'   Aviso para o Alex: "{aviso}"')
