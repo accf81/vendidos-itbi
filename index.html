@@ -684,9 +684,17 @@ async function doSearch() {
     showSearchMessage('Não encontramos nenhuma rua com esse nome. Confira a grafia e tente de novo.');
     return;
   }
+  // Corte de ano (decisão do Alex, 07/08/2026: "vamos manter de 2006 só até agora").
+  // A base tem vendas mais antigas — 5.853 anteriores a 2006, a mais velha de 1994 —
+  // que são vendas declaradas com muito atraso. Elas CONTINUAM no banco (esconder é
+  // reversível, apagar não), mas ficam fora do que o site mostra.
+  // A lista de ruas do autopreencher usa o MESMO corte (migração 038); se os dois
+  // divergirem, o visitante vê uma rua sugerida que devolve busca vazia.
+  const ANO_MIN_SITE = 2006;
   const params = new URLSearchParams({
     select: 'data_transacao,logradouro,logradouro_norm,numero,complemento,bairro,referencia,area_construida_m2,valor_transacao,valor_m2',
     or: `(${orGroups.join(',')})`,
+    ano: `gte.${ANO_MIN_SITE}`,
     order: 'data_transacao.desc',
     limit: String(SEARCH_LIMIT),
   });
