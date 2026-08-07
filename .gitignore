@@ -2,3 +2,7 @@ deploy_github.command
 fix_deploy.command
 ITBI_SP_residencial.db.gz
 ITBI_SP_residencial_backup_*.db.gz
+
+# Documentos internos da esteira (requisitos, arquitetura, QA) — este repositório é PÚBLICO.
+# Adicionado em 01/08/2026 para impedir que planejamento interno vá parar no site.
+Esteira/

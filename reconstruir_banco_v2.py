@@ -468,9 +468,26 @@ def ler_aba(ws, nome_aba, ano_planilha, conta):
         vals['residencial'] = 1 if any(k in uso for k in ab.USOS_RESIDENCIAIS_KW) else 0
         vals['ano_planilha'] = ano_planilha
         vals['aba_origem'] = nome_aba
+        # Impressão digital da declaração. A MATRÍCULA entra na chave desde 06/08/2026
+        # (decisão do Alex), e é a única diferença em relação à chave usada até aqui.
+        #
+        # Por quê: sem ela, duas vagas de garagem do mesmo prédio, vendidas no mesmo dia,
+        # pelo mesmo valor e com o complemento escrito igual viravam UM registro só —
+        # eram imóveis diferentes, e um sumia. Medido nas 21 planilhas: **7.602 vendas**
+        # perdidas assim (0,29% da base), concentradas justamente em vaga e em unidade de
+        # lançamento, que é onde o ACM mais erra. A matrícula é o registro do imóvel no
+        # cartório: matrícula diferente = imóvel diferente.
+        #
+        # O risco que isso abre, e que é menor de propósito: se a Prefeitura republicar
+        # uma declaração com a matrícula corrigida, ela entra duas vezes. Repetição a
+        # gente enxerga e conserta; o que some, ninguém procura.
+        #
+        # ATENÇÃO: `atualizar_banco.py` (a rotina mensal) PRECISA usar exatamente esta
+        # mesma chave. Se as duas divergirem, a rodada do dia 10 reinsere como novidade
+        # o que já está na base. Foi assim que 124 mil revendas se perderam em 2026.
         vals['chave_dedup'] = '\x1f'.join([
             vals['sql'] or '', vals['numero'] or '', vals['complemento'] or '',
-            (data or '')[:19], f'{valor:.2f}',
+            (data or '')[:19], f'{valor:.2f}', vals['matricula'] or '',
         ])
         registros.append(vals)
     return registros
