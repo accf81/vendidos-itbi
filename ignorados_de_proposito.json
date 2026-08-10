@@ -1,0 +1,23 @@
+{
+  "_leia_isto":
+    "A lista do que a carga do ITBI ignora DE PROPÓSITO. Ela morava escondida dentro do reconstruir_banco_v2.py; desde 08/08/2026 mora aqui, é lida ANTES de cada carga e é repetida no boletim. O motivo é a lição L-21: duas abas da planilha de 2024 foram puladas em silêncio e 19.785 vendas ficaram fora do banco por mais de um ano. Aba que não rende nada só é aceita se ESTIVER ESCRITA AQUI; qualquer outra que tenha linhas e não renda nada PARA a rodada.",
+
+  "_como_mexer":
+    "Acrescente uma linha em 'abas' com o começo do nome da aba (sem acento, maiúsculas) e o motivo em uma frase. Tirar uma linha daqui faz a rodada parar na aba correspondente — que é o comportamento certo se ela passar a ter dado de verdade.",
+
+  "abas": [
+    { "comeca_com": "LEGENDA",           "motivo": "aba de legenda da planilha da Prefeitura: explica os códigos, não tem transação nenhuma" },
+    { "comeca_com": "EXPLICACOES",       "motivo": "aba de explicações da Prefeitura sobre como ler a planilha" },
+    { "comeca_com": "TABELA DE USOS",    "motivo": "tabela de apoio: a lista de códigos de uso do IPTU" },
+    { "comeca_com": "TABELA DE PADROES", "motivo": "tabela de apoio: a lista de padrões construtivos do IPTU" }
+  ],
+
+  "descartes_esperados": [
+    { "motivo": "nao_residencial", "explicacao": "o recorte do ACM é residencial; imóvel comercial, terreno e garagem são contados e descartados, com o motivo" },
+    { "motivo": "sem_valor",       "explicacao": "linha sem valor de transação: não dá para calcular preço nenhum" },
+    { "motivo": "valor_absurdo",   "explicacao": "acima de R$ 1 bilhão — é erro de digitação da fonte, não venda" }
+  ],
+
+  "atualizado_em": "2026-08-08",
+  "por": "Trava de publicação, Etapa 3 (R-11)"
+}

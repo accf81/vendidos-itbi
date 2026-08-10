@@ -33,6 +33,7 @@ import requests
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import reconstruir_banco_v2 as leitor
+import trava_itbi
 
 PROJETO = 'ijyxkyxovhvifrtfnqvs'          # Pandora OS — a base definitiva
 BASE = f'https://{PROJETO}.supabase.co'
@@ -133,7 +134,15 @@ def contar(H):
 
     Cuidado que motivou este comentário: a primeira versão desta função quebrou DEPOIS do
     envio já ter dado certo. Contador que falha no fim faz uma rodada bem-sucedida parecer
-    falha — e o passo seguinte (publicar o arquivo do ACM) deixa de acontecer."""
+    falha — e o passo seguinte (publicar o arquivo do ACM) deixa de acontecer.
+
+    ACHADO DE 10/08/2026: mesmo a forma canônica quebrava com 500 logo depois de um envio
+    grande. Causa raiz (confirmada com EXPLAIN ANALYZE): a contagem usa um índice e não
+    devia precisar abrir as vendas uma por uma — mas só consegue esse atalho se o "mapa de
+    visibilidade" do Postgres estiver em dia, e um envio grande deixa ele desatualizado nas
+    páginas recém-escritas. Nesse estado a contagem precisou abrir 325 mil vendas à toa e
+    levou 5,4s; toda consulta tem um limite de 8s, e a soma com a carga do envio estourava
+    esse limite. `limpar_vendas_itbi()` roda antes desta função para evitar isso — ver lá."""
     r = requests.get(f'{BASE}/rest/v1/vendas_itbi?select=id&limit=1',
                      headers={**H, 'Prefer': 'count=exact'}, timeout=180)
     r.raise_for_status()
@@ -142,6 +151,36 @@ def contar(H):
     if not total.isdigit():
         raise RuntimeError(f'Não consegui contar as linhas da base (content-range: {faixa!r}).')
     return int(total)
+
+
+def limpar_vendas_itbi():
+    """Roda a limpeza de rotina do Postgres (VACUUM ANALYZE) na tabela logo após um envio
+    grande, para que a contagem seguinte não precise abrir vendas uma por uma (ver o
+    comentário longo em `contar()`). Não apaga nem muda nenhum dado — só atualiza o
+    índice e o "mapa de visibilidade" internos do banco.
+
+    VACUUM não pode rodar dentro de uma transação, e a API normal do banco (PostgREST)
+    sempre embrulha cada chamada numa transação — por isso não dá para pedir isso pela
+    mesma porta usada para ler/escrever venda. Usa a API de administração do Supabase
+    (o token já existente em SUPABASE_ACCESS_TOKEN, sem precisar de senha nova).
+
+    Falha aqui não é motivo para parar a rodada: na pior das hipóteses a contagem
+    seguinte volta a correr o risco antigo, mas o dado em si não é afetado."""
+    token = secret('SUPABASE_ACCESS_TOKEN')
+    if not token:
+        print('   ⚠ SUPABASE_ACCESS_TOKEN não configurado — pulando a limpeza (a contagem '
+              'a seguir pode voltar a dar erro sob carga).')
+        return False
+    try:
+        r = requests.post(
+            f'https://api.supabase.com/v1/projects/{PROJETO}/database/query',
+            headers={'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'},
+            json={'query': 'vacuum (analyze) vendas_itbi;'}, timeout=120)
+        r.raise_for_status()
+        return True
+    except Exception as e:
+        print(f'   ⚠ não consegui limpar a tabela antes de contar: {e}')
+        return False
 
 
 def main():
@@ -195,14 +234,53 @@ def main():
     for c in nao_lidas:
         print(f'   ⚠ aba NÃO lida: {c.nome} — {c.motivo}')
     if falhas:
-        print(f'\n✗ VETO (lição L-21): {len(falhas)} aba(s) com linhas e nada aproveitado:')
-        for c in falhas:
-            print(f'   - {c.nome}: {c.lidas:,} linhas lidas, 0 entendidas')
-        print('   A rodada PARA aqui. Nada foi escrito. Avise numa sessão DEV.')
+        # O grito SAI DO TERMINAL: esta rotina roda sozinha, de madrugada, e
+        # ninguém está olhando a tela. Agora ela também vira cartão no quadro.
+        trava_itbi.parar_a_rodada(
+            assunto=f'aba-vazia-{args.ano}',
+            titulo=f'ITBI {args.ano}: {len(falhas)} aba(s) com linhas e nada aproveitado',
+            motivos=[f'{c.nome}: {c.lidas:,} linhas lidas, 0 entendidas' for c in falhas],
+            ensaio=args.ensaio)
         sys.exit(1)
 
+    # ── Comparação com a rodada anterior (R-11 da trava) ─────────────────────
+    # O caderno de bordo já guardava os totais de cada rodada; faltava LER a
+    # última e gritar na variação. Parte que encolhe é o sintoma da L-21: a aba
+    # veio quebrada e o leitor pulou, sem erro nenhum. Crescimento nunca para
+    # nada — a planilha da Prefeitura é republicada e cresce.
+    print('\n2b. Comparando com a rodada anterior (caderno de bordo)')
+    origem_do_arquivo = os.path.basename(caminho)
+    try:
+        anterior = trava_itbi.rodada_anterior(BASE, H, 'itbi', origem_do_arquivo)
+    except Exception as e:
+        print(f'   ✗ não consegui ler a rodada anterior: {e}')
+        print('   A rodada PARA aqui: sem a comparação eu não sei se a planilha veio inteira.')
+        print('   (isto é o R-14 da trava: "não consegui conferir" vale como reprovado)')
+        sys.exit(1)
+    gritos = trava_itbi.comparar_com_a_anterior(anterior, contas, origem_do_arquivo)
+    nada_comparado = trava_itbi.sem_comparacao(anterior)
+    if anterior and not nada_comparado:
+        print(f'   rodada anterior deste arquivo: {anterior.get("referencia")} '
+              f'({int(anterior.get("linhas_entendidas_do_arquivo") or 0):,} entendidas em {origem_do_arquivo})')
+    if gritos:
+        trava_itbi.parar_a_rodada(
+            assunto=f'variacao-{args.ano}',
+            titulo=f'ITBI {args.ano}: a planilha encolheu de uma rodada para a outra',
+            motivos=gritos, ensaio=args.ensaio)
+        sys.exit(1)
+    # "Nada comparado" NUNCA vira "OK". São dois desfechos diferentes e cada um
+    # tem a sua frase — foi confundi-los que deixou a rodada de janeiro passar
+    # calada, com o total caindo a zero (05_QA.md §AC.3.2).
+    if nada_comparado:
+        print(f'   {nada_comparado}')
+    else:
+        print('   OK — nenhuma parte sumiu nem encolheu além do limite de '
+              f'{trava_itbi.QUEDA_MAXIMA*100:.0f}%')
+
     if args.ensaio:
-        print('\n(ensaio) Pararia aqui sem escrever. Banco local em: ' + tmp)
+        print('\n' + trava_itbi.texto_dos_ignorados())
+        print(trava_itbi.texto_da_comparacao(anterior, contas, origem_do_arquivo, gritos))
+        print('(ensaio) Pararia aqui sem escrever. Banco local em: ' + tmp)
         return
 
     # ─── 3. Enviar ao banco (o banco ignora o que já tem) ────────────────────
@@ -218,9 +296,19 @@ def main():
             break
         enviar_lote(url, hh, [dict(zip(leitor.COLS_BANCO, l)) for l in linhas])
         enviados += len(linhas)
+    print('   limpando a tabela antes de contar de novo (achado de 10/08/2026)...')
+    limpar_vendas_itbi()
     depois = contar(H)
     novas = depois - antes
     print(f'   {enviados:,} enviados · base foi de {antes:,} para {depois:,} ({novas:,} novas)')
+
+    # ─── 3b. Espelhar as vendas novas na cópia local ─────────────────────────
+    # O passo 5 gera o arquivo do ACM a partir da cópia local, NÃO do banco na nuvem.
+    # Sem este passo a cópia ficava parada: o site ganhava as vendas novas, o ACM era
+    # republicado com o dado do mês anterior e o aviso dizia que deu tudo certo.
+    # É a L-21 se disfarçando de sucesso. (Achado de 08/08/2026, antes da 1ª rodada.)
+    print('\n3b. Espelhando as vendas na cópia local (a que gera o arquivo do ACM)')
+    local_ok = espelhar_no_banco_local(tmp)
 
     # ─── 4. Atualizar a lista de ruas do autopreencher ──────────────────────
     print('\n4. Atualizando a lista de ruas')
@@ -230,12 +318,18 @@ def main():
     # ─── 5. Republicar o arquivo do ACM (recorte residencial, 2019+) ────────
     # Isto NÃO existia antes: o arquivo ficava parado até alguém subir à mão.
     print('\n5. Republicando o arquivo do ACM')
-    acm_ok = publicar_arquivo_acm(key)
+    acm_ok = publicar_arquivo_acm(key) if local_ok else False
+    if not local_ok:
+        print('   ✗ NÃO PUBLIQUEI: a cópia local não recebeu as vendas novas (passo 3b).')
+        print('     Publicar agora subiria dado velho parecendo novo.')
 
     # ─── 6. Boletim no caderno de bordo (L-21) ──────────────────────────────
     print('\n6. Gravando o boletim')
     aviso = montar_aviso(novas, nao_lidas, acm_ok)
-    gravar_boletim(H, args.ano, lidas, entendidas, novas, depois, contas, aviso)
+    gravar_boletim(H, args.ano, lidas, entendidas, novas, depois, contas, aviso,
+                   extras=[trava_itbi.texto_dos_ignorados(),
+                           trava_itbi.texto_da_comparacao(anterior, contas,
+                                                          origem_do_arquivo, gritos)])
 
     print(f'\n✅ Terminado em {time.time()-t0:.0f}s')
     print(f'   Aviso para o Alex: "{aviso}"')
@@ -260,6 +354,57 @@ def montar_aviso(novas, nao_lidas, acm_ok=True):
         base += (' ATENÇÃO: o arquivo que o ACM usa NÃO foi atualizado — o ACM segue com '
                  'o dado do mês passado. Precisa olhar numa sessão DEV.')
     return base
+
+
+def espelhar_no_banco_local(banco_do_mes):
+    """Copia as vendas do mês para a cópia local completa (BANCO_LOCAL).
+
+    Por que existe: o arquivo que o ACM baixa é gerado a partir de BANCO_LOCAL, não do
+    banco na nuvem. Se a cópia não receber as vendas novas, o ACM trabalha com dado velho
+    e ninguém fica sabendo — porque a rodada termina com sucesso em tudo o mais.
+
+    Seguro de repetir: a cópia tem índice único na impressão digital (`idx_dedup`), então
+    `insert or ignore` descarta o que já está lá. Devolve True só se realmente espelhou.
+    """
+    if not os.path.exists(BANCO_LOCAL):
+        print(f'   ✗ a cópia local não existe: {BANCO_LOCAL}')
+        print('     Para refazer (leva ~9 min): python3 reconstruir_banco_v2.py '
+              f'--anos 2006-2026 --saida {BANCO_LOCAL}')
+        return False
+    try:
+        dst = sqlite3.connect(BANCO_LOCAL)
+        # `id` fica DE FORA de propósito. Ele é só o número de ordem interno de cada
+        # banco, e os dois numeram do 1. Copiá-lo faria o `insert or ignore` descartar
+        # a venda por choque de número, não por ser repetida — e como o `ignore` é
+        # calado, a rodada terminaria dizendo "0 novas" com tudo certo na tela.
+        # Pego por teste antes da 1ª rodada; sem ele, o espelho não espelharia nada.
+        cols_dst = [r[1] for r in dst.execute('pragma table_info(vendas)') if r[1] != 'id']
+        src = sqlite3.connect(banco_do_mes)
+        cols_src = [r[1] for r in src.execute('pragma table_info(vendas)')]
+        src.close()
+        # Recusa em vez de escrever torto: se os formatos divergirem, `insert select *`
+        # gravaria valor na coluna errada, em silêncio e sem volta.
+        faltando = [c for c in cols_dst if c not in cols_src]
+        if faltando:
+            print('   ✗ os dois bancos não têm o mesmo formato — não escrevi nada.')
+            print(f'     Falta na leitura do mês: {", ".join(faltando)}')
+            dst.close()
+            return False
+        antes = dst.execute('select count(*) from vendas').fetchone()[0]
+        dst.execute('attach database ? as mes', (banco_do_mes,))
+        lista = ','.join(f'"{c}"' for c in cols_dst)
+        dst.execute(f'insert or ignore into vendas ({lista}) select {lista} from mes.vendas')
+        dst.commit()
+        depois = dst.execute('select count(*) from vendas').fetchone()[0]
+        recente = dst.execute('select max(data_transacao) from vendas').fetchone()[0]
+        dst.execute('detach database mes')
+        dst.close()
+        print(f'   ✓ cópia local foi de {antes:,} para {depois:,} '
+              f'({depois-antes:,} novas) · venda mais recente: {str(recente)[:10]}')
+        return True
+    except Exception as e:
+        print(f'   ✗ não deu para espelhar na cópia local: {e}')
+        return False
 
 
 def publicar_arquivo_acm(key):
@@ -316,7 +461,7 @@ def publicar_arquivo_acm(key):
     return True
 
 
-def gravar_boletim(H, ano, lidas, entendidas, novas, total, contas, aviso):
+def gravar_boletim(H, ano, lidas, entendidas, novas, total, contas, aviso, extras=None):
     """Grava em DOIS lugares: arquivo (sobrevive a falha de rede) e banco (para o mês
     seguinte comparar). Lição L-21: toda importação declara o que NÃO importou."""
     os.makedirs(BOLETINS_DIR, exist_ok=True)
@@ -333,6 +478,11 @@ def gravar_boletim(H, ano, lidas, entendidas, novas, total, contas, aviso):
         estado = 'lida' if c.lida else f'NÃO LIDA — {c.motivo}'
         linhas.append(f'- {c.nome}: {c.lidas:,} lidas · {c.entendidas:,} entendidas · {estado}')
     linhas += ['', f'## Aviso enviado ao Alex', '', f'> {aviso}', '']
+    # A lista do que se ignora de propósito e a comparação com a rodada anterior
+    # entram no boletim SEMPRE, inclusive quando está tudo bem: relatório vazio
+    # reprova, porque silêncio não é sinal de sucesso (CA-29 e lição L-21).
+    for bloco in (extras or []):
+        linhas += ['', bloco]
     with open(caminho, 'w') as f:
         f.write('\n'.join(linhas))
     print(f'   arquivo: {caminho}')

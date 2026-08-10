@@ -23,6 +23,9 @@ Autor: Claude Code (Opus 5) · 06/08/2026
 """
 import sqlite3, sys, os, json, time, urllib.request, urllib.error, argparse
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import trava_itbi
+
 LOTE = 1000          # linhas por requisição
 AMOSTRA = 20         # lotes medidos antes de projetar o tempo total
 
@@ -85,6 +88,8 @@ def main():
                    help='pula as N primeiras linhas (para retomar)')
     p.add_argument('--seguir', action='store_true',
                    help='não para na projeção, mesmo se passar do limite')
+    p.add_argument('--sem-rede', action='store_true',
+                   help='carrega mesmo sem boletim aprovado (você assume)')
     p.add_argument('--max-linhas', type=int, default=0,
                    help='envia no máximo N linhas e para (carga em blocos, para medir o '
                         'disco entre um bloco e outro — ver nota sobre o disco abaixo)')
@@ -110,6 +115,19 @@ def main():
     headers = {'apikey': key, 'Authorization': f'Bearer {key}',
                'Content-Type': 'application/json',
                'Prefer': 'return=minimal,resolution=ignore-duplicates'}
+
+    # ── A REDE (R-11 da trava) ───────────────────────────────────────────────
+    # Este programa era SÓ um carregador: empurrava para o banco o que achasse
+    # no arquivo local, sem conferir nada. Um arquivo gerado por uma rodada que
+    # PAROU seria carregado do mesmo jeito, em silêncio. Agora ele recusa
+    # arquivo sem boletim aprovado.
+    if not args.sem_rede:
+        ok, recado = trava_itbi.conferir_boletim_do_arquivo(args.db)
+        if not ok:
+            print(f'✗ NÃO CARREGUEI: {recado}')
+            print('  Para carregar assim mesmo (e é você assumindo): --sem-rede')
+            sys.exit(1)
+        print(f'Rede    : {recado}')
 
     conn = sqlite3.connect(args.db)
     cur = conn.cursor()
@@ -177,6 +195,16 @@ def main():
                   f'{humano(passado)} corridos, faltam ~{humano(resta)}', flush=True)
 
     conn.close()
+
+    # "Arquivo com linhas, zero enviadas" é FALHA, não resultado. É a L-21 do
+    # lado do carregador: um erro que fizesse o laço não rodar nenhuma vez
+    # terminaria com "0 registros enviados" e código de saída ZERO — sucesso
+    # aparente com o banco intocado.
+    ok, recado = trava_itbi.conferir_o_que_saiu(total, enviados - args.comecar_em)
+    if not ok:
+        print(f'\n✗ {recado}')
+        sys.exit(1)
+
     print(f'\n✅ {enviados:,} registros enviados em {humano(time.time()-t0)}')
     print('   Confira o total no banco antes de dar por encerrado — o número que vale')
     print('   é o que está gravado lá, não o que este programa diz ter mandado.')

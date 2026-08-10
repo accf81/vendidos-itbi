@@ -66,6 +66,7 @@ import openpyxl
 
 import atualizar_banco as ab
 import normalizar_banco as nb
+import trava_itbi
 
 PLAN_DIR = "/Users/accf81/Documents/IA/Claude/Projects/Dados ITBI/planilhas_originais"
 
@@ -120,7 +121,16 @@ TIPO_CAMPO = {c[0]: c[2] for c in CANONICAS}
 POSICAO_CANONICA = {c[0]: i for i, c in enumerate(CANONICAS)}
 
 # Abas que não são de dados — tratadas pelo nome, não são falha.
-ABAS_NAO_DADOS = ['LEGENDA', 'EXPLICACOES', 'TABELA DE USOS', 'TABELA DE PADROES']
+#
+# A LISTA SAIU DE DENTRO DO CÓDIGO em 08/08/2026 (R-11 da trava de publicação).
+# Ela vive agora em `ignorados_de_proposito.json`, é lida ANTES da carga e é
+# repetida no boletim. Motivo: enquanto a lista morava aqui dentro, ninguém
+# conseguia ver o que estava sendo pulado sem abrir o código — e foi
+# exatamente uma aba pulada em silêncio que deixou 19.785 vendas de 2024 fora
+# do banco por mais de um ano (lição L-21).
+#
+# Não existe lista de reserva de propósito: sem o arquivo, a carga PARA.
+ABAS_NAO_DADOS = trava_itbi.prefixos_ignorados()
 
 # Campos sem os quais a linha não foi entendida (o layout não pegou).
 CAMPOS_ESSENCIAIS = ['sql', 'valor_transacao']
@@ -751,6 +761,11 @@ def escrever_boletim(caminho, saida_db, planilhas, segundos, falhas, conn=None):
         else:
             L.append('- nenhum.')
         L.append('')
+
+    # A lista do que se ignora DE PROPÓSITO, repetida aqui (R-11 da trava).
+    # Ela é lida ANTES da carga, de um arquivo à parte; repeti-la no boletim é o
+    # que separa "aba de instruções, combinada" de "aba que sumiu em silêncio".
+    L.append(trava_itbi.texto_dos_ignorados())
 
     L.append('## Veto — aba com linhas e nada aproveitado')
     L.append('')
