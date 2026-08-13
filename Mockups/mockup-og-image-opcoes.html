@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Imagem de compartilhamento (og:image) · B2 refinada</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;600;700;800;900&display=swap');
+* { box-sizing: border-box; margin: 0; }
+body { font-family: 'Montserrat', sans-serif; background: #f0f1f5; color: #1a2744; padding: 40px 20px 80px; }
+.page { max-width: 1000px; margin: 0 auto; }
+h1 { font-weight: 200; font-size: 30px; margin-bottom: 6px; }
+h1 strong { font-weight: 700; }
+.intro { color: #7a7d82; font-size: 14px; line-height: 1.6; margin-bottom: 40px; max-width: 640px; }
+.opt { margin-bottom: 56px; }
+.opt-label { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.opt-num { font-weight: 800; font-size: 13px; color: #ff6600; }
+.opt-title { font-weight: 700; font-size: 17px; }
+.opt-desc { color: #7a7d82; font-size: 13.5px; line-height: 1.6; margin-bottom: 16px; max-width: 640px; }
+
+/* Arte desenhada em 1200x630, mostrada na metade */
+.frame { width: 600px; height: 315px; max-width: 100%; border-radius: 10px; overflow: hidden; box-shadow: 0 10px 30px rgba(26,39,68,.18); }
+.art { width: 1200px; height: 630px; transform: scale(.5); transform-origin: top left; position: relative; overflow: hidden; background: #1a2744; display: flex; flex-direction: column; justify-content: center; padding: 0 80px; }
+@media (max-width: 660px) {
+  .frame { width: 340px; height: 178.5px; }
+  .art { transform: scale(.2833); }
+}
+
+/* Linha 1 — logos alinhados na mesma altura */
+.head-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 42px; }
+.brand { display: flex; align-items: center; gap: 20px; }
+.brand .wordmark { width: 260px; height: auto; display: block; color: #ff6600; }
+.divider { width: 2px; height: 30px; background: rgba(255,255,255,.3); }
+.sub { color: #fff; font-size: 24px; font-weight: 600; }
+.pilar { color: #fff; }
+.pilar svg { height: 38px; width: auto; display: block; }
+
+/* Linha 2 — frase + card */
+.mid { display: flex; align-items: center; gap: 44px; }
+.left { flex: 1; min-width: 0; }
+.headline { font-size: 46px; font-weight: 200; line-height: 1.22; color: #fff; }
+.headline strong { font-weight: 700; color: #ff8533; }
+.card { flex: none; width: 640px; border-radius: 22px; padding: 14px 32px; }
+.row { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 24px 6px; }
+.row:last-child { border-bottom: none !important; }
+.addr { font-size: 27px; font-weight: 600; white-space: nowrap; }
+.meta { font-size: 19px; margin-top: 6px; font-weight: 400; }
+.price { font-size: 34px; font-weight: 800; text-align: right; white-space: nowrap; }
+.m2 { font-size: 19px; font-weight: 700; text-align: right; margin-top: 6px; white-space: nowrap; }
+
+/* Linha 3 — benefícios na largura toda */
+.foot { display: flex; align-items: center; justify-content: space-between; margin-top: 42px; color: #c8d0e8; font-size: 23px; font-weight: 600; }
+.foot .dot { width: 8px; height: 8px; border-radius: 50%; background: #ff6600; }
+
+/* ── Variante A: card translúcido (vidro), padrão do CTA do site ── */
+.card-glass .card { background: rgba(255,255,255,.07); border: 2px solid rgba(255,255,255,.16); }
+.card-glass .row { border-bottom: 2px solid rgba(255,255,255,.10); }
+.card-glass .addr { color: #fff; }
+.card-glass .meta { color: #c8d0e8; }
+.card-glass .price { color: #ff8533; }
+.card-glass .m2 { color: #fff; }
+
+/* ── Variante B: card chapado num navy mais claro ── */
+.card-solid .card { background: #24345a; border: 2px solid #3a4d7d; }
+.card-solid .row { border-bottom: 2px solid rgba(255,255,255,.09); }
+.card-solid .addr { color: #fff; }
+.card-solid .meta { color: #c8d0e8; }
+.card-solid .price { color: #ff8533; }
+.card-solid .m2 { color: #fff; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Imagem de compartilhamento — <strong>B2 refinada</strong></h1>
+  <p class="intro">Ajustes aplicados: logos Pandora e Pilar alinhados na mesma linha no topo, e a faixa "Grátis · sem cadastro · dado da Prefeitura" distribuída na largura toda embaixo. Duas soluções pro card não ficar "gritante": vidro translúcido ou navy mais claro.</p>
+
+  <div class="opt">
+    <div class="opt-label"><span class="opt-num">B2-A</span><span class="opt-title">Card translúcido (efeito vidro)</span></div>
+    <p class="opt-desc">Mesmo tratamento que o site já usa no bloco azul do CTA final — o card é o fundo navy com um véu branco de 7%. Integra tudo numa peça só.</p>
+    <div class="frame"><div class="art card-glass" data-variant></div></div>
+  </div>
+
+  <div class="opt">
+    <div class="opt-label"><span class="opt-num">B2-B</span><span class="opt-title">Card chapado em navy mais claro</span></div>
+    <p class="opt-desc">Um degrau acima do fundo, sem transparência. Um pouco mais de presença que o vidro, ainda longe do branco puro.</p>
+    <div class="frame"><div class="art card-solid" data-variant></div></div>
+  </div>
+</div>
+
+<script>
+const WORDMARK = `<svg class="wordmark" viewBox="0 0 1375.79 376.12" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M356.75,22.3v64.36h19.36V14.48l-19.36,7.82ZM14.48,0l7.86,19.37h331.48l7.82-19.37H14.48ZM353.82,356.71H22.34l-7.86,19.41h347.16l-7.82-19.41ZM19.36,22.3L0,14.44v347.25l19.36-7.86V22.3ZM356.75,289.42v64.4l19.36,7.82v-72.22h-19.36Z"/><path d="M200.09,121.97h-48.95v18.17h48.81c19.05,0,30.65,10.13,30.65,27.54s-11.59,28.03-30.65,28.03h-48.81v67.42h21.54v-49.26h27.41c31.67,0,52.06-16.7,52.06-46.33s-20.39-45.57-52.06-45.57Z"/><path d="M377.49,121.97h-23.9l-54.1,141.15h21.85l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM340.85,210.62l24.16-65.07,23.76,65.07h-47.93Z"/><path d="M593.71,121.97v107.26l-72.58-107.26h-23.59v141.15h20.08v-110.37l74.31,110.37h21.85V121.97h-20.08Z"/><path d="M735.75,121.97h-44.55v141.15h44.55c44.11,0,71.11-30.51,71.11-71.24s-25.94-69.91-71.11-69.91ZM734.86,244.33h-21.99v-103.76h21.99c32.56,0,49.83,19.5,49.83,51.3s-17.41,52.46-49.83,52.46Z"/><path d="M939.98,119.04c-40.91,0-71.86,31.49-71.86,73.29s30.96,73.73,71.86,73.73,71.64-32.11,71.64-73.73-30.78-73.29-71.64-73.29ZM939.98,246.55c-29.94,0-49.43-24.03-49.43-54.23s19.5-53.97,49.43-53.97,49.21,23.63,49.21,53.97-19.5,54.23-49.21,54.23Z"/><path d="M1151.49,206.8c21.41-5.11,34.16-20.65,34.16-40.86,0-28.16-19.5-43.97-51.88-43.97h-52.77v17.99h51.43c19.94,0,31.36,9.1,31.36,25.98s-11.42,25.94-31.36,25.94h-51.43v71.24h21.68v-53.08h25.94l35.18,53.08h25.94l-38.24-56.32Z"/><path d="M1322.13,121.97h-23.9l-53.97,141.15h21.72l13.01-35.04h60.98l12.79,35.04h23.01l-53.65-141.15ZM1285.49,210.62l24.16-65.07,23.9,65.07h-48.06Z"/></svg>`;
+
+// Logo "Parceiro Pilar Homes" (SVG fornecido pelo Alex, recolorido via currentColor)
+const PILAR = `<svg viewBox="0 0 1513.86 273.01" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M367.93.75h25.06c6.41,0,11.52,1.74,15.36,5.23,3.83,3.49,5.75,8.12,5.75,13.9s-1.92,10.41-5.75,13.9c-3.83,3.49-8.95,5.23-15.36,5.23h-16.49v27.7h-8.57V.75ZM401.9,28.26c2.23-2.01,3.34-4.8,3.34-8.38s-1.12-6.39-3.34-8.43c-2.23-2.04-5.29-3.06-9.19-3.06h-16.2v22.89h16.2c3.89,0,6.96-1,9.19-3.01Z"/><path d="M446.83,28.03c-2.11-1.92-4.92-2.87-8.43-2.87-3.27,0-5.97.91-8.1,2.73-2.14,1.82-3.36,4.33-3.67,7.54l-7.44-1.41c.69-4.71,2.81-8.48,6.36-11.31,3.55-2.83,7.83-4.24,12.86-4.24,5.84,0,10.55,1.6,14.13,4.8,3.58,3.2,5.37,7.54,5.37,13v30.43h-7.91v-8.1c-1.38,2.7-3.5,4.85-6.36,6.45-2.86,1.6-6.01,2.4-9.47,2.4-4.71,0-8.56-1.3-11.54-3.91-2.98-2.61-4.47-5.98-4.47-10.13,0-4.52,1.87-8.07,5.61-10.65,3.74-2.57,9.4-4.24,17.01-4.99l9.23-1.04v-.94c0-3.26-1.05-5.86-3.16-7.77ZM428.75,58.74c1.73,1.41,3.94,2.12,6.64,2.12,4.58,0,8.16-1.41,10.74-4.24,2.57-2.83,3.86-6.63,3.86-11.4v-2.26l-9.23,1.04c-4.77.5-8.4,1.55-10.88,3.16-2.48,1.6-3.72,3.66-3.72,6.17,0,2.2.86,4,2.59,5.42Z"/><path d="M492.57,25.91c-4.02,0-7.3,1.93-9.84,5.79s-3.82,9.5-3.82,16.91v18.09h-8.01V19.22h8.01v9.61c1.38-3.01,3.45-5.5,6.22-7.44,2.76-1.95,5.62-2.92,8.57-2.92,2.07,0,3.89.28,5.46.85l-.47,7.73c-1.76-.75-3.8-1.13-6.12-1.13Z"/><path d="M513.3,64.39c-3.58-2.04-6.34-4.91-8.29-8.62-1.95-3.71-2.92-7.98-2.92-12.81s.97-9.11,2.92-12.81c1.95-3.71,4.71-6.58,8.29-8.62,3.58-2.04,7.69-3.06,12.34-3.06,5.53,0,10.16,1.4,13.9,4.19,3.74,2.8,6.04,6.55,6.92,11.26l-7.91,1.6c-.5-2.89-1.92-5.26-4.24-7.11-2.32-1.85-5.15-2.78-8.48-2.78-4.65,0-8.37,1.59-11.16,4.76-2.8,3.17-4.19,7.36-4.19,12.58s1.4,9.41,4.19,12.58c2.79,3.17,6.52,4.76,11.16,4.76,3.39,0,6.23-.88,8.53-2.64,2.29-1.76,3.75-4.21,4.38-7.35l7.82,1.6c-1.01,4.9-3.38,8.71-7.11,11.45-3.74,2.73-8.34,4.1-13.8,4.1-4.65,0-8.76-1.02-12.34-3.06Z"/><path d="M556.59,30.57c1.85-3.74,4.52-6.69,8.01-8.86,3.49-2.17,7.55-3.25,12.2-3.25s8.51.99,11.96,2.97c3.45,1.98,6.11,4.68,7.96,8.1,1.85,3.42,2.78,7.18,2.78,11.26,0,1.32-.06,2.54-.19,3.67h-37.5c.25,4.77,1.77,8.62,4.57,11.54,2.79,2.92,6.33,4.38,10.6,4.38,3.64,0,6.66-.82,9.04-2.45,2.39-1.63,3.92-3.92,4.62-6.88l7.54,1.79c-1.19,4.59-3.66,8.17-7.4,10.74-3.74,2.58-8.34,3.86-13.8,3.86-4.65,0-8.71-1.08-12.2-3.25-3.49-2.17-6.19-5.12-8.1-8.86-1.92-3.74-2.87-7.87-2.87-12.39s.93-8.65,2.78-12.39ZM591.02,37.78c-.38-3.77-1.82-6.81-4.33-9.14-2.51-2.32-5.81-3.49-9.89-3.49-3.71,0-6.85,1.12-9.42,3.34-2.58,2.23-4.27,5.32-5.09,9.28h28.73Z"/><path d="M618.44,0v10.17h-9.23V0h9.23ZM609.77,19.22h8.01v47.48h-8.01V19.22Z"/><path d="M652.45,25.91c-4.02,0-7.3,1.93-9.84,5.79-2.54,3.86-3.82,9.5-3.82,16.91v18.09h-8.01V19.22h8.01v9.61c1.38-3.01,3.45-5.5,6.22-7.44,2.76-1.95,5.62-2.92,8.57-2.92,2.07,0,3.89.28,5.46.85l-.47,7.73c-1.76-.75-3.8-1.13-6.12-1.13Z"/><path d="M673.6,64.3c-3.67-2.1-6.53-5.01-8.57-8.71-2.04-3.71-3.06-7.91-3.06-12.62s1.02-8.92,3.06-12.62c2.04-3.71,4.9-6.61,8.57-8.71,3.67-2.1,7.83-3.16,12.48-3.16s8.81,1.05,12.48,3.16c3.67,2.11,6.55,5.01,8.62,8.71,2.07,3.71,3.11,7.91,3.11,12.62s-1.04,8.92-3.11,12.62c-2.07,3.71-4.95,6.61-8.62,8.71-3.67,2.11-7.84,3.16-12.48,3.16s-8.81-1.05-12.48-3.16ZM697.57,55.44c2.95-3.23,4.43-7.4,4.43-12.48s-1.48-9.25-4.43-12.48c-2.95-3.23-6.78-4.85-11.49-4.85s-8.54,1.62-11.49,4.85c-2.95,3.24-4.43,7.4-4.43,12.48s1.47,9.25,4.43,12.48c2.95,3.24,6.78,4.85,11.49,4.85s8.54-1.62,11.49-4.85Z"/><path d="M77.63.76L0,135.21l77.63,134.46h155.26l77.63-134.46L232.89.76H77.63ZM206.14,252.6L28.15,149.84,231.48,32.45l-25.34,220.15Z"/><path d="M952.96,113.36v156.31h-14.96v-76.15h-87.97v76.15h-14.96V113.36h14.96v66.31h87.97v-66.31h14.96Z"/><path d="M1006.88,264.08c-8.56-4.91-15.26-11.79-20.1-20.66-4.84-8.86-7.25-18.86-7.25-30.04s2.42-21.18,7.25-30.04c4.83-8.86,11.54-15.73,20.1-20.66,8.56-4.91,18.27-7.37,29.14-7.37s20.58,2.5,29.14,7.48c8.56,4.99,15.26,11.88,20.1,20.66,4.83,8.79,7.25,18.76,7.25,29.92s-2.42,21.13-7.25,29.92c-4.84,8.79-11.54,15.67-20.1,20.66-8.56,4.99-18.28,7.48-29.14,7.48s-20.58-2.46-29.14-7.37h0ZM1057.8,252.7c6.32-3.88,11.23-9.23,14.73-16.08,3.5-6.84,5.25-14.59,5.25-23.21s-1.75-16.37-5.25-23.23c-3.5-6.84-8.41-12.2-14.73-16.08-6.33-3.88-13.59-5.81-21.77-5.81s-15.45,1.93-21.77,5.81c-6.33,3.88-11.24,9.19-14.73,15.96-3.5,6.78-5.25,14.55-5.25,23.34s1.75,16.56,5.25,23.33c3.5,6.78,8.41,12.1,14.73,15.96,6.32,3.88,13.59,5.81,21.77,5.81s15.44-1.93,21.77-5.81Z"/><path d="M1118.42,157.13h14.06v23.44c2.68-7.74,6.96-13.88,12.84-18.42,5.88-4.54,13.13-6.81,21.77-6.81,9.67,0,17.94,2.19,24.78,6.59,6.84,4.39,11.16,10.53,12.95,18.42,3.13-7.45,7.89-13.47,14.29-18.09,6.4-4.62,13.62-6.92,21.66-6.92,12.05,0,21.54,3.5,28.47,10.49,6.92,6.99,10.38,16.6,10.38,28.81v75.02h-14.06v-73.24c0-8.48-2.39-15.29-7.15-20.43-4.76-5.14-11.39-7.71-19.87-7.71-10.27,0-18.27,4.21-24,12.62-5.73,8.41-8.59,19.32-8.59,32.71v56.05h-14.06v-73.24c0-8.63-2.34-15.48-7.04-20.54-4.68-5.06-11.28-7.59-19.76-7.59-10.27,0-18.28,4.21-24,12.62-5.73,8.41-8.59,19.32-8.59,32.71v56.05h-14.06v-112.54h0Z"/><path d="M1312.35,183.59c4.54-8.86,10.9-15.78,19.09-20.77,8.19-4.98,17.49-7.48,27.91-7.48s19.17,2.24,27.13,6.7c7.96,4.47,14.18,10.64,18.64,18.53,4.47,7.89,6.7,16.83,6.7,26.8,0,2.83-.15,5.29-.44,7.37h-91.55c0,8.63,1.71,16.27,5.14,22.89,3.42,6.63,8.07,11.77,13.96,15.4,5.88,3.65,12.62,5.47,20.2,5.47,9.67,0,17.68-2.16,24-6.48,6.32-4.32,10.3-10.43,11.95-18.32l13.39,2.68c-2.54,11.16-8.12,19.8-16.75,25.9-8.64,6.11-19.43,9.16-32.38,9.16-10.43,0-19.72-2.49-27.91-7.48-8.19-4.99-14.55-11.9-19.09-20.77-4.55-8.86-6.81-18.79-6.81-29.81s2.26-20.95,6.81-29.81v.02ZM1397.31,201.79c-1.19-9.97-5.14-18.05-11.83-24.23-6.7-6.17-15.4-9.27-26.13-9.27-9.97,0-18.35,2.98-25.12,8.92-6.78,5.96-11.2,14.14-13.29,24.57h76.38Z"/><path d="M1443.19,261.96c-7.67-6.32-12.77-13.95-15.29-22.89l12.51-6.25c2.68,8.04,6.62,14.32,11.83,18.87,5.21,4.55,12.36,6.81,21.44,6.81,7.45,0,13.59-1.93,18.42-5.81,4.83-3.88,7.25-8.49,7.25-13.85,0-4.76-1.34-8.59-4.02-11.51-2.68-2.9-5.96-5.09-9.82-6.58-3.88-1.49-9.23-3.05-16.08-4.68-7.89-1.93-14.26-3.87-19.09-5.81-4.84-1.93-8.97-4.99-12.39-9.15-3.42-4.16-5.14-9.74-5.14-16.75,0-8.94,3.54-16,10.61-21.21,7.07-5.21,16.56-7.81,28.47-7.81,9.53,0,18.01,2.57,25.45,7.71,7.45,5.14,12.28,11.8,14.52,19.99l-12.28,5.58c-1.49-5.95-4.91-10.83-10.27-14.63-5.35-3.8-11.46-5.7-18.32-5.7-7.45,0-13.24,1.38-17.42,4.13-4.17,2.75-6.25,6.74-6.25,11.95,0,3.57,1.15,6.45,3.46,8.59,2.31,2.16,5.14,3.83,8.48,5.02,3.35,1.19,8.07,2.54,14.18,4.01,8.63,2.08,15.63,4.24,20.99,6.48,5.35,2.23,9.94,5.78,13.73,10.61,3.8,4.84,5.7,11.35,5.7,19.54,0,9.82-3.65,17.75-10.94,23.77-7.3,6.03-17.04,9.05-29.25,9.05s-22.82-3.16-30.48-9.49h0Z"/><path d="M448.35,113.58h-80.49v156.08h24.08v-58.42h56.41c33.67,0,55.07-18.51,55.07-48.61s-21.85-49.06-55.07-49.06h0ZM447.23,189.61h-55.3v-54.4h55.3c21.62,0,32.11,8.7,32.11,27.21s-10.7,27.21-32.11,27.21h0Z"/><rect x="516.09" y="151.49" width="22.96" height="118.18"/><rect x="514.52" y="106.89" width="25.19" height="24.08"/><rect x="560.37" y="106.89" width="22.96" height="162.78"/><path d="M657.12,148.14c-14.94,0-27.65,3.79-37.9,11.15-10.48,7.36-16.72,17.39-18.95,29.66l21.85,4.68c3.34-16.05,16.5-25.86,35.23-25.86,16.28,0,26.98,6.47,26.98,16.5,0,8.03-8.03,12.27-32.11,16.05-37.46,5.57-51.96,16.28-51.96,37.46s16.72,35.23,43.7,35.23c18.51,0,34.79-6.68,42.59-17.61h.44v14.27h21.62v-80.49c0-25.19-20.07-41.03-51.51-41.03h.01ZM686.11,227.53c0,13.6-17.84,25.42-37.9,25.42-17.61,0-25.42-4.91-25.42-15.84,0-9.81,9.37-15.17,33.45-19.4,18.72-3.34,26.53-6.47,29.43-11.82h.44v21.62h0Z"/><path d="M783.17,149.48c-12.71,0-23.86,5.13-31.66,13.38h-.44v-11.37h-21.62v118.18h22.96v-64.88c0-21.62,10.93-33.67,28.09-33.67,5.57,0,9.37.67,16.5,2.46l4.9-21.41c-6.68-1.78-12.94-2.67-18.72-2.67h0Z"/></svg>`;
+
+const CONTENT = `
+  <div class="head-row">
+    <div class="brand">${WORDMARK}<div class="divider"></div><span class="sub">Data SP</span></div>
+    <div class="pilar">${PILAR}</div>
+  </div>
+  <div class="mid">
+    <div class="left">
+      <div class="headline">Por quanto os imóveis <strong>realmente venderam</strong> em São Paulo</div>
+    </div>
+    <div class="card">
+      <div class="row">
+        <div><div class="addr">Alameda Lorena, 1052</div><div class="meta">94 m² · Jardim Paulista</div></div>
+        <div><div class="price">R$ 1.480.000</div><div class="m2">R$ 15.744/m² · Mai/2026</div></div>
+      </div>
+      <div class="row">
+        <div><div class="addr">Alameda Lorena, 1052</div><div class="meta">94 m² · Jardim Paulista</div></div>
+        <div><div class="price">R$ 1.390.000</div><div class="m2">R$ 14.787/m² · Nov/2025</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot">
+    <span>Grátis</span><span class="dot"></span><span>Sem cadastro</span><span class="dot"></span><span>Dado oficial da Prefeitura</span>
+  </div>`;
+
+document.querySelectorAll('[data-variant]').forEach(el => { el.innerHTML = CONTENT; });
+</script>
+</body>
+</html>

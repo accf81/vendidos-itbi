@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — CTA final pra artigo de comprador</title>
+<link rel="stylesheet" href="../css/design-tokens.css">
+<link rel="stylesheet" href="../css/site-base.css">
+<style>
+  body { padding: 40px 20px; }
+  .wrap { max-width: 1040px; margin: 0 auto; }
+  .label { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 12px; }
+  .compare-block { margin-bottom: 56px; }
+
+  .cta-final { background: var(--brand-navy); color: #fff; border-radius: var(--radius-xl); padding: 40px; display: grid; grid-template-columns: 1.15fr 1fr; gap: 40px; align-items: center; }
+  @media (max-width: 780px) { .cta-final { grid-template-columns: 1fr; padding: 26px 20px; } }
+  .cta-final h2 { font-size: clamp(22px, 3vw, 29px); font-weight: 200; color: #fff; margin: 0 0 14px; line-height: 1.22; }
+  .cta-final h2 strong { font-weight: 700; color: var(--brand-orange-light); }
+  .cta-intro { color: var(--brand-navy-pale); font-size: 14.5px; line-height: 1.65; margin: 0 0 20px; }
+  .cta-points { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+  .cta-points li { display: flex; gap: 12px; align-items: flex-start; }
+  .cta-points .icon { flex: none; width: 18px; height: 18px; color: var(--brand-orange-light); margin-top: 2px; }
+  .cta-points span { font-size: 13.5px; color: var(--brand-navy-pale); line-height: 1.5; }
+  .lead-form { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: var(--radius-lg); padding: 22px; }
+  .lead-form label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--brand-navy-pale); margin: 0 0 6px; }
+  .lead-form .f { margin-bottom: 14px; }
+  .lead-form input, .lead-form select { width: 100%; padding: 12px 13px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,.2); background: rgba(255,255,255,.05); color: #fff; font-size: 14px; box-sizing: border-box; }
+  .lead-form input::placeholder { color: rgba(255,255,255,.4); }
+  .lead-form button { width: 100%; padding: 14px; border: none; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: var(--font-brand); font-weight: 700; font-size: 14.5px; cursor: pointer; margin-top: 4px; }
+  .lead-form .or-line { display: flex; align-items: center; gap: 10px; margin: 16px 0; }
+  .lead-form .or-line .line { flex: 1; height: 1px; background: rgba(255,255,255,.14); }
+  .lead-form .or-line span { font-size: 11px; color: var(--brand-navy-pale); text-transform: uppercase; letter-spacing: .06em; }
+  .btn-outline { display: block; text-align: center; width: 100%; padding: 13px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,.28); color: #fff; font-family: var(--font-brand); font-weight: 700; font-size: 14px; text-decoration: none; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="compare-block">
+    <p class="label">Hoje (único bloco que existe — todo artigo termina assim)</p>
+    <div class="cta-final">
+      <div>
+        <h2>Quanto vale <strong>o seu imóvel</strong> — não a média do edifício.</h2>
+        <p class="cta-intro">O ITBI mostra o que já foi vendido. Uma avaliação completa vai além — e é isso que você recebe ao falar comigo:</p>
+        <ul class="cta-points">
+          <li><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Vendidos de prédios parecidos na sua região — não só o que rolou no seu endereço</span></li>
+          <li><svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>Concorrentes disponíveis no mercado agora — o que está competindo com você</span></li>
+          <li><svg class="icon" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Ajuste pelo que faz seu imóvel único: reforma, andar, vista, estado de conservação</span></li>
+        </ul>
+      </div>
+      <div>
+        <form class="lead-form">
+          <div class="f"><label>Nome</label><input type="text" placeholder="Seu nome"></div>
+          <div class="f"><label>WhatsApp</label><input type="text" placeholder="(11) 90000-0000"></div>
+          <div class="f"><label>Endereço do imóvel</label><input type="text" placeholder="Rua e número"></div>
+          <div class="f"><label>Sobre a venda</label><select><option>Já decidi vender</option></select></div>
+          <button type="button">Quero uma avaliação</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-block">
+    <p class="label">Novo — pra artigos de intenção de compra (os 4 marcados [B])</p>
+    <div class="cta-final">
+      <div>
+        <h2>Ainda não achou <strong>o imóvel certo?</strong></h2>
+        <p class="cta-intro">Me conta o que você procura e eu aviso direto no seu WhatsApp quando aparecer algo assim — inclusive imóveis que ainda nem chegaram ao portal:</p>
+        <ul class="cta-points">
+          <li><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span>Acesso a imóveis fora do portal, através da Rede Pilar</span></li>
+          <li><svg class="icon" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg><span>Preço já checado com dado real de ITBI — sem pagar acima do mercado</span></li>
+          <li><svg class="icon" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span>Atendimento direto comigo, sem fila de plantão</span></li>
+        </ul>
+      </div>
+      <div>
+        <form class="lead-form">
+          <div class="f"><label>Nome</label><input type="text" placeholder="Seu nome"></div>
+          <div class="f"><label>WhatsApp</label><input type="text" placeholder="(11) 90000-0000"></div>
+          <div class="f"><label>Bairro de interesse</label><input type="text" placeholder="Ex: Jardins, Itaim Bibi"></div>
+          <div class="f"><label>Faixa de valor (opcional)</label><input type="text" placeholder="Até R$ 1.500.000"></div>
+          <button type="button">Quero receber opções</button>
+        </form>
+        <div class="or-line"><div class="line"></div><span>ou</span><div class="line"></div></div>
+        <a class="btn-outline" href="#">Ver imóveis agora no site da Pandora Homes →</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

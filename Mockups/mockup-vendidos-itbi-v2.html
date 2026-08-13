@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Mockup v2 — Vendidos ITBI</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap');
+    :root {
+      --brand-orange: #ff6600;
+      --brand-orange-dark: #cc5200;
+      --bg: #0e0f12;
+      --surface: #16181d;
+      --surface2: #1c1f25;
+      --surface3: #23272e;
+      --text: #eef0f3;
+      --muted: #8a9099;
+      --border: rgba(255,255,255,.07);
+      --accent: var(--brand-orange);
+      --accent-sel: rgba(255, 102, 0, .09);
+      --edge: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.02) 45%, rgba(255,255,255,.012));
+      --shadow-card: 0 1px 0 rgba(255,255,255,.04) inset, 0 12px 26px -14px rgba(0,0,0,.6);
+      --shadow-btn: 0 1px 0 rgba(255,255,255,.07) inset, 0 2px 5px rgba(0,0,0,.4);
+      --sep-line: rgba(255,255,255,.16);
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-brand: 'Montserrat', sans-serif;
+    }
+    [data-theme="light"] {
+      --bg: #eef0f6;
+      --surface: #ffffff;
+      --surface2: #f5f7fb;
+      --surface3: #e3e7f2;
+      --text: #1a2744;
+      --muted: #6f7a8e;
+      --border: #c8d0e8;
+      --accent-sel: rgba(255, 102, 0, .08);
+      --edge: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.01));
+      --shadow-card: 0 1px 2px rgba(26,39,68,.06), 0 10px 24px -16px rgba(26,39,68,.25);
+      --shadow-btn: 0 1px 1px rgba(26,39,68,.05), 0 1px 3px rgba(26,39,68,.12);
+      --sep-line: rgba(26,39,68,.12);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: var(--font-ui);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .page { min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── TOPBAR (com área segura do iPhone) ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0 24px;
+      padding-top: env(safe-area-inset-top);
+      height: calc(56px + env(safe-area-inset-top));
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+    }
+    .brand {
+      font-family: var(--font-brand);
+      font-size: 20px; font-weight: 700; letter-spacing: -.02em;
+      display: inline-flex; align-items: center; gap: 10px;
+    }
+    .brand em { color: var(--accent); font-style: normal; }
+    .brand svg { width: 20px; height: 20px; stroke: var(--accent); fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .pill {
+      display: inline-flex; align-items: center; padding: 8px 10px;
+      border-radius: 999px; background: var(--accent-sel); color: var(--accent);
+      font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em;
+    }
+    .theme-toggle {
+      width: 34px; height: 34px; border-radius: 8px;
+      border: 1px solid var(--border); background: var(--surface2);
+      display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text);
+    }
+    .theme-toggle svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+    .content { padding: 20px 24px 24px; display: grid; gap: 16px; width: 100%; }
+    .card {
+      background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--edge) border-box;
+      border: 1px solid transparent; border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card); padding: 18px 20px;
+    }
+    .hero { margin-bottom: 16px; }
+    .hero h1 { font-size: 22px; font-weight: 700; margin: 0; }
+
+    /* ── LINHAS DE BUSCA (numeradas + x) ── */
+    .addr-list { display: flex; flex-direction: column; gap: 12px; }
+    .addr-row {
+      display: grid;
+      grid-template-columns: 24px minmax(0,1fr) 118px 36px;
+      gap: 10px; align-items: center;
+    }
+    .addr-num { font-family: var(--font-brand); font-weight: 800; color: var(--accent); text-align: right; font-size: 15px; }
+    input {
+      width: 100%; padding: 11px 12px; border-radius: var(--radius-md);
+      border: 1px solid var(--border); background: var(--surface2); color: var(--text);
+      font-size: 14px; font-family: inherit;
+    }
+    input:focus { outline: none; border-color: var(--accent); }
+    input::placeholder { color: var(--muted); }
+    .btn-x {
+      width: 36px; height: 36px; border-radius: var(--radius-md);
+      border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+      cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 18px; line-height: 1;
+    }
+    .btn-x:hover { color: var(--accent); border-color: var(--accent); }
+    .add-link {
+      color: var(--accent); font-weight: 700; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-size: 14px;
+      background: none; border: none; padding: 0;
+    }
+    .actions-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+    .btn {
+      border: 1px solid transparent; border-radius: var(--radius-md);
+      padding: 11px 16px; font-weight: 700; cursor: pointer;
+      box-shadow: var(--shadow-btn); background: var(--accent); color: white;
+      display: inline-flex; align-items: center; gap: 8px; font-size: 14px;
+    }
+    .btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .btn.secondary { background: var(--surface2); color: var(--text); border-color: var(--border); box-shadow: none; }
+
+    /* ── KPIs ── */
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+    .kpi { padding: 14px 16px; border-radius: var(--radius-lg); background: var(--surface2); border: 1px solid var(--border); }
+    .kpi .num { font-size: 22px; font-weight: 800; }
+    .kpi .num.accent { color: var(--accent); }
+    .kpi .lbl { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; }
+
+    /* ── TABELA DE RESULTADOS (todas as colunas + separadores) ── */
+    /* tabela de verdade com bordas unidas → linha vertical contínua e alinhada
+       do cabeçalho até a última linha (mesmo modelo que permite ajustar a largura) */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-lg); -webkit-overflow-scrolling: touch; border: 1px solid var(--border); }
+    table.results { border-collapse: collapse; width: 100%; min-width: 1220px; background: var(--surface); }
+    table.results th, table.results td {
+      padding: 10px 12px; text-align: left; white-space: nowrap;
+      border-right: 2px solid var(--sep-line);
+    }
+    table.results th:last-child, table.results td:last-child { border-right: none; }
+    table.results thead th {
+      background: var(--surface2); font-size: 11px; font-weight: 800;
+      text-transform: uppercase; letter-spacing: .08em; color: var(--muted);
+      border-bottom: 1px solid var(--sep-line);
+    }
+    table.results tbody td { font-size: 13px; border-top: 1px solid var(--border); }
+    .accent { color: var(--accent); font-weight: 700; }
+    .muted { color: var(--muted); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+      .content { padding: 16px; }
+      .topbar { padding-left: 16px; padding-right: 16px; }
+    }
+    @media (max-width: 640px) {
+      .addr-row { grid-template-columns: 20px minmax(0,1fr) 84px 34px; gap: 8px; }
+      .btn-x { width: 34px; height: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-3v-6H8v6H5a1 1 0 0 1-1-1z"></path>
+        </svg>
+        Pandora <em>Vendidos</em>
+      </div>
+      <div class="topbar-actions">
+        <div class="pill">ITBI SP</div>
+        <button class="theme-toggle" id="themeBtn" title="Alternar tema" type="button" onclick="toggleTheme()">
+          <svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true"></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- BUSCA -->
+      <div class="card">
+        <div class="hero">
+          <h1>Busca por endereço</h1>
+        </div>
+        <div class="addr-list" id="addrList"></div>
+        <button class="add-link" onclick="addRow()">+ Adicionar endereço</button>
+        <div class="actions-row">
+          <button class="btn secondary" onclick="clearRows()">
+            <svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            Limpar
+          </button>
+          <button class="btn">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.2-4.2"/></svg>
+            Buscar
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpis">
+        <div class="kpi"><div class="num accent">1.248</div><div class="lbl">Resultados</div></div>
+        <div class="kpi"><div class="num">R$ 1,8M</div><div class="lbl">Ticket médio</div></div>
+        <div class="kpi"><div class="num">14/06/2026</div><div class="lbl">Mais recente</div></div>
+        <div class="kpi"><div class="num">03/01/2020</div><div class="lbl">Mais antiga</div></div>
+      </div>
+
+      <!-- RESULTADOS -->
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div class="table-wrap">
+          <table class="results">
+            <thead>
+              <tr>
+                <th>Data</th><th>Rua</th><th>Nº</th><th>Complemento</th><th>Bairro</th>
+                <th>Edifício</th><th>A.C. (m²)</th><th>Valor</th><th>R$/m²</th>
+                <th>Cartório</th><th>Matrícula</th><th>SQL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>14/06/2026</td><td>Alameda Tietê</td><td>250</td><td class="muted">—</td><td>Jardim América</td>
+                <td>Villa Rica</td><td>145</td><td class="accent">R$ 1.850.000</td><td class="accent">R$ 12.400</td>
+                <td>5º CRI</td><td>123456</td><td>123456789</td>
+              </tr>
+              <tr>
+                <td>10/06/2026</td><td>Rua Augusta</td><td>1000</td><td>AP 12</td><td>Consolação</td>
+                <td>Palazzo</td><td>112</td><td class="accent">R$ 1.320.000</td><td class="accent">R$ 11.800</td>
+                <td>3º CRI</td><td>654321</td><td>987654321</td>
+              </tr>
+              <tr>
+                <td>02/05/2026</td><td>Rua da Consolação</td><td>500</td><td class="muted">—</td><td>Consolação</td>
+                <td>Uirapuru</td><td>89</td><td class="accent">R$ 950.000</td><td class="accent">R$ 10.600</td>
+                <td>7º CRI</td><td>456789</td><td>456789123</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  var ICON_SUN = '<path d="M12 3v2"/><path d="M12 19v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M3 12h2"/><path d="M19 12h2"/><path d="M4.93 19.07l1.41-1.41"/><path d="M17.66 6.34l1.41-1.41"/><circle cx="12" cy="12" r="4"/>';
+  var ICON_MOON = '<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>';
+  function applyThemeIcon() {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.getElementById('themeIcon').innerHTML = dark ? ICON_SUN : ICON_MOON;
+  }
+  function toggleTheme() {
+    var html = document.documentElement;
+    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    applyThemeIcon();
+  }
+
+  function renumber() {
+    var rows = document.querySelectorAll('#addrList .addr-row');
+    rows.forEach(function (r, i) { r.querySelector('.addr-num').textContent = (i + 1) + '.'; });
+  }
+  function addRow() {
+    var list = document.getElementById('addrList');
+    var row = document.createElement('div');
+    row.className = 'addr-row';
+    row.innerHTML =
+      '<span class="addr-num"></span>' +
+      '<input type="text" placeholder="Logradouro (ex: Alameda Tietê)">' +
+      '<input type="text" placeholder="Número">' +
+      '<button class="btn-x" title="Remover" onclick="removeRow(this)">&times;</button>';
+    list.appendChild(row);
+    renumber();
+    row.querySelector('input').focus();
+  }
+  function removeRow(btn) {
+    if (document.querySelectorAll('#addrList .addr-row').length <= 1) return;
+    btn.closest('.addr-row').remove();
+    renumber();
+  }
+  function clearRows() {
+    document.getElementById('addrList').innerHTML = '';
+    addRow(); addRow();
+  }
+
+  applyThemeIcon();
+  addRow(); addRow(); addRow();
+</script>
+</body>
+</html>

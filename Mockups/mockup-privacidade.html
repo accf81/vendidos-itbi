@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Política de Privacidade</title>
+<link rel="stylesheet" href="../css/design-tokens.css">
+<link rel="stylesheet" href="../css/site-base.css">
+<style>
+  h1.hero-title { font-size: clamp(24px, 3.3vw, 38px); font-weight: 200; line-height: 1.2; color: var(--brand-navy); margin: 0 0 16px; }
+  h1.hero-title strong { font-weight: 700; color: var(--text); }
+  .priv-hero { padding: var(--site-py-top) 0 var(--site-py-sm); }
+  .priv-item { display: flex; gap: 18px; padding: 26px 0; border-top: 1px solid var(--border); max-width: 720px; }
+  .priv-item:first-child { border-top: none; }
+  .priv-num { font-family: var(--font-brand); font-weight: 800; font-size: 13px; color: var(--brand-orange); flex: none; width: 26px; padding-top: 2px; }
+  .priv-item h3 { font-family: var(--font-brand); font-size: 17px; font-weight: 700; color: var(--brand-navy); margin: 0 0 8px; }
+  .priv-item p { font-size: 15px; color: var(--muted); line-height: 1.7; margin: 0; }
+  .priv-item a { color: var(--brand-orange); font-weight: 600; }
+  .priv-updated { font-size: 12.5px; color: var(--muted); margin-top: 32px; max-width: 720px; }
+
+  /* pré-visualização da linha nova nos formulários */
+  .mock-form-note { font-size: 11.5px; color: var(--muted); line-height: 1.5; margin-top: 4px; }
+  .mock-form-note a { color: var(--brand-orange); font-weight: 600; }
+  .mock-block { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; max-width: 420px; margin-top: 14px; }
+  .mock-block .btn-fake { display: block; width: 100%; padding: 13px; text-align: center; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: var(--font-brand); font-weight: 700; font-size: 13.5px; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+<main>
+  <section class="priv-hero">
+    <div class="wrap">
+      <h1 class="hero-title">Como cuidamos <strong>dos seus dados.</strong></h1>
+      <p class="hero-sub" style="font-size:16px;color:var(--muted);line-height:1.6;max-width:720px">Política de privacidade do Pandora Data SP — escrita em linguagem simples, sem juridiquês.</p>
+
+      <div style="margin-top:36px">
+        <div class="priv-item">
+          <span class="priv-num">01</span>
+          <div><h3>Quem é responsável pelos seus dados</h3>
+          <p>Alex Fontes, corretor de imóveis (CRECI 205029-F), responsável pela Pandora Homes e por esta ferramenta. Qualquer dúvida, fale direto comigo: <a href="tel:+5511945240721">(11) 94524-0721</a> ou <a href="mailto:alexccfontes@gmail.com">alexccfontes@gmail.com</a>.</p></div>
+        </div>
+        <div class="priv-item">
+          <span class="priv-num">02</span>
+          <div><h3>A busca em si não pede nenhum dado seu</h3>
+          <p>Pesquisar os vendidos de um endereço não exige nome, e-mail nem telefone — é só digitar a rua e ver o resultado. Seus dados só entram no sistema se você preencher um dos formulários: pedir uma avaliação, exportar a planilha, ou pedir pra receber opções de compra.</p></div>
+        </div>
+        <div class="priv-item">
+          <span class="priv-num">03</span>
+          <div><h3>Quais dados coletamos, e por quê</h3>
+          <p>Quando você preenche um formulário, guardamos nome, WhatsApp e, dependendo do formulário, e-mail ou o endereço que te interessa. Usamos isso só por um motivo: entrar em contato sobre o que você pediu. Não vendemos, não compartilhamos com terceiros e não usamos pra nenhuma outra finalidade.</p></div>
+        </div>
+        <div class="priv-item">
+          <span class="priv-num">04</span>
+          <div><h3>Por quanto tempo guardamos</h3>
+          <p>Seus dados ficam guardados até você pedir a remoção, ou até 2 anos sem nenhum contato — o que vier primeiro.</p></div>
+        </div>
+        <div class="priv-item">
+          <span class="priv-num">05</span>
+          <div><h3>Medição de visitas</h3>
+          <p>Usamos o Google Analytics pra entender quantas pessoas visitam o site — são números agregados (quantidade de visitas, de onde vêm), sem identificar quem é quem.</p></div>
+        </div>
+        <div class="priv-item">
+          <span class="priv-num">06</span>
+          <div><h3>Seus direitos</h3>
+          <p>Você pode pedir a qualquer momento pra ver, corrigir ou apagar seus dados. É só chamar no WhatsApp <a href="tel:+5511945240721">(11) 94524-0721</a> ou mandar um e-mail pra <a href="mailto:alexccfontes@gmail.com">alexccfontes@gmail.com</a>.</p></div>
+        </div>
+      </div>
+
+      <p class="priv-updated">Última atualização: 17 de julho de 2026.</p>
+    </div>
+  </section>
+
+  <section class="block alt">
+    <div class="wrap">
+      <h2 class="block-title" style="font-size:22px;font-weight:700;color:var(--brand-navy)">Pré-visualização — linha nova nos 3 formulários</h2>
+      <p style="color:var(--muted);font-size:14px;margin-bottom:20px">Mesma frase nos 3: formulário de avaliação (home + 22 artigos), formulário de "quero comprar" (4 artigos) e modal de exportar planilha. Fica logo abaixo do botão, pequena, sem atrapalhar.</p>
+      <div class="mock-block">
+        <div class="btn-fake">Quero uma avaliação</div>
+        <div class="mock-form-note">Seus dados são usados só pra este contato — nunca compartilhados. <a href="privacidade.html">Veja a política de privacidade</a>.</div>
+      </div>
+    </div>
+  </section>
+</main>
+</div>
+</body>
+</html>

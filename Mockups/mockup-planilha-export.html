@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Planilha de exportação (final)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+* { box-sizing: border-box; margin: 0; }
+body { font-family: 'Montserrat', sans-serif; background: #f0f1f5; color: #1a2744; padding: 40px 20px 80px; }
+.page { max-width: 1080px; margin: 0 auto; }
+h1 { font-weight: 800; font-size: 26px; margin-bottom: 6px; }
+.intro { color: #7a7d82; font-size: 14px; line-height: 1.6; margin-bottom: 36px; max-width: 720px; }
+
+/* Simulação de planilha */
+.sheet { background: #fff; border: 1px solid #d0d3dc; border-radius: 6px; overflow-x: auto; box-shadow: 0 6px 20px rgba(26,39,68,.10); }
+table { border-collapse: collapse; width: 100%; font-size: 12.5px; white-space: nowrap; }
+td, th { border: 1px solid #e2e5ec; padding: 7px 12px; text-align: left; font-weight: 400; }
+.col-margin { width: 26px; background: #fafbfc; border: none; }
+.brandbar td { border: none; padding: 12px; vertical-align: middle; }
+.logo-cell { width: 34px; text-align: left; padding-left: 7px !important; }
+.logo-cell svg { height: 30px; width: auto; color: #ff6600; display: block; }
+.brandbar .t1 { font-weight: 700; font-size: 13.5px; }
+.brandbar .t1 .orange { color: #ff6600; }
+.brandbar .t1 .navy { color: #1a2744; font-weight: 600; }
+.brandbar .t2 { font-weight: 400; font-size: 12px; color: #7a7d82; padding-top: 3px; }
+.rownum { text-align: center; font-weight: 700; color: #9aa0ab; width: 34px; background: #fafbfc; }
+.hdr th { color: #fff; font-weight: 700; font-size: 12px; background: #1a2744; }
+.num { text-align: right; }
+.empty { color: #b8bcc6; text-align: center; }
+.zebra td { background: #f6f7fa; }
+.legend { font-size: 12px; color: #7a7d82; padding: 12px 14px 2px; display: flex; align-items: center; gap: 8px; }
+.legend .dash { font-weight: 800; color: #b8bcc6; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Planilha de exportação — versão final</h1>
+  <p class="intro">Ajustes aplicados: logo do tamanho do bloco de texto (2 linhas ao lado), "Pandora Data SP" em laranja na primeira linha (mesma cor do símbolo), cabeçalho navy, campos sem informação com "—" e legenda explicando embaixo.</p>
+
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+const SYMBOL = `<svg viewBox="0 0 585.31 585.31" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M0,36.63v512.04l48.47-19.64V56.21L0,36.63ZM536.89,56.21v472.83l48.42,19.64V36.63l-48.42,19.58ZM56.27,536.84l-19.64,48.47h512.04l-19.58-48.47H56.27ZM36.63,0l19.64,48.42h472.83L548.68,0H36.63Z"/><path d="M311.64,118.15h-124.49v46.17h124.1c48.47,0,77.87,25.75,77.87,70.07s-29.4,71.19-77.87,71.19h-124.1v171.45h54.81v-125.22h69.68c80.51,0,132.29-42.47,132.29-117.76s-51.78-115.91-132.29-115.91Z"/></svg>`;
+
+const linhas = [
+  ['Mai/2026', 'AL LORENA', '853', 'VG MAT 11832', 'ED IRAPUA', null, 28, 180000, 6428.57],
+  ['Mai/2026', 'AL LORENA', '718', 'AP 1404', null, 'CONDOMINIO ON LORENA', 37, 353158.52, 9545.00],
+  ['Mai/2026', 'AL LORENA', '75', 'APTO N 11', 'JARDIM PAULISTA', null, 187, 1117428, 5976.00],
+  ['Ago/2024', 'AL LORENA', '82', null, null, null, 145, 8518376.65, 58747.43],
+  ['Abr/2026', 'AL LORENA', '1041', 'APTO 11 BL I', 'JARDIM PAULISTA', 'ED PORTAL', 216, 2500000, 11574.07],
+];
+const money = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits:2, maximumFractionDigits:2});
+const cell = v => v == null ? '<td class="empty">—</td>' : `<td>${v}</td>`;
+
+const rows = linhas.map((l, i) => `
+  <tr class="${i % 2 ? 'zebra' : ''}">
+    <td class="col-margin"></td>
+    <td class="rownum">${i + 1}</td>
+    <td>${l[0]}</td><td>${l[1]}</td><td>${l[2]}</td>
+    ${cell(l[3])}${cell(l[4])}${cell(l[5])}
+    <td class="num">${l[6]}</td>
+    <td class="num">${money(l[7])}</td>
+    <td class="num">${money(l[8])}</td>
+  </tr>`).join('');
+
+document.getElementById('sheet').innerHTML = `
+  <table>
+    <tr class="brandbar">
+      <td class="col-margin"></td>
+      <td class="logo-cell">${SYMBOL}</td>
+      <td colspan="9">
+        <div class="t1"><span class="orange">Pandora Data SP</span> — <span class="navy">Alex Fontes · CRECI 205029-F · (11) 94524-0721 · alexccfontes@gmail.com</span></div>
+        <div class="t2">Dados oficiais da Prefeitura de São Paulo (ITBI) · gerado em 16/07/2026</div>
+      </td>
+    </tr>
+    <tr class="hdr">
+      <td class="col-margin"></td>
+      <th></th><th>Data</th><th>Rua</th><th>Número</th><th>Complemento</th><th>Bairro</th><th>Edifício</th><th>Área (m²)</th><th>Valor (R$)</th><th>R$/m²</th>
+    </tr>
+    ${rows}
+  </table>
+  <div class="legend"><span class="dash">—</span> campo não informado pela Prefeitura de São Paulo</div>`;
+</script>
+</body>
+</html>

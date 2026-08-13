@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Resumo estatístico nos resultados (versão final)</title>
+<link rel="stylesheet" href="../css/design-tokens.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+* { box-sizing: border-box; margin: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f1f5; color: var(--brand-navy); padding: 40px 20px 80px; }
+.page { max-width: 620px; margin: 0 auto; }
+h1 { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 24px; margin-bottom: 6px; }
+.intro { color: #7a7d82; font-size: 13.5px; line-height: 1.6; margin-bottom: 28px; max-width: 560px; }
+
+.search-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-xl); box-shadow: var(--shadow-card); padding: 22px; }
+.icon { stroke: currentColor; stroke-width: 1.7; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── stat tiles: ícone maior à direita, do tamanho do bloco de texto ── */
+.stat-tiles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+.stat-tile { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 9px 11px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.stat-tile .txt { min-width: 0; }
+.stat-tile .val { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 16px; color: var(--brand-navy); line-height: 1.2; white-space: nowrap; }
+.stat-tile .lbl { font-size: 10.5px; color: var(--muted); margin-top: 1px; line-height: 1.2; }
+.stat-tile .icon { width: 30px; height: 30px; color: var(--brand-orange); flex: none; }
+/* Celular: número no topo (blocos alinhados entre si) e ícone menor embaixo */
+@media (max-width: 640px) {
+  .stat-tile { padding: 8px 9px; align-items: flex-start; gap: 6px; }
+  .stat-tile .icon { width: 18px; height: 18px; align-self: flex-end; margin-bottom: 1px; }
+  .stat-tile .val { font-size: 15px; }
+}
+@media (max-width: 420px) { .stat-tiles { grid-template-columns: 1fr; } }
+
+/* ── chamada com botão ── */
+.stat-cta { background: var(--accent-pale); border: 1px solid var(--accent-line); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 16px; }
+.stat-cta p { font-size: 13px; color: var(--text); margin: 0 0 12px; line-height: 1.4; text-align: center; }
+.stat-cta p b { color: var(--brand-navy); }
+.stat-cta .btn-cta { display: block; width: 100%; padding: 13px 18px; border: none; border-radius: var(--radius-md); background: var(--accent); color: #fff; font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 13.5px; cursor: pointer; }
+
+.results-source { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+.result-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); margin-bottom: 10px; }
+.result-addr { font-weight: 600; font-size: 14px; }
+.result-meta { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.result-price { font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 16px; color: var(--brand-orange); text-align: right; }
+.result-m2 { font-size: 11.5px; color: var(--brand-navy); font-weight: 700; text-align: right; }
+.result-date { font-size: 13px; font-weight: 700; text-align: right; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Resumo estatístico — versão final</h1>
+  <p class="intro">Ajustes aplicados: blocos menores, ícone maior à direita (do tamanho do bloco de texto ao lado), e chamada com botão "Peça uma avaliação completa do seu imóvel em São Paulo".</p>
+
+  <div class="search-card">
+    <div class="stat-tiles">
+      <div class="stat-tile">
+        <div class="txt"><div class="val">3</div><div class="lbl">vendas encontradas</div></div>
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      </div>
+      <div class="stat-tile">
+        <div class="txt"><div class="val">R$ 15.115</div><div class="lbl">mediana R$/m²</div></div>
+        <svg class="icon" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      </div>
+      <div class="stat-tile">
+        <div class="txt"><div class="val">Mai/2026</div><div class="lbl">última venda</div></div>
+        <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      </div>
+    </div>
+
+    <div class="stat-cta">
+      <p><b>Vendidos no seu edifício.</b> Peça uma avaliação completa do seu imóvel em São Paulo.</p>
+      <button class="btn-cta">Quero uma avaliação</button>
+    </div>
+
+    <div class="results-source">Fonte: Prefeitura de São Paulo (ITBI)</div>
+    <div class="result-row">
+      <div><div class="result-addr">Al. Lorena, 1052</div><div class="result-meta">94 m² · Jardim Paulista</div></div>
+      <div><div class="result-price">R$ 1.480.000</div><div class="result-m2">R$ 15.744/m²</div><div class="result-date">Mai/2026</div></div>
+    </div>
+    <div class="result-row">
+      <div><div class="result-addr">Al. Lorena, 1052</div><div class="result-meta">87 m² · Jardim Paulista</div></div>
+      <div><div class="result-price">R$ 1.315.000</div><div class="result-m2">R$ 15.115/m²</div><div class="result-date">Fev/2026</div></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

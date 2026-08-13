@@ -1,3 +1,6 @@
+# Lixo que o Finder do Mac espalha sozinho (13/08/2026) — nunca é do projeto.
+.DS_Store
+
 deploy_github.command
 fix_deploy.command
 ITBI_SP_residencial.db.gz

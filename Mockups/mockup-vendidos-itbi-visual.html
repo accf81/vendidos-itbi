@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mockup — Vendidos ITBI</title>
+  <style>
+    :root {
+      --brand-orange: #ff6600;
+      --brand-orange-dark: #cc5200;
+      --brand-navy: #1a2744;
+      --bg: #0e0f12;
+      --surface: #16181d;
+      --surface2: #1c1f25;
+      --surface3: #23272e;
+      --text: #eef0f3;
+      --muted: #8a9099;
+      --border: rgba(255,255,255,.07);
+      --accent: var(--brand-orange);
+      --accent-sel: rgba(255, 102, 0, .09);
+      --accent-line: rgba(255, 102, 0, .32);
+      --edge: linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.02) 45%, rgba(255,255,255,.012));
+      --shadow-card: 0 1px 0 rgba(255,255,255,.04) inset, 0 12px 26px -14px rgba(0,0,0,.6);
+      --shadow-btn: 0 1px 0 rgba(255,255,255,.07) inset, 0 2px 5px rgba(0,0,0,.4);
+      --radius-lg: 12px;
+      --radius-md: 8px;
+      --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --font-brand: 'Montserrat', sans-serif;
+    }
+    [data-theme="light"] {
+      --bg: #eef0f6;
+      --surface: #ffffff;
+      --surface2: #eef0f6;
+      --surface3: #e3e7f2;
+      --text: #1a2744;
+      --muted: #7a7d82;
+      --border: #c8d0e8;
+      --accent: var(--brand-orange);
+      --accent-sel: rgba(255, 102, 0, .08);
+      --accent-line: rgba(255, 102, 0, .35);
+      --edge: linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.01));
+      --shadow-card: 0 1px 2px rgba(26,39,68,.06), 0 10px 24px -16px rgba(26,39,68,.25);
+      --shadow-btn: 0 1px 1px rgba(26,39,68,.05), 0 1px 3px rgba(26,39,68,.12);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font-ui);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .topbar {
+      height: 56px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 24px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-card);
+    }
+    .content {
+      padding: 20px 24px 24px;
+      display: grid;
+      gap: 16px;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+    }
+    .card {
+      background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--edge) border-box;
+      border: 1px solid transparent;
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      padding: 18px 20px;
+    }
+    .brand {
+      font-family: var(--font-brand);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand em { color: var(--accent); font-style: normal; }
+    .brand svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .theme-toggle {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text);
+    }
+    .theme-toggle svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: var(--accent-sel);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .hero p {
+      color: var(--muted);
+      margin: 4px 0 0;
+    }
+    .btn {
+      border: 1px solid transparent;
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow-btn);
+      background: var(--accent);
+      color: white;
+    }
+    .btn.secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .search-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .field-inline {
+      display: flex;
+      gap: 10px;
+      align-items: end;
+      margin-top: 10px;
+    }
+    .field-inline:first-of-type {
+      margin-top: 0;
+    }
+    .field-inline .field {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    .field-inline .field-number {
+      flex: 0 0 110px;
+    }
+    label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    input, select {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 14px;
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .actions-row {
+      display: flex;
+      justify-content: flex-start;
+      gap: 10px;
+      margin-top: 8px;
+      flex-wrap: wrap;
+    }
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    .kpi {
+      padding: 14px 16px;
+      border-radius: var(--radius-lg);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+    }
+    .kpi .num { font-size: 24px; font-weight: 800; }
+    .kpi .lbl { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; margin-top: 4px; }
+    .table {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .table-head {
+      display: grid;
+      grid-template-columns: 90px 1.4fr 0.8fr 0.9fr 1fr 1.2fr 0.8fr 1fr 0.9fr 1fr 1fr 1.2fr;
+      background: var(--surface2);
+      padding: 10px 12px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--muted);
+      min-width: 1220px;
+    }
+    .table-row {
+      display: grid;
+      grid-template-columns: 90px 1.4fr 0.8fr 0.9fr 1fr 1.2fr 0.8fr 1fr 0.9fr 1fr 1fr 1.2fr;
+      padding: 12px;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      min-width: 1220px;
+    }
+    .muted { color: var(--muted); }
+    .accent { color: var(--accent); font-weight: 700; }
+    .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius-lg);
+    }
+    .table .table-head > div,
+    .table .table-row > div {
+      border-right: 2px solid rgba(255,255,255,0.16);
+      padding-right: 8px;
+      background-clip: padding-box;
+    }
+    .table .table-head > div:last-child,
+    .table .table-row > div:last-child {
+      border-right: none;
+    }
+    .table .table-head {
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .table .table-row + .table-row {
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .add-link {
+      color: var(--accent);
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    @media (max-width: 900px) {
+      .kpis { grid-template-columns: repeat(2, 1fr); }
+      .content { padding: 16px; }
+      .topbar { padding: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-3v-6H8v6H5a1 1 0 0 1-1-1z"></path>
+        </svg>
+        Pandora <em>Homes</em>
+      </div>
+      <div class="topbar-actions">
+        <div class="pill">ITBI SP</div>
+        <button class="theme-toggle" title="Alternar tema" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v2"></path>
+            <path d="M12 19v2"></path>
+            <path d="M4.93 4.93l1.41 1.41"></path>
+            <path d="M17.66 17.66l1.41 1.41"></path>
+            <path d="M3 12h2"></path>
+            <path d="M19 12h2"></path>
+            <path d="M4.93 19.07l1.41-1.41"></path>
+            <path d="M17.66 6.34l1.41-1.41"></path>
+            <circle cx="12" cy="12" r="4"></circle>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <div class="hero">
+          <div>
+            <h1>Busca por endereço</h1>
+            <p>Interface visualmente alinhada ao Alex OS, preservando o fluxo atual da busca.</p>
+          </div>
+        </div>
+
+        <div class="search-grid">
+          <div>
+            <div class="field-inline">
+              <div class="field field-inline-field" style="flex:1">
+                <label>Logradouro</label>
+                <input value="Alameda Tietê" />
+              </div>
+              <div class="field field-number">
+                <label>Número</label>
+                <input value="250" />
+              </div>
+            </div>
+            <div class="field-inline">
+              <div class="field field-inline-field" style="flex:1">
+                <label>Logradouro</label>
+                <input value="Rua Augusta" />
+              </div>
+              <div class="field field-number">
+                <label>Número</label>
+                <input value="1000" />
+              </div>
+            </div>
+            <div class="field-inline">
+              <div class="field field-inline-field" style="flex:1">
+                <label>Logradouro</label>
+                <input value="Rua da Consolação" />
+              </div>
+              <div class="field field-number">
+                <label>Número</label>
+                <input value="500" />
+              </div>
+            </div>
+            <div class="add-link">+ Adicionar endereço</div>
+            <div class="actions-row">
+              <button class="btn secondary">Limpar</button>
+              <button class="btn">Buscar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="num">1.248</div>
+          <div class="lbl">Resultados</div>
+        </div>
+        <div class="kpi">
+          <div class="num">R$ 1,8M</div>
+          <div class="lbl">Ticket médio</div>
+        </div>
+        <div class="kpi">
+          <div class="num">14/06/2026</div>
+          <div class="lbl">Mais recente</div>
+        </div>
+        <div class="kpi">
+          <div class="num">03/01/2020</div>
+          <div class="lbl">Mais antiga</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <div class="table">
+            <div class="table-head">
+              <div>Data</div>
+              <div>Logradouro</div>
+              <div>Nº</div>
+              <div>Complemento</div>
+              <div>Bairro</div>
+              <div>Edifício</div>
+              <div>A.C. (m²)</div>
+              <div>Valor</div>
+              <div>R$/m²</div>
+              <div>Cartório</div>
+              <div>Matrícula</div>
+              <div>SQL</div>
+            </div>
+            <div class="table-row">
+              <div>14/06/2026</div>
+              <div>Alameda Tietê</div>
+              <div>250</div>
+              <div>—</div>
+              <div>Jardim América</div>
+              <div>Villa Rica</div>
+              <div>145</div>
+              <div class="accent">R$ 1.850.000</div>
+              <div class="accent">R$ 12.400</div>
+              <div>5º CRI</div>
+              <div>123456</div>
+              <div>123456789</div>
+            </div>
+            <div class="table-row">
+              <div>10/06/2026</div>
+              <div>Rua Augusta</div>
+              <div>1000</div>
+              <div>AP 12</div>
+              <div>Consolação</div>
+              <div>Palazzo</div>
+              <div>112</div>
+              <div class="accent">R$ 1.320.000</div>
+              <div class="accent">R$ 11.800</div>
+              <div>3º CRI</div>
+              <div>654321</div>
+              <div>987654321</div>
+            </div>
+            <div class="table-row">
+              <div>02/05/2026</div>
+              <div>Rua da Consolação</div>
+              <div>500</div>
+              <div>—</div>
+              <div>Consolação</div>
+              <div>Uirapuru</div>
+              <div>89</div>
+              <div class="accent">R$ 950.000</div>
+              <div class="accent">R$ 10.600</div>
+              <div>7º CRI</div>
+              <div>456789</div>
+              <div>456789123</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
