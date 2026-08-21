@@ -72,6 +72,16 @@ NORMALIZE_MAP = [
     (r'\bCONS\b',  'CONSELHEIRO'),
     (r'\bMAL\b',   'MARECHAL'),
     (r'\bGEN\b',   'GENERAL'),
+    # 8 abreviações acrescentadas em 21/08/2026, iguais às do atualizar_banco.py.
+    # Já existiam no reconstruir_banco_v2 (EXTRA_NORMALIZE_MAP); faltavam aqui.
+    (r'\bGAL\b',   'GENERAL'),
+    (r'\bSOLD\b',  'SOLDADO'),
+    (r'\bMONS\b',  'MONSENHOR'),
+    (r'\bVISC\b',  'VISCONDE'),
+    (r'\bTTE\b',   'TENENTE'),
+    (r'\bSARG\b',  'SARGENTO'),
+    (r'\bALM\b',   'ALMIRANTE'),
+    (r'\bARQ\b',   'ARQUITETO'),
     (r'\bGOV\b',   'GOVERNADOR'),
     (r'\bPREF\b',  'PREFEITO'),
     (r'\bDEP\b',   'DEPUTADO'),

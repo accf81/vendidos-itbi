@@ -89,6 +89,16 @@ NORMALIZE_MAP = [
     (r'\bCAP\b','CAPITAO'),(r'\bTEN\b','TENENTE'),(r'\bBRIG\b','BRIGADEIRO'),
     (r'\bBR\b','BARAO'),(r'\bVIS\b','VISCONDE'),(r'\bCONS\b','CONSELHEIRO'),
     (r'\bMAL\b','MARECHAL'),(r'\bGEN\b','GENERAL'),(r'\bGOV\b','GOVERNADOR'),
+    # ── 8 abreviações acrescentadas em 21/08/2026 (476 ruas) ───────────────────
+    # Elas já existiam no `reconstruir_banco_v2.py` (EXTRA_NORMALIZE_MAP) e por
+    # isso o banco está consistente. Mas a rodada MENSAL roda este arquivo, não
+    # o v2 — então rua nova com essas abreviações entrava sem expandir, e a busca
+    # falhava só nelas, sem ninguém perceber. Achado testando a função contra o
+    # cadastro do IPTU (sessão "Dados IPTU 20260821").
+    # CON fica de fora de propósito: é ambíguo (Conselheiro ou Cônego).
+    (r'\bGAL\b','GENERAL'),(r'\bSOLD\b','SOLDADO'),(r'\bMONS\b','MONSENHOR'),
+    (r'\bVISC\b','VISCONDE'),(r'\bTTE\b','TENENTE'),(r'\bSARG\b','SARGENTO'),
+    (r'\bALM\b','ALMIRANTE'),(r'\bARQ\b','ARQUITETO'),
     (r'\bPREF\b','PREFEITO'),(r'\bDEP\b','DEPUTADO'),(r'\bSEN\b','SENADOR'),
     (r'\bVER\b','VEREADOR'),(r'\bPRES\b','PRESIDENTE'),(r'\bMIN\b','MINISTRO'),
     (r'\bCOM\b','COMENDADOR'),(r'\bDES\b','DESEMBARGADOR'),(r'\bMAJ\b','MAJOR'),
