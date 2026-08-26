@@ -20,6 +20,23 @@ O arquivo `.trava/etapa.json` (fica nesta pasta, e **nunca é publicado**):
 quais arquivos são desta etapa, e o que na pasta **não é** desta etapa, com o
 motivo. Há um exemplo pronto na pasta do motor.
 
+## Quando há mais de uma sessão trabalhando nesta pasta
+
+Cada sessão escreve a **sua** ficha em `.trava/etapas/<nome>.json` e diz qual
+usar:
+
+    ./publicar.command --ficha <nome>
+
+Sem dizer nome nenhum, a porta usa a `.trava/etapa.json` de sempre, e nada
+muda. **Ela nunca escolhe por você:** se não houver a ficha de sempre, ela
+mostra as fichas vivas que encontrou e espera você dizer qual é a sua.
+
+Ficha viva é a que está **no lugar de ficha viva**: `.trava/etapa.json` ou
+`.trava/etapas/`. Qualquer outro arquivo solto em `.trava/` é papel velho:
+não publica, não decide nada e não vira alarme. Depois de uma publicação que
+saiu, a ficha **nomeada** é guardada em `.trava/publicadas/`, e a tela diz o
+comando de trazê-la de volta. Nada é apagado, nunca.
+
 ## Onde a trava mora
 
 Fora deste repositório, na pasta `_trava/` de `Projects/` — um motor só,
