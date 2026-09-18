@@ -46,7 +46,15 @@ echo ""
 REPO_DIR="$(pwd)"
 # Token lido de ~/.alex-os-secrets — nunca gravado no script nem na config (regra 12.5)
 SECRETS_FILE="$HOME/.alex-os-secrets"
-[ -f "$SECRETS_FILE" ] && source "$SECRETS_FILE"
+# 14/09/2026: le so o ALEX_OS_GH_TOKEN, pelo nome, sem executar o cofre (molde _comandos/_molde/ler-cofre.sh).
+MOLDE_COFRE="$HOME/Documents/IA/Claude/Projects/_comandos/_molde/ler-cofre.sh"
+if [ ! -r "$MOLDE_COFRE" ]; then
+  echo "Nao achei o leitor do cofre ($MOLDE_COFRE). Nada foi enviado."
+  read -p "Pressione Enter para fechar..."
+  exit 1
+fi
+. "$MOLDE_COFRE"
+ler_cofre ALEX_OS_GH_TOKEN "$SECRETS_FILE"
 TOKEN="$ALEX_OS_GH_TOKEN"
 if [ -z "$TOKEN" ]; then echo "❌ Token não configurado em ~/.alex-os-secrets"; read -p "Pressione Enter para fechar..."; exit 1; fi
 
